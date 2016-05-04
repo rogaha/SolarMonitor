@@ -72,3 +72,8 @@ def oauth_redirect():
     """	The redirect URI you provide here is where PG&E will send the Authorization Code once customer authorization is completed and you make a request for the authorization code.
     """
     return render_template('public/oauth.html', page_title='Redirect')
+
+@blueprint.route('/notifications', methods=['GET', 'POST'])
+def notifications():
+    """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
+    return render_template('public/oauth.html', page_title='Notification Bucket')
