@@ -4,8 +4,8 @@ import datetime as dt
 
 from flask_login import UserMixin
 
-from solartender.database import Column, Model, SurrogatePK, db, reference_col, relationship
-from solartender.extensions import bcrypt
+from solarmonitor.database import Column, Model, SurrogatePK, db, reference_col, relationship
+from solarmonitor.extensions import bcrypt
 
 
 class Role(SurrogatePK, Model):

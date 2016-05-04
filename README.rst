@@ -1,5 +1,5 @@
 ===============================
-SolarTender
+SolarMonitor
 ===============================
 
 Energy Data Connectivity
@@ -12,7 +12,7 @@ First, set your app's secret key as an environment variable. For example, exampl
 
 .. code-block:: bash
 
-    export SOLARTENDER_SECRET='something-really-secret'
+    export SOLARMONITOR_SECRET='something-really-secret'
 
 
 Then run the following commands to bootstrap your environment.
@@ -20,8 +20,8 @@ Then run the following commands to bootstrap your environment.
 
 ::
 
-    git clone https://github.com/sktzofrenic/solartender
-    cd solartender
+    git clone https://github.com/sktzofrenic/solarmonitor
+    cd solarmonitor
     pip install -r requirements/dev.txt
     bower install
     python manage.py server
@@ -42,7 +42,7 @@ Once you have installed your DBMS, run the following to create your app's databa
 Deployment
 ----------
 
-In your production environment, make sure the ``SOLARTENDER_ENV`` environment variable is set to ``"prod"``.
+In your production environment, make sure the ``SOLARMONITOR_ENV`` environment variable is set to ``"prod"``.
 
 
 Shell

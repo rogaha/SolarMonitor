@@ -3,11 +3,11 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
 
-from solartender.extensions import login_manager
-from solartender.public.forms import LoginForm
-from solartender.user.forms import RegisterForm
-from solartender.user.models import User
-from solartender.utils import flash_errors
+from solarmonitor.extensions import login_manager
+from solarmonitor.public.forms import LoginForm
+from solarmonitor.user.forms import RegisterForm
+from solarmonitor.user.models import User
+from solarmonitor.utils import flash_errors
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
 

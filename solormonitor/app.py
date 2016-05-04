@@ -2,10 +2,10 @@
 """The app module, containing the app factory function."""
 from flask import Flask, render_template
 
-from solartender import public, user
-from solartender.assets import assets
-from solartender.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate
-from solartender.settings import ProdConfig
+from solarmonitor import public, user
+from solarmonitor.assets import assets
+from solarmonitor.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate
+from solarmonitor.settings import ProdConfig
 
 
 def create_app(config_object=ProdConfig):
