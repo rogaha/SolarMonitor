@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test configs."""
-from solartender.app import create_app
-from solartender.settings import DevConfig, ProdConfig
+from solarmonitor.app import create_app
+from solarmonitor.settings import DevConfig, ProdConfig
 
 
 def test_production_config():

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Test forms."""
 
-from solartender.public.forms import LoginForm
-from solartender.user.forms import RegisterForm
+from solarmonitor.public.forms import LoginForm
+from solarmonitor.user.forms import RegisterForm
 
 
 class TestRegisterForm:

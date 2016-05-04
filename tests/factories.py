@@ -3,8 +3,8 @@
 from factory import PostGenerationMethodCall, Sequence
 from factory.alchemy import SQLAlchemyModelFactory
 
-from solartender.database import db
-from solartender.user.models import User
+from solarmonitor.database import db
+from solarmonitor.user.models import User
 
 
 class BaseFactory(SQLAlchemyModelFactory):

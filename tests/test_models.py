@@ -4,7 +4,7 @@ import datetime as dt
 
 import pytest
 
-from solartender.user.models import Role, User
+from solarmonitor.user.models import Role, User
 
 from .factories import UserFactory
 

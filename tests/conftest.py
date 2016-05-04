@@ -4,9 +4,9 @@
 import pytest
 from webtest import TestApp
 
-from solartender.app import create_app
-from solartender.database import db as _db
-from solartender.settings import TestConfig
+from solarmonitor.app import create_app
+from solarmonitor.database import db as _db
+from solarmonitor.settings import TestConfig
 
 from .factories import UserFactory
 
