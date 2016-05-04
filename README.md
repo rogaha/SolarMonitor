@@ -1,0 +1,2 @@
+# SolarMonitor
+Solar usage tracker
