@@ -4,62 +4,58 @@ import datetime as dt
 
 from flask_login import UserMixin
 
-from solarmonitor.database import Column, Model, SurrogatePK, db, reference_col, relationship
-from solarmonitor.extensions import bcrypt
+from solarmonitor.extensions import bcrypt, db
 
 
-class Role(SurrogatePK, Model):
-    """A role for a user."""
-
-    __tablename__ = 'roles'
-    name = Column(db.String(80), unique=True, nullable=False)
-    user_id = reference_col('users', nullable=True)
-    user = relationship('User', backref='roles')
-
-    def __init__(self, name, **kwargs):
-        """Create instance."""
-        db.Model.__init__(self, name=name, **kwargs)
-
-    def __repr__(self):
-        """Represent instance as a unique string."""
-        return '<Role({name})>'.format(name=self.name)
-
-
-class User(UserMixin, SurrogatePK, Model):
-    """A user of the app."""
-
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
-    username = Column(db.String(80), unique=True, nullable=False)
-    email = Column(db.String(80), unique=True, nullable=False)
-    #: The hashed password
-    password = Column(db.String(128), nullable=True)
-    created_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
-    first_name = Column(db.String(30), nullable=True)
-    last_name = Column(db.String(30), nullable=True)
-    active = Column(db.Boolean(), default=False)
-    is_admin = Column(db.Boolean(), default=False)
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(64))
+    username = db.Column(db.String(64), unique=True)
+    first_name = db.Column(db.String(64))
+    last_name = db.Column(db.String(64))
+    address_one = db.Column(db.String(64))
+    address_two = db.Column(db.String(64))
+    state = db.Column(db.String(64))
+    city = db.Column(db.String(64))
+    zip_code = db.Column(db.Integer)
+    cell_phone = db.Column(db.Integer)
+    role_id = db.Column(db.Integer)
+    password_hash = db.Column(db.String(128))
 
-    def __init__(self, username, email, password=None, **kwargs):
-        """Create instance."""
-        db.Model.__init__(self, username=username, email=email, **kwargs)
-        if password:
-            self.set_password(password)
-        else:
-            self.password = None
-
-    def set_password(self, password):
-        """Set password."""
-        self.password = bcrypt.generate_password_hash(password)
-
-    def check_password(self, value):
-        """Check password."""
-        return bcrypt.check_password_hash(self.password, value)
 
     @property
-    def full_name(self):
-        """Full user name."""
-        return '{0} {1}'.format(self.first_name, self.last_name)
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = bcrypt.generate_password_hash(password, 12)
+
+    def verify_password(self, password):
+        try:
+            return bcrypt.check_password_hash(self.password_hash, password)
+        except:
+            return check_password_hash(self.password_hash, password)
+
+
 
     def __repr__(self):
-        """Represent instance as a unique string."""
-        return '<User({username!r})>'.format(username=self.username)
+        return '<User {}>' .format(self.first_name)
+
+    def generate_auth_token(self, expiration=3600):
+        s = Serializer(app.config['SECRET_KEY'], expiration)
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(self, token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return False
+        if data.get('id') != self.id:
+            return False
+        self.confirmed = 1
+        db.session.commit()
+        return True
