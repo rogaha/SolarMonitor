@@ -8,6 +8,9 @@ from solarmonitor.public.forms import LoginForm
 from solarmonitor.user.forms import RegistrationForm
 from solarmonitor.user.models import User
 from solarmonitor.utils import flash_errors
+from solarmonitor.app import create_app
+
+app = create_app()
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
 
@@ -113,7 +116,7 @@ def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
     if request.method == 'POST':
         print request.values
-        email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", ['dan@danwins.com'], request.values)
+        email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", app.config.['ADMIN_EMAILS'], request.values)
 
 
     return render_template('public/oauth.html', page_title='Notification Bucket')

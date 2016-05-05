@@ -15,7 +15,7 @@ class Config(object):
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    ADMIN_EMAILS = ['dan@danwins.com', 'brad@epirtle.com']
 
 class ProdConfig(Config):
     """Production configuration."""
@@ -24,7 +24,6 @@ class ProdConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'postgres://zqdbbnsrdcldwf:hN8yok1PcmPR6elNtOXUyqOCQg@ec2-54-235-207-226.compute-1.amazonaws.com:5432/de83poa0e5nd3o'
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
-
 
 class DevConfig(Config):
     """Development configuration."""
