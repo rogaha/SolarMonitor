@@ -6,6 +6,7 @@ from solarmonitor import public, user
 from solarmonitor.assets import assets
 from solarmonitor.extensions import bcrypt, db, login_manager
 from solarmonitor.settings import ProdConfig
+from solarmonitor.public.forms import LoginForm
 
 
 def create_app(config_object=ProdConfig):
@@ -19,8 +20,13 @@ def create_app(config_object=ProdConfig):
     register_blueprints(app)
     register_errorhandlers(app)
     register_logger(app)
-    return app
+    
+    @app.context_processor
+    def inject_login_form():
+        login_form = LoginForm()
+        return dict(login_form=login_form)
 
+    return app
 
 def register_extensions(app):
     """Register Flask extensions."""
