@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User forms."""
 from flask_wtf import Form
-from wtforms import PasswordField, StringField
+from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Required, Regexp
 
 from .models import User
