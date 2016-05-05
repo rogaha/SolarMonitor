@@ -8,6 +8,9 @@ from solarmonitor.public.forms import LoginForm
 from solarmonitor.user.forms import RegistrationForm
 from solarmonitor.user.models import User
 from solarmonitor.utils import flash_errors
+from solarmonitor.app import create_app
+
+app = create_app()
 
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
