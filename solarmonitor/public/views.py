@@ -12,6 +12,7 @@ from solarmonitor.utils import flash_errors
 blueprint = Blueprint('public', __name__, static_folder='../static')
 
 def send_email(sender, subject, to, text):
+    import requests
     return requests.post(
         "https://api.mailgun.net/v3/danwins.com/messages",
         auth=("api", "key-f60af287775bbf5807c978339b701aed"),
