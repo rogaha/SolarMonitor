@@ -2,7 +2,7 @@
 """User forms."""
 from flask_wtf import Form
 from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Required, Regexp
 
 from .models import User
 
