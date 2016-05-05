@@ -3,7 +3,7 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
 
-from solarmonitor.extensions import login_manager, db
+from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm
 from solarmonitor.user.forms import RegistrationForm
 from solarmonitor.user.models import User
@@ -14,8 +14,7 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 
 @login_manager.user_loader
 def load_user(user_id):
-    """Load user by ID."""
-    return User.get_by_id(int(user_id))
+    return User.query.get(int(user_id))
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -25,10 +24,19 @@ def home():
     # Handle logging in
     if request.method == 'POST':
         if form.validate_on_submit():
-            login_user(form.user)
-            flash('You are logged in.', 'success')
-            redirect_url = request.args.get('next') or url_for('user.members')
-            return redirect(redirect_url)
+            try:
+                user = User.query.filter_by(username=form.username.data).first()
+            except:
+                db.session.rollback()
+                user = User.query.filter_by(username=form.username.data).first()
+            if user is not None and user.verify_password(form.password.data):
+                login_user(user, True)
+                next = request.args.get('next')
+                #if not next_is_valid('next'):
+                #    return abort(400)
+
+                return redirect(next or url_for('public.home'))
+            flash('Invalid username or password')
         else:
             flash_errors(form)
     return render_template('public/home.html', form=form)
