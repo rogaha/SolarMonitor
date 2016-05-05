@@ -11,6 +11,15 @@ from solarmonitor.utils import flash_errors
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
 
+def send_email(sender, subject, to, text):
+    return requests.post(
+        "https://api.mailgun.net/v3/danwins.com/messages",
+        auth=("api", "key-f60af287775bbf5807c978339b701aed"),
+        data={"from": sender,
+              "to": to,
+              "subject": subject,
+              "text": text}, verify=False)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -99,4 +108,5 @@ def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
     if request.method == 'POST':
         print request.values
+        send_email('Dan <admin@solarmonitor>', 'dan@danwins.com', 'Incoming POST data', request.values )
     return render_template('public/oauth.html', page_title='Notification Bucket')
