@@ -7,34 +7,19 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length
 from .models import User
 
 
-class RegisterForm(Form):
-    """Register form."""
+class RegistrationForm(Form):
+    email = StringField('Email', validators=[Required(), Length(1, 64), Email()])
+    first_name = StringField('First Name', validators=[Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, 'Usernames must have only letters, numbers, dots, or underscores')])
+    last_name = StringField('Last Name', validators=[Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, 'Usernames must have only letters, numbers, dots, or underscores')])
+    username = StringField('Username', validators=[Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, 'Usernames must have only letters, numbers, dots, or underscores')])
+    password = PasswordField('Password', validators=[Required(), EqualTo('password2', message='Passwords must match.')])
+    password2 = PasswordField('Confirm Password', validators=[Required()])
+    submit = SubmitField('Register')
 
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=3, max=25)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email(), Length(min=6, max=40)])
-    password = PasswordField('Password',
-                             validators=[DataRequired(), Length(min=6, max=40)])
-    confirm = PasswordField('Verify password',
-                            [DataRequired(), EqualTo('password', message='Passwords must match')])
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already in use.')
 
-    def __init__(self, *args, **kwargs):
-        """Create instance."""
-        super(RegisterForm, self).__init__(*args, **kwargs)
-        self.user = None
-
-    def validate(self):
-        """Validate the form."""
-        initial_validation = super(RegisterForm, self).validate()
-        if not initial_validation:
-            return False
-        user = User.query.filter_by(username=self.username.data).first()
-        if user:
-            self.username.errors.append('Username already registered')
-            return False
-        user = User.query.filter_by(email=self.email.data).first()
-        if user:
-            self.email.errors.append('Email already registered')
-            return False
-        return True
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('Username already in use.')
