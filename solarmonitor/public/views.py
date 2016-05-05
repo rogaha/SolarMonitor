@@ -19,7 +19,7 @@ def send_email(sender, subject, to, text):
         data={"from": sender,
               "to": to,
               "subject": subject,
-              "text": text}, verify=False)
+              "text": text})
 
 
 @login_manager.user_loader
