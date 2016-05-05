@@ -97,4 +97,6 @@ def oauth_redirect():
 @blueprint.route('/notifications', methods=['GET', 'POST'])
 def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
+    if request.method == 'POST':
+        print request.data
     return render_template('public/oauth.html', page_title='Notification Bucket')
