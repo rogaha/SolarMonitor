@@ -2,28 +2,103 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container-narrow">
-  <h1>Register</h1>
-    <br/>
-    <form id="registerForm" class="form form-register" method="POST" action="" role="form">
-            <input type="hidden" name="csrf_token" value=""/>
-            <div class="form-group">
-                {{form.username.label}}
-                {{form.username(placeholder="Username", class_="form-control")}}
-            </div>
-            <div class="form-group">
-                {{form.email.label}}
-                {{form.email(placeholder="Email", class_="form-control")}}
-            </div>
-            <div class="form-group">
-                {{form.password.label}}
-                {{form.password(placeholder="Password", class_="form-control")}}
-            </div>
-            <div class="form-group">
-                {{form.confirm.label}}
-                {{form.confirm(placeholder="Password (again)", class_="form-control")}}
-            </div>
-            <p><input class="btn btn-default btn-submit" type="submit" value="Register"></p>
-    </form>
-    <p><em>Already registered?</em> Click <a href="/">here</a> to login.</p>
+
+                {% for message in get_flashed_messages() %}
+<div class="alert error2">
+<button type="button" class ="close" data-dismiss="alert"><span class="fa fa-close" style="margin-right: 15px;"></span></button>
+{{ message }}
+
+</div>
+{% endfor %}
+
+{% if form.errors %}
+<div class="alert error2">
+<button type="button" class ="close" data-dismiss="alert"><span class="fa fa-close" style="margin-right: 15px;"></span></button>
+    <ul class="alert error" style="list-style-type:none">
+        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+            {% for error in field_errors %}
+                <li>{{ form[field_name].label }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    </div>
+{% endif %}
+
+
+
+<form class="form-horizontal" method="post" action="{{ url_for('auth.register') }}">
+
+      {{ form.hidden_tag() }}
+<fieldset>
+
+<!-- Form Name -->
+<legend>Register New User</legend>
+
+<!-- Text input-->
+<div class="form-group">
+<label class="col-md-4 control-label" for="textinput">Username</label>
+<div class="col-md-4">
+{{ form.username(id="inputEmail", class="form-control input-md", style="margin-bottom: 10px;", placeholder="Username") }}
+
+</div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+<label class="col-md-4 control-label" for="textinput">First Name</label>
+<div class="col-md-4">
+
+{{ form.first_name(id="inputEmail", class="form-control input-md", style="margin-bottom: 10px;", placeholder="First Name") }}
+
+</div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+<label class="col-md-4 control-label" for="textinput">Last Name</label>
+<div class="col-md-4">
+{{ form.last_name(id="inputEmail", class="form-control input-md", style="margin-bottom: 10px;", placeholder="Last Name") }}
+
+</div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+<label class="col-md-4 control-label" for="textinput">Email</label>
+<div class="col-md-4">
+{{ form.email(id="inputEmail", class="form-control input-md", style="margin-bottom: 10px;", placeholder="johndoe@example.com") }}
+</div>
+</div>
+
+<!-- Password input-->
+<div class="form-group">
+<label class="col-md-4 control-label" for="passwordinput">Password</label>
+<div class="col-md-4">
+{{ form.password(id="inputEmail", class="form-control input-md", style="margin-bottom: 10px;", placeholder="Password") }}
+
+</div>
+</div>
+
+<!-- Password input-->
+<div class="form-group">
+<label class="col-md-4 control-label" for="passwordinput">Repeat Password</label>
+<div class="col-md-4">
+{{ form.password2(id="inputEmail", class="form-control input-md", style="margin-bottom: 10px;", placeholder="Repeat") }}
+</div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+<label class="col-md-4 control-label" for="singlebutton"></label>
+<div class="col-md-4">
+<div class="g-recaptcha" data-sitekey="6LfhVhwTAAAAAOkGKdnY6u-dtLU1dfYh6F21yliS"></div> <br>
+<button id="singlebutton" name="singlebutton" class="btn btn-primary">Create Account</button>
+</div>
+</div>
+
+</fieldset>
+</form>
+
+
 </div>
 {% endblock %}
