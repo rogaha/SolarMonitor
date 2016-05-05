@@ -90,8 +90,12 @@ def register():
 @blueprint.route('/about')
 def about():
     """About page."""
-    form = LoginForm(request.form)
-    return render_template('public/about.html', form=form)
+    return render_template('public/about.html')
+
+@blueprint.route('/charts')
+def charts():
+    """About page."""
+    return render_template('public/charts.html')
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])
 def oauth():
@@ -110,6 +114,6 @@ def notifications():
     if request.method == 'POST':
         print request.values
         email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", ['dan@danwins.com'], request.values)
-    
+
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
