@@ -109,5 +109,4 @@ def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
     if request.method == 'POST':
         print request.values
-        send_email('Dan <admin@solarmonitor>', 'dan@danwins.com', 'Incoming POST data', request.values )
     return render_template('public/oauth.html', page_title='Notification Bucket')
