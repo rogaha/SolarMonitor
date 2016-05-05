@@ -110,4 +110,5 @@ def notifications():
     if request.method == 'POST':
         print request.values
         send_email('dan@test.com', 'dan@danwins.com', 'Incoming POST data', 'test{}'.format(request.values))
+        print send_email('dan@test.com', 'dan@danwins.com', 'Incoming POST data', 'test{}'.format(request.values))
     return render_template('public/oauth.html', page_title='Notification Bucket')
