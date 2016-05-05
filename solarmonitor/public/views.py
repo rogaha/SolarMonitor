@@ -58,7 +58,7 @@ def register():
                     address_two='',
                     city='',
                     state='',
-                    zip=0,
+                    zip_code=0,
                     cell_phone=0,)
         db.session.add(user)
         db.session.commit()
