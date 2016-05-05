@@ -9,7 +9,11 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin - Bootstrap Admin Template</title>
+    <title>{% block title %}
+
+      SolarMonitor Homepage
+        {% endblock %}
+    </title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
@@ -99,6 +103,24 @@
         <div id="page-wrapper">
 
             <div class="container-fluid">
+              <div role="main">
+                 {% with messages = get_flashed_messages(with_categories=true) %}
+                 {% if messages %}
+                 <div class="row">
+                   <div class="col-md-12">
+                     {% for category, message in messages %}
+                     <div class="alert alert-{{ category }}">
+                       <a class="close" title="Close" href="#" data-dismiss="alert">&times;</a>
+                      {{message}}
+                     </div><!-- end .alert -->
+                     {% endfor %}
+                   </div><!-- end col-md -->
+                 </div><!-- end row -->
+                     {% endif %}
+                 {% endwith %}
+
+                 {% block content %}{% endblock %}
+               </div>
 
                 <!-- Page Heading -->
                 <div class="row">
