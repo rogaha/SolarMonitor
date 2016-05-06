@@ -86,10 +86,10 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li class="active">
+                    <li class="{% if request.url_rule.endpoint == 'public.home' %} active {% endif %}">
                         <a href="{{ url_for('public.home') }}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
-                    <li>
+                    <li class="{% if request.url_rule.endpoint == 'public.charts' %} active {% endif %}">
                         <a href="{{ url_for('public.charts') }}"><i class="fa fa-fw fa-bar-chart-o"></i> Charts</a>
                     </li>
 
