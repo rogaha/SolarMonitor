@@ -116,6 +116,8 @@ def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
     if request.method == 'POST':
         print request.values
+        print request
+        print request.data
         email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, request.values)
 
 
