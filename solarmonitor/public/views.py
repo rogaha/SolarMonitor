@@ -117,7 +117,7 @@ def notifications():
     if request.method == 'POST':
         print request.values
         print request
-        print request.data
+        print request.form
         email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, request.values)
 
 
