@@ -120,7 +120,7 @@ def notifications():
         print request.form
         print request.args
         print request
-        email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, request.values)
+        email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, request.data)
 
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
