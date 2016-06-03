@@ -4,8 +4,6 @@ from base64 import b64encode
 
 class Api:
 	"""
-    api.py
-    ~~~~~~~~~~~~~
 	This API for the  synchronous and Asynchronous XML data to get from the PG&E.
     This is used by PG&E thrid parties.
 	:Author: Bharati V
@@ -14,7 +12,7 @@ class Api:
 		self.cert = (cert_params_hash["crt"], cert_params_hash["key"])
 
 	#API sync request using Oauth2 access token
-	def sync_request(self, url,subscription_id,usage_point, published_min, published_max, access_token):
+	def sync_request(self, url,subscription_id, usage_point, published_min, published_max, access_token):
 		url = url + "/Subscription/" + subscription_id + "/UsagePoint/"+usage_point
 		url = url + "?published-max=" +published_max+ "&published-min="+published_min
 		header_params = {'Authorization' : 'Bearer ' + access_token}
@@ -27,7 +25,7 @@ class Api:
 
 
 	#API async request using Oauth2 access token
-	def async_request(self, url, subscription_id,published_min,published_max, access_token):
+	def async_request(self, url, subscription_id, published_min, published_max, access_token):
 		url = url +"/Subscription/" + subscription_id
 		url +=  "?published-max=" +published_max+ "&published-min="+published_min
 		header_params = {'Authorization' : 'Bearer ' + access_token}
@@ -41,8 +39,6 @@ class Api:
 
 class ClientCredentials:
 	"""
-    ClientCredentials.py
-    ~~~~~~~~~~~~~~~~~~~~
 	This API for  to get client_credentials from PG&E
     This is used by PG&E thrid parties.
 	:Author: Bharati V
@@ -66,8 +62,6 @@ class ClientCredentials:
 
 class OAuth2:
 	"""
-    OAuth2.py
-    ~~~~~~~~~~~~~
 	For safe Authentication OAuth2 is defined.
 	This API's provides the  OAuth2 access token from PG&E.
     This is used by PG&E thrid parties.

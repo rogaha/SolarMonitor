@@ -105,7 +105,12 @@ def charts():
 def test():
     """Testing"""
     cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
+    api = Api(config.SSL_CERTS)
+
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
+
+    session['async_data'] = api.async_request(
+        'https://api.pge.com/espi/1_1/resource/Batch', 148747, 1464274800, 1454274800, session['client_credentials'][u'client_access_token'])
 
     return render_template('public/test.html')
 
