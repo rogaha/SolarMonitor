@@ -18,7 +18,7 @@ lib
 lib64
 
 # SSL
-*.pem
+
 
 # Installer logs
 pip-log.txt
