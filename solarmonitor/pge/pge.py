@@ -11,7 +11,7 @@ class Api:
 	:Author: Bharati V
 	"""
 	def __init__(self, cert_params_hash):
-			self.cert = (cert_params_hash["crt"], cert_params_hash["key"])
+		self.cert = (cert_params_hash["crt"], cert_params_hash["key"])
 
 	#API sync request using Oauth2 access token
 	def sync_request(self, url,subscription_id,usage_point, published_min, published_max, access_token):
@@ -40,13 +40,13 @@ class Api:
 
 
 class ClientCredentials:
-    """
+	"""
     ClientCredentials.py
     ~~~~~~~~~~~~~~~~~~~~
 	This API for  to get client_credentials from PG&E
     This is used by PG&E thrid parties.
 	:Author: Bharati V
-    """
+	"""
 	def __init__(self, client_credentials_hash, cert_params_hash):
 		client_key = client_credentials_hash["client_key"]
 		client_secret_key = client_credentials_hash["client_secret_key"]
@@ -65,14 +65,14 @@ class ClientCredentials:
 		return {"status": response.status_code, "error": response.text}
 
 class OAuth2:
-    """
+	"""
     OAuth2.py
     ~~~~~~~~~~~~~
 	For safe Authentication OAuth2 is defined.
 	This API's provides the  OAuth2 access token from PG&E.
     This is used by PG&E thrid parties.
 	:Author: Bharati V
-    """
+	"""
 	def __init__(self, client_credentials_hash, cert_params_hash):
 		client_key = client_credentials_hash["client_key"]
 		client_secret_key = client_credentials_hash["client_secret_key"]
