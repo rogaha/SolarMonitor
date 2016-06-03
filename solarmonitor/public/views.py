@@ -109,14 +109,15 @@ def test():
     cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
     api = Api(config.SSL_CERTS)
 
+    session.clear()
+
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
     session['resource_authorization'] = api.simple_request(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
 
 
     root = ET.fromstring(session['resource_authorization']['data'])
-    for resource in root.iter('resourceURI'):
-        print resource
+    print root
 
 
     return render_template('public/test.html')
