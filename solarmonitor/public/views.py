@@ -115,10 +115,12 @@ def test():
     session['resource_authorization'] = api.simple_request(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
 
-
+    ns = {'ns0': 'http://naesb.org/espi',
+          'ns1': 'http://www.w3.org/2005/Atom'}
     root = ET.fromstring(session['resource_authorization']['data'])
-    print root
 
+    for resource in root.findall('ns0:resourceURI', ns):
+        print resource.text
 
     return render_template('public/test.html')
 
