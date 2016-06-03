@@ -109,19 +109,15 @@ def test():
     cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
     api = Api(config.SSL_CERTS)
 
-    session.clear()
-
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
     session['resource_authorization'] = api.simple_request(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
 
     root = ET.fromstring(xml)
-    ns = {'ns0': 'http://naesb.org/espi', 'ns1': 'http://www.w3.org/2005/Atom'}
-
-    print root.tag, root.attrib
 
     for resource in root.iter('{http://naesb.org/espi}resourceURI'):
-        print resource.text
+        if 'Batch/Bulk' in resource.text:
+            api.simple_request(resource.text, session['client_credentials'][u'client_access_token'])
 
     for resource in root.iter('{http://naesb.org/espi}authorizationURI'):
         print resource.text
