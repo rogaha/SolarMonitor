@@ -6,6 +6,11 @@ from flask_login import UserMixin
 
 from solarmonitor.extensions import bcrypt, db
 
+class Session(db.Model):
+    __tablename__ = 'sessions'
+    id = db.Column(db.Integer, primary_key=True)
+    access = db.Column(db.String(240))
+    data = db.Column(db.String(240)) 
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
