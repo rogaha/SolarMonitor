@@ -13,9 +13,10 @@ from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 
 import xml.etree.ElementTree as ET
 
+
+config = Config()
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
-config = Config()
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
 
