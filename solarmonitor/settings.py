@@ -16,6 +16,7 @@ class Config(object):
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ADMIN_EMAILS = ['dan@danwins.com', 'brad@epirtle.com']
+    SSL_CERTS = {'crt': '../ssl/client_cert.pem', 'key': '../ssl/client_key.pem'}
 
 class ProdConfig(Config):
     """Production configuration."""
