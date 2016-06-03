@@ -119,8 +119,9 @@ def test():
         if 'Batch/Bulk' in resource.text:
             api.simple_request(resource.text, session['client_credentials'][u'client_access_token'])
 
-    for resource in root.iter('{http://naesb.org/espi}authorizationURI'):
-        print resource.text
+    if 'bulk_data' in session:
+        bulk_root = ET.fromstring(session['bulk_data'])
+
 
     return render_template('public/test.html')
 
@@ -140,5 +141,5 @@ def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
     if request.method == 'POST':
         print request.data
-        email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, request.data)
+        session['bulk_data'] = request.data
     return render_template('public/oauth.html', page_title='Notification Bucket')
