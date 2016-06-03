@@ -108,9 +108,7 @@ def test():
     api = Api(config.SSL_CERTS)
 
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
-
-    session['async_data'] = api.async_request(
-        'https://api.pge.com/espi/1_1/resource/Batch', '148747', '1464274800', '1454274800', session['client_credentials'][u'client_access_token'])
+    session['async_data'] = api.simple_request('https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
 
     return render_template('public/test.html')
 
