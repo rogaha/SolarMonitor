@@ -113,7 +113,7 @@ def test():
     session['resource_authorization'] = api.simple_request(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
 
-    root = ET.fromstring(xml)
+    root = ET.fromstring(session['resource_authorization']['data'])
 
     for resource in root.iter('{http://naesb.org/espi}resourceURI'):
         if 'Batch/Bulk' in resource.text:
