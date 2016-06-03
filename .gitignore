@@ -18,7 +18,7 @@ lib
 lib64
 
 # SSL
-
+.remote-sync.json
 
 # Installer logs
 pip-log.txt

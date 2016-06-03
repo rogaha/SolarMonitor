@@ -20,7 +20,7 @@ def create_app(config_object=ProdConfig):
     register_blueprints(app)
     register_errorhandlers(app)
     register_logger(app)
-    
+
     @app.context_processor
     def inject_login_form():
         login_form = LoginForm()
@@ -62,3 +62,7 @@ def register_logger(app):
     app.logger.addHandler(stream_handler)
     app.logger.setLevel(logging.INFO)
     app.logger.info('microblog startup')
+
+if __name__ == "__main__":
+    app = create_app(Config)
+    app.run(host='0.0.0.0', debug=True)
