@@ -119,8 +119,9 @@ def test():
           'ns1': 'http://www.w3.org/2005/Atom'}
     root = ET.fromstring(session['resource_authorization']['data'])
 
-    for resource in root.findall('ns0:resourceURI', ns):
-        print resource.text
+    for resource in root.findall('ns0:Authorization', ns):
+        resourceURI = resource.find('ns0:resourceURI', ns)
+        print resourceURI.text
 
     return render_template('public/test.html')
 
