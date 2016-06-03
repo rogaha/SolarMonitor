@@ -105,10 +105,10 @@ def charts():
 def test():
     """Testing"""
     cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
-
+    print config.SSL_CERTS
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
 
-    print config.SSL_CERTS
+
 
     return render_template('public/test.html')
 
