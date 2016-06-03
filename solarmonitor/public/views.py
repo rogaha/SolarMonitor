@@ -124,7 +124,7 @@ def test():
     for child in root:
         print child.tag, child.attrib
 
-    print 'RESOURCE', root.findall('{http://naesb.org/espi}resourceURI')
+    print 'RESOURCE:', root.findall('resourceURI')
     for resource in root.findall('{http://naesb.org/espi}resourceURI'):
         print resource
         print resource.text
