@@ -16,7 +16,7 @@ class Config(object):
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ADMIN_EMAILS = ['dan@danwins.com', 'brad@epirtle.com']
-    SSL_CERTS = {'crt': os.path.join(PROJECT_ROOT '../ssl/client_cert.pem'), 'key': os.path.join(PROJECT_ROOT '../ssl/client_key.pem')}
+    SSL_CERTS = {'crt': os.path.join(PROJECT_ROOT, '../ssl/client_cert.pem'), 'key': os.path.join(PROJECT_ROOT, '../ssl/client_key.pem')}
     PGE_CLIENT_CREDENTIALS = {'client_key': 'b5020eaae0f34c56a62726ff6f059b45', 'client_secret_key': '69f7ad97530447f49d9468373cf2fc4f'}
 
 class ProdConfig(Config):
