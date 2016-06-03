@@ -117,7 +117,8 @@ def test():
 
     for resource in root.iter('{http://naesb.org/espi}resourceURI'):
         if 'Batch/Bulk' in resource.text:
-            api.simple_request(resource.text, session['client_credentials'][u'client_access_token'])
+            print 'FOUND URL:'
+            print api.simple_request(resource.text, session['client_credentials'][u'client_access_token'])
 
     if 'bulk_data' in session:
         bulk_root = ET.fromstring(session['bulk_data'])
@@ -142,4 +143,5 @@ def notifications():
     if request.method == 'POST':
         print request.data
         session['bulk_data'] = request.data
+        email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, request.data)
     return render_template('public/oauth.html', page_title='Notification Bucket')
