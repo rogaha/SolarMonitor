@@ -11,6 +11,8 @@ from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 
+import xml.etree.ElementTree as ET
+
 config = Config()
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
@@ -108,7 +110,13 @@ def test():
     api = Api(config.SSL_CERTS)
 
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
-    session['async_data'] = api.simple_request('https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
+    session['resource_authorization'] = api.simple_request(
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
+
+    tree = ET.parse(session['resource_authorization'])
+    root = tree.getroot()
+    for resource in root.iter('resourceURI'):
+        print resource
 
     return render_template('public/test.html')
 
