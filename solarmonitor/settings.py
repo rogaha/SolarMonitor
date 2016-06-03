@@ -6,7 +6,6 @@ import os
 class Config(object):
     """Base configuration."""
 
-    SERVER_NAME = 'solarmonitor.epirtle.com:5000'
     SECRET_KEY = 'ft-EcE#=fnBxNL9BQ2g*_E7ZdJrtM3z&6MwJ6vbEr@K#uV-?Ar#z+L!qX99h5rEXS'  # TODO: Change me
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
