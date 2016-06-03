@@ -117,11 +117,12 @@ def test():
 
     ns = {'ns0': 'http://naesb.org/espi',
           'ns1': 'http://www.w3.org/2005/Atom'}
+
     root = ET.fromstring(session['resource_authorization']['data'])
 
-    for resource in root.findall('ns0:Authorization', ns):
-        resourceURI = resource.find('ns0:resourceURI', ns)
-        print resourceURI.text
+    print root.tag, root.attrib
+    for child in root:
+        print child.tag, child.attrib
 
     return render_template('public/test.html')
 
