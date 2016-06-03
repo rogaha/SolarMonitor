@@ -114,8 +114,7 @@ def test():
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
 
 
-    tree = ET.fromstring(session['resource_authorization']['data'])
-    root = tree.getroot()
+    root = ET.fromstring(session['resource_authorization']['data'])
     for resource in root.iter('resourceURI'):
         print resource
 
