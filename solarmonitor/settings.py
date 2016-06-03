@@ -6,7 +6,7 @@ import os
 class Config(object):
     """Base configuration."""
 
-    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'  # TODO: Change me
+    SECRET_KEY = 'ft-EcE#=fnBxNL9BQ2g*_E7ZdJrtM3z&6MwJ6vbEr@K#uV-?Ar#z+L!qX99h5rEXS'  # TODO: Change me
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
     BCRYPT_LOG_ROUNDS = 13
@@ -21,8 +21,18 @@ class Config(object):
 
 class ProdConfig(Config):
     """Production configuration."""
-
-    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+    SECRET_KEY = 'ft-EcE#=fnBxNL9BQ2g*_E7ZdJrtM3z&6MwJ6vbEr@K#uV-?Ar#z+L!qX99h5rEXS'  # TODO: Change me
+    APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
+    PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
+    BCRYPT_LOG_ROUNDS = 13
+    ASSETS_DEBUG = False
+    DEBUG_TB_ENABLED = False  # Disable Debug toolbar
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+    CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    ADMIN_EMAILS = ['dan@danwins.com', 'brad@epirtle.com']
+    SSL_CERTS = {'crt': os.path.join(APP_DIR, 'ssl/client_cert.pem'), 'key': os.path.join(APP_DIR, 'ssl/client_key.pem')}
+    PGE_CLIENT_CREDENTIALS = {'client_key': 'b5020eaae0f34c56a62726ff6f059b45', 'client_secret_key': '69f7ad97530447f49d9468373cf2fc4f'}
     ENV = 'prod'
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'postgres://zqdbbnsrdcldwf:hN8yok1PcmPR6elNtOXUyqOCQg@ec2-54-235-207-226.compute-1.amazonaws.com:5432/de83poa0e5nd3o'
@@ -31,7 +41,6 @@ class ProdConfig(Config):
 class DevConfig(Config):
     """Development configuration."""
 
-    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
     ENV = 'dev'
     DEBUG = True
     DB_NAME = 'dev.db'
@@ -46,7 +55,6 @@ class DevConfig(Config):
 class TestConfig(Config):
     """Test configuration."""
 
-    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
