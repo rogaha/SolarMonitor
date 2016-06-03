@@ -21,7 +21,8 @@ class Config(object):
 
 class ProdConfig(Config):
     """Production configuration."""
-    
+
+    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
     ENV = 'prod'
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'postgres://zqdbbnsrdcldwf:hN8yok1PcmPR6elNtOXUyqOCQg@ec2-54-235-207-226.compute-1.amazonaws.com:5432/de83poa0e5nd3o'
@@ -30,6 +31,7 @@ class ProdConfig(Config):
 class DevConfig(Config):
     """Development configuration."""
 
+    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
     ENV = 'dev'
     DEBUG = True
     DB_NAME = 'dev.db'
@@ -44,6 +46,7 @@ class DevConfig(Config):
 class TestConfig(Config):
     """Test configuration."""
 
+    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'

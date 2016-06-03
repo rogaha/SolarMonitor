@@ -114,7 +114,7 @@ def test():
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
     session['resource_authorization'] = api.simple_request(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
-
+    print session    
     root = ET.fromstring(session['resource_authorization']['data'])
 
     for resource in root.iter('{http://naesb.org/espi}resourceURI'):
@@ -142,10 +142,11 @@ def notifications():
         print request.data
         bulk_root = ET.fromstring(request.data)
         session['bulk'] = []
+        print session
 
         for resource in bulk_root.iter('{http://naesb.org/espi}resources'):
             session['bulk'].append(api.simple_request(resource.text, session['client_credentials'][u'client_access_token']))
-            print session
+
 
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
