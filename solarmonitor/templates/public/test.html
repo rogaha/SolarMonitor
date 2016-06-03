@@ -7,6 +7,9 @@
 
   <h1>Testing</h1>
 
+{{ session }}
+
+
   <p>Session: {{ session['resource_authorization'] }}</p>
 
   <p>Bulk Data: {% if 'bulk_data' in session %}{{ session['bulk_data'] }}{% else %} No Bulk Data Yet {% endif %} {{ session['bulk_data'] }}</p>
