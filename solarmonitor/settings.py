@@ -6,7 +6,7 @@ import os
 class Config(object):
     """Base configuration."""
 
-    SECRET_KEY = os.environ.get('SOLARMONITOR_SECRET', 'secret-key')  # TODO: Change me
+    SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'  # TODO: Change me
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
     BCRYPT_LOG_ROUNDS = 13
@@ -21,7 +21,7 @@ class Config(object):
 
 class ProdConfig(Config):
     """Production configuration."""
-
+    
     ENV = 'prod'
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'postgres://zqdbbnsrdcldwf:hN8yok1PcmPR6elNtOXUyqOCQg@ec2-54-235-207-226.compute-1.amazonaws.com:5432/de83poa0e5nd3o'
