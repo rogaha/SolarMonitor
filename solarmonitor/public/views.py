@@ -124,6 +124,10 @@ def test():
     for child in root:
         print child.tag, child.attrib
 
+    for resource in root.findall('{http://naesb.org/espi}resourceURI'):
+        print resource
+        print resource.text
+
     return render_template('public/test.html')
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])
