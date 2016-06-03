@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Public section, including homepage and signup."""
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for, session
 from flask_login import login_required, login_user, logout_user
 
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
@@ -9,6 +9,7 @@ from solarmonitor.user.forms import RegistrationForm
 from solarmonitor.user.models import User
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
+from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 
 config = Config()
 
@@ -100,6 +101,15 @@ def charts():
     """About page."""
     return render_template('public/charts.html')
 
+@blueprint.route('/test')
+def test():
+    """Testing"""
+    cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
+    
+    session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
+
+    return render_template('public/test.html')
+
 @blueprint.route('/oauth', methods=['GET', 'POST'])
 def oauth():
     """	The OAuth URL you provide here will be used to direct customers to your customer login page to complete the authorization."""
@@ -117,6 +127,4 @@ def notifications():
     if request.method == 'POST':
         print request.data
         email = send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, request.data)
-
-
     return render_template('public/oauth.html', page_title='Notification Bucket')

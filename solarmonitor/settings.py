@@ -17,6 +17,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ADMIN_EMAILS = ['dan@danwins.com', 'brad@epirtle.com']
     SSL_CERTS = {'crt': '../ssl/client_cert.pem', 'key': '../ssl/client_key.pem'}
+    PGE_CLIENT_CREDENTIALS = {'client_key': 'b5020eaae0f34c56a62726ff6f059b45', 'client_secret_key': '69f7ad97530447f49d9468373cf2fc4f'}
 
 class ProdConfig(Config):
     """Production configuration."""
