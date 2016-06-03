@@ -13,6 +13,8 @@ from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 
 import xml.etree.ElementTree as ET
 
+cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
+api = Api(config.SSL_CERTS)
 config = Config()
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
@@ -106,8 +108,7 @@ def charts():
 @blueprint.route('/test')
 def test():
     """Testing"""
-    cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
-    api = Api(config.SSL_CERTS)
+
 
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
     session['resource_authorization'] = api.simple_request(
