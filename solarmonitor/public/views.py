@@ -150,7 +150,7 @@ def notifications():
 
         for resource in session['bulk_data']:
             pass
-            #send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, resource['data'])
+            send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", ['dan@danwins.com'], resource['data'])
 
 
 
