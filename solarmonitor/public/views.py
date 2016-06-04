@@ -148,7 +148,9 @@ def notifications():
         for resource in bulk_root.iter('{http://naesb.org/espi}resources'):
             session['bulk'].append(api.simple_request(resource.text, session['client_credentials'][u'client_access_token']))
 
-        print session
+        for resource in session['bulk']:
+            send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, resource)
+
 
 
 
