@@ -10,7 +10,7 @@ from flask_script import Command, Manager, Option, Server, Shell
 from flask_script.commands import Clean, ShowUrls
 
 from solarmonitor.app import create_app
-from solarmonitor.database import db
+#from solarmonitor.database import db
 from solarmonitor.settings import DevConfig, ProdConfig
 from solarmonitor.user.models import User
 
@@ -20,7 +20,7 @@ TEST_PATH = os.path.join(HERE, 'tests')
 
 app = create_app(CONFIG)
 manager = Manager(app)
-migrate = Migrate(app, db)
+#migrate = Migrate(app, db)
 
 
 def _make_context():
@@ -65,6 +65,9 @@ class Lint(Command):
             execute_tool('Fixing import order', 'isort', '-rc')
         execute_tool('Checking code style', 'flake8')
 
+@manager.command
+def run_server():
+    app.run(host='0.0.0.0', debug=True)
 
 manager.add_command('server', Server())
 manager.add_command('shell', Shell(make_context=_make_context))
@@ -72,6 +75,7 @@ manager.add_command('db', MigrateCommand)
 manager.add_command('urls', ShowUrls())
 manager.add_command('clean', Clean())
 manager.add_command('lint', Lint())
+manager.add_command('run', Lint())
 
 if __name__ == '__main__':
     manager.run()

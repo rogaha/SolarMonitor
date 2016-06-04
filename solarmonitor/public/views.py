@@ -110,7 +110,6 @@ def charts():
 def test():
     """Testing"""
 
-
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
     session['resource_authorization'] = api.simple_request(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
@@ -133,6 +132,7 @@ def oauth():
 def oauth_redirect():
     """	The redirect URI you provide here is where PG&E will send the Authorization Code once customer authorization is completed and you make a request for the authorization code.
     """
+    session['test'] = 'testing'
     return render_template('public/oauth.html', page_title='Redirect')
 
 @blueprint.route('/notifications', methods=['GET', 'POST'])
@@ -142,14 +142,15 @@ def notifications():
         print request.data
         bulk_root = ET.fromstring(request.data)
 
-        session['bulk'] = []
+        session['bulk_data'] = []
         session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
 
         for resource in bulk_root.iter('{http://naesb.org/espi}resources'):
-            session['bulk'].append(api.simple_request(resource.text, session['client_credentials'][u'client_access_token']))
+            session['bulk_data'].append(api.simple_request(resource.text, session['client_credentials'][u'client_access_token']))
 
-        for resource in session['bulk']:
-            send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, resource['data'])
+        for resource in session['bulk_data']:
+            pass
+            #send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, resource['data'])
 
 
 
