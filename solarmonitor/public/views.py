@@ -149,7 +149,7 @@ def notifications():
             session['bulk'].append(api.simple_request(resource.text, session['client_credentials'][u'client_access_token']))
 
         for resource in session['bulk']:
-            send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, resource)
+            send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", config.ADMIN_EMAILS, resource['data'])
 
 
 
