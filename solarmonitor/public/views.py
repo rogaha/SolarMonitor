@@ -157,12 +157,11 @@ def notifications():
         print request.data
         bulk_root = ET.fromstring(request.data)
         xml_dict = parse(request.data)
-        xml_dict.prettyprint()
 
         session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
         session['bulk_data'] = []
-        for resource in xml_dict[u'ns0:BatchList']:
-            session['bulk_data'].append(api.simple_request(resource[u'ns0:resources'], session['client_credentials'][u'client_access_token']))
+        for resource in xml_dict[u'ns0:BatchList'][u'ns0:resources']:
+            session['bulk_data'].append(api.simple_request(resource, session['client_credentials'][u'client_access_token']))
 
         for resource in session['bulk_data']:
             send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", ['dan@danwins.com'], resource['data'])
