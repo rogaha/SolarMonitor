@@ -62,7 +62,3 @@ def register_logger(app):
     app.logger.addHandler(stream_handler)
     app.logger.setLevel(logging.INFO)
     app.logger.info('microblog startup')
-
-if __name__ == "__main__":
-    app = create_app(Config)
-    app.run(host='0.0.0.0', debug=True)

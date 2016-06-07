@@ -11,7 +11,7 @@ from flask_script.commands import Clean, ShowUrls
 
 from solarmonitor.app import create_app
 #from solarmonitor.database import db
-from solarmonitor.settings import DevConfig, ProdConfig
+from solarmonitor.settings import DevConfig, ProdConfig, Config
 from solarmonitor.user.models import User
 
 CONFIG = ProdConfig if os.environ.get('SOLARMONITOR_ENV') == 'prod' else DevConfig

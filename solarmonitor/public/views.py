@@ -10,18 +10,21 @@ from solarmonitor.user.models import User
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
+import requests
 
-import xml.etree.ElementTree as ET
+from jxmlease import parse
+import xml.etree.cElementTree as ET
+
 
 
 config = Config()
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
+oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
 
 def send_email(sender, subject, to, text):
-    import requests
     return requests.post(
         "https://api.mailgun.net/v3/app618ef831f75f4a2eb15e3f08f18d09fe.mailgun.org/messages",
         auth=("api", "key-e3bfd2daee0cab79737c792954d54b12"),
@@ -104,7 +107,15 @@ def about():
 @blueprint.route('/charts')
 def charts():
     """About page."""
-    return render_template('public/charts.html')
+    #oauth.get_access_token('https://api.pge.com/datacustodian/oauth/v2/token', )
+
+    r = requests.get(
+    'https://api.pge.com/datacustodian/oauth/v2/authorize?client_id={}&redirect_uri=https://solarmonitor.epirtle.com/oauth-redirect&scope=357&response_type=code'.format(config.PGE_CLIENT_CREDENTIALS['client_key']), cert=(config.SSL_CERTS["crt"], config.SSL_CERTS["key"]))
+
+    print r.text
+
+
+    return render_template('public/data_chart.html')
 
 @blueprint.route('/test')
 def test():
@@ -112,13 +123,17 @@ def test():
 
     session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
     session['resource_authorization'] = api.simple_request(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',  session['client_credentials'][u'client_access_token'])
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',
+        session['client_credentials'][u'client_access_token']
+        )
 
-    root = ET.fromstring(session['resource_authorization']['data'])
+    xml_dict = parse(session['resource_authorization']['data'])
+    bulk_url = xml_dict[u'ns1:feed'][u'ns1:entry'][1][u'ns1:content'][u'ns0:Authorization'][u'ns0:resourceURI']
 
-    for resource in root.iter('{http://naesb.org/espi}resourceURI'):
-        if 'Batch/Bulk' in resource.text:
-            api.simple_request(resource.text, session['client_credentials'][u'client_access_token'])
+    api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
+
+
+
 
 
     return render_template('public/test.html')
@@ -132,7 +147,7 @@ def oauth():
 def oauth_redirect():
     """	The redirect URI you provide here is where PG&E will send the Authorization Code once customer authorization is completed and you make a request for the authorization code.
     """
-    session['test'] = 'testing'
+
     return render_template('public/oauth.html', page_title='Redirect')
 
 @blueprint.route('/notifications', methods=['GET', 'POST'])
@@ -141,18 +156,15 @@ def notifications():
     if request.method == 'POST':
         print request.data
         bulk_root = ET.fromstring(request.data)
+        xml_dict = parse(request.data)
 
-        session['bulk_data'] = []
         session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
-
-        for resource in bulk_root.iter('{http://naesb.org/espi}resources'):
+        session['bulk_data'] = []
+        for resource in xml_dict[u'ns0:BatchList']:
             session['bulk_data'].append(api.simple_request(resource.text, session['client_credentials'][u'client_access_token']))
 
         for resource in session['bulk_data']:
             pass
             send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", ['dan@danwins.com'], resource['data'])
-
-
-
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
