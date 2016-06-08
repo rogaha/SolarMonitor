@@ -127,8 +127,8 @@ def charts():
             session['client_credentials'][u'client_access_token']
             )
 
-        start_date_epoch = datetime.datetime.strptime(form.start_date.data, '%Y-%m-%d').strftime('%Y-%m%dT%H:%M:%S%Z')
-        end_date_epoch = datetime.datetime.strptime(form.end_date.data, '%Y-%m-%d').strftime('%Y-%m%dT%H:%M:%S%Z')
+        start_date_epoch = datetime.datetime.strptime(form.start_date.data, '%Y-%m-%d').strftime('%Y-%m-%dT%H:%M:%SZ')
+        end_date_epoch = datetime.datetime.strptime(form.end_date.data, '%Y-%m-%d').strftime('%Y-%m-%dT%H:%M:%SZ')
 
         print start_date_epoch, end_date_epoch
 
@@ -206,7 +206,10 @@ def notifications():
                 if u'ns0:IntervalBlock' in resource[u'ns1:content']:
 
                     for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
-                        reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
+                        try:
+                            reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
+                        except:
+                            reading[u'ns0:timePeriod']
                         reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
                         reading_type['interval_value'] = reading[u'ns0:value']
 
