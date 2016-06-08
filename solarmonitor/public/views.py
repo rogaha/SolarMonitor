@@ -15,6 +15,9 @@ import requests
 from jxmlease import parse
 import xml.etree.cElementTree as ET
 
+import datetime
+
+
 
 
 config = Config()
@@ -167,7 +170,7 @@ def notifications():
 
         for resource in bulk_data:
             """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
-            database.
+            database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
             """
             data = parse(resource['data'])
 
@@ -197,7 +200,7 @@ def notifications():
                             commodity_type=reading_type['commodity_type'],
                             measuring_period=reading_type['measuring_period'],
                             interval_value=reading_type['interval_value'],
-                            interval_start=reading_type['interval_start'],
+                            interval_start=datetime.datetime.fromtimestamp(reading_type['interval_start']),
                             interval_duration=reading_type['interval_duration'],
                             flow_direction=reading_type['flow_direction'],
                             unit_of_measure=reading_type['unit_of_measure'],
