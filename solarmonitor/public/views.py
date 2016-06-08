@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Public section, including homepage and signup."""
-from flask import Blueprint, flash, redirect, render_template, request, url_for, session, current_user
-from flask_login import login_required, login_user, logout_user
+from flask import Blueprint, flash, redirect, render_template, request, url_for, session
+from flask_login import login_required, login_user, logout_user, current_user
 
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm
