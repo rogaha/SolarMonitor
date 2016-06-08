@@ -169,6 +169,7 @@ def notifications():
             """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
             database.
             """
+            print resource
             data = parse(resource)
 
             reading_type = {}
