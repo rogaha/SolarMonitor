@@ -163,7 +163,7 @@ def notifications():
             This for-loop will grab all of these url's and make a get request to each one. PGE will then respond to the GET request by returning the bulk data
             XML immediately, which is then added to the bulk_data list for processing.
             """
-            bulk_data.append(api.simple_request(resource, client_credentials))
+            bulk_data.append(api.simple_request(resource, client_credentials[u'client_access_token']))
 
         for resource in bulk_data:
             """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
