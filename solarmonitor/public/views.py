@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Public section, including homepage and signup."""
-from flask import Blueprint, flash, redirect, render_template, request, url_for, session
+from flask import Blueprint, flash, redirect, render_template, request, url_for, session, current_user
 from flask_login import login_required, login_user, logout_user
 
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
@@ -190,7 +190,8 @@ def notifications():
                         reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
                         reading_type['interval_value'] = reading[u'ns0:value']
 
-                        usage_point = UsagePoint(user_id=1,
+                        usage_point = UsagePoint(
+                            user_id=current_user.id,
                             commodity_type=reading_type['commodity_type'],
                             measuring_period=reading_type['measuring_period'],
                             interval_value=reading_type['interval_value'],
@@ -199,8 +200,19 @@ def notifications():
                             flow_direction=reading_type['flow_direction'],
                             unit_of_measure=reading_type['unit_of_measure'],
                             power_of_ten_multiplier=reading_type['power_of_ten_multiplier'],
-                            accumulation_behavior=reading_type['accumulation_behavior'])
-                        db.session.add(usage_point)
-                        db.session.commit()
+                            accumulation_behavior=reading_type['accumulation_behavior']
+                            )
+
+                        duplicate_check = UsagePoint.query.filter_by(
+                            user_id=current_user.id,
+                            interval_value=usage_point.interval_value,
+                            flow_direction=usage_point.flow_direction,
+                            interval_start=usage_point.interval_start
+                            ).first()
+                        if duplicate_check == None:
+                            db.session.add(usage_point)
+                            db.session.commit()
+                        else:
+                            print 'usage_point already in database'
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
