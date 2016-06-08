@@ -209,7 +209,10 @@ def notifications():
                         try:
                             reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
                         except:
-                            reading[u'ns0:timePeriod']
+                            try:
+                                print reading[u'ns0:timePeriod']
+                            except:
+                                print reading
                         reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
                         reading_type['interval_value'] = reading[u'ns0:value']
 
