@@ -191,7 +191,7 @@ def notifications():
                         reading_type['interval_value'] = reading[u'ns0:value']
 
                         usage_point = UsagePoint(
-                            user_id=current_user.id,
+                            user_id=50098,
                             commodity_type=reading_type['commodity_type'],
                             measuring_period=reading_type['measuring_period'],
                             interval_value=reading_type['interval_value'],
@@ -204,7 +204,7 @@ def notifications():
                             )
 
                         duplicate_check = UsagePoint.query.filter_by(
-                            user_id=current_user.id,
+                            user_id=50098,
                             interval_value=usage_point.interval_value,
                             flow_direction=usage_point.flow_direction,
                             interval_start=usage_point.interval_start
