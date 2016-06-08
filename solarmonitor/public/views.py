@@ -187,6 +187,7 @@ def notifications():
 
                     for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
                         reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
+                        print reading[u'ns0:timePeriod']
                         reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
                         reading_type['interval_value'] = reading[u'ns0:value']
 
@@ -209,6 +210,7 @@ def notifications():
                             flow_direction=usage_point.flow_direction,
                             interval_start=usage_point.interval_start
                             ).first()
+
                         if duplicate_check == None:
                             db.session.add(usage_point)
                             db.session.commit()
