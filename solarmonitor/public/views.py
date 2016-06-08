@@ -16,6 +16,7 @@ from jxmlease import parse
 import xml.etree.cElementTree as ET
 
 import datetime
+import rfc3339
 
 
 
@@ -127,20 +128,30 @@ def charts():
             session['client_credentials'][u'client_access_token']
             )
 
-        start_date_epoch = datetime.datetime.strptime(form.start_date.data, '%Y-%m-%d').strftime('%Y-%m-%dT%H:%M:%SZ')
-        end_date_epoch = datetime.datetime.strptime(form.end_date.data, '%Y-%m-%d').strftime('%Y-%m-%dT%H:%M:%SZ')
+        start_date_epoch = datetime.datetime.strptime(form.start_date.data, '%Y-%m-%d').strftime('%s')
+        end_date_epoch = datetime.datetime.strptime(form.end_date.data, '%Y-%m-%d').strftime('%s')
 
         print start_date_epoch, end_date_epoch
 
         xml_dict = parse(session['resource_authorization']['data'])
         bulk_url = xml_dict[u'ns1:feed'][u'ns1:entry'][1][u'ns1:content'][u'ns0:Authorization'][u'ns0:resourceURI']
-        bulk_url += '?published-min={}&publishedmax={}' .format(start_date_epoch, end_date_epoch)
+        bulk_url += '?published-min={}&published-max={}' .format('2016-06-01T19:08:186Z', '2016-06-08T19:08:186Z')
 
         print bulk_url
 
-        api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
+        print api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
 
-    return render_template('public/data_chart.html', form=form)
+    incoming_electric_list = UsagePoint.query.filter_by(flow_direction=1).all()
+    incoming_electric = [x.interval_value for x in incoming_electric_list]
+    incoming_labels = [x.interval_start.strftime('%d/%m %H:00') for x in incoming_electric_list]
+
+
+    outgoing_electric_list = UsagePoint.query.filter_by(flow_direction=19).all()
+    outgoing_electric = [x.interval_value for x in outgoing_electric_list]
+    outgoing_labels = [x.interval_start.strftime('%d/%m %H:00') for x in outgoing_electric_list]
+
+
+    return render_template('public/data_chart.html', form=form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels)
 
 @blueprint.route('/test')
 def test():
@@ -206,13 +217,7 @@ def notifications():
                 if u'ns0:IntervalBlock' in resource[u'ns1:content']:
 
                     for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
-                        try:
-                            reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
-                        except:
-                            try:
-                                print reading[u'ns0:timePeriod']
-                            except:
-                                print reading
+                        reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
                         reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
                         reading_type['interval_value'] = reading[u'ns0:value']
 

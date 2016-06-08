@@ -20,6 +20,9 @@ class UsagePoint(db.Model):
     power_of_ten_multiplier = db.Column(db.Integer)
     accumulation_behavior = db.Column(db.Integer)
 
+    def __repr__(self):
+        return '<UsagePoint {}>' .format(self.id)
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

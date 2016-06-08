@@ -71,10 +71,85 @@
   </fieldset>
   </form>
 
-{{ test }}
-
-
 </div><!-- /.jumbotron -->
+<div class="row">
+    <div class="col-sm-4">
 
+    <canvas id="myChart" width="100" height="100"></canvas>
+
+    <script>
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: {{ outgoing_labels|safe }},
+          datasets: [{
+              label: 'Outgoing Electric (Sold to Grid)',
+              data: {{ outgoing_electric|safe }},
+              borderWidth: 1
+          }]
+      },
+      options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero:true
+                  }
+              }]
+          }
+      }
+    });
+    </script>
+
+    </div>
+
+    <div class="col-sm-4">
+
+    <canvas id="myChart2" width="100" height="100"></canvas>
+
+    <script>
+    var ctx = document.getElementById("myChart2");
+    var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: {{ incoming_labels|safe }},
+          datasets: [{
+              label: 'Incoming Electric (Usage)',
+              data: {{ incoming_electric|safe }},
+              borderWidth: 1
+          }]
+      },
+      options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero:true
+                  }
+              }]
+          }
+      }
+    });
+    </script>
+
+    </div>
+    <div class="col-sm-4">
+      <p>Debug Data</p>
+      {{ incoming_labels|safe }}
+
+    {% for reading in outgoing_electric %}
+
+    {{ reading }},
+
+    {% endfor %}
+
+    <hr>
+
+    {% for reading in incoming_electric %}
+
+    {{ reading }},
+
+    {% endfor %}
+    </div>
+</div>
 
 {% endblock %}
