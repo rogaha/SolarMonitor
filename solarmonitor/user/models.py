@@ -6,11 +6,19 @@ from flask_login import UserMixin
 
 from solarmonitor.extensions import bcrypt, db
 
-class Session(db.Model):
-    __tablename__ = 'sessions'
+class UsagePoint(db.Model):
+    __tablename__ = 'usagepoints'
     id = db.Column(db.Integer, primary_key=True)
-    access = db.Column(db.String(240))
-    data = db.Column(db.String(240)) 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    commodity_type = db.Column(db.Integer)
+    measuring_period = db.Column(db.Integer)
+    interval_start = db.Column(db.Integer)
+    interval_duration = db.Column(db.Integer)
+    interval_value = db.Column(db.Integer)
+    flow_direction = db.Column(db.Integer)
+    unit_of_measure = db.Column(db.Integer)
+    power_of_ten_multiplier = db.Column(db.Integer)
+    accumulation_behavior = db.Column(db.Integer)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -25,8 +33,10 @@ class User(UserMixin, db.Model):
     city = db.Column(db.String(64))
     zip_code = db.Column(db.Integer)
     cell_phone = db.Column(db.Integer)
+    pge_bulk_id = db.Column(db.Integer)
     role_id = db.Column(db.Integer)
     password_hash = db.Column(db.String(128))
+    usage_points = db.relationship('UsagePoint', backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
 
     @property

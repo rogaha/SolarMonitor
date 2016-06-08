@@ -6,7 +6,7 @@ from flask_login import login_required, login_user, logout_user
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm
 from solarmonitor.user.forms import RegistrationForm
-from solarmonitor.user.models import User
+from solarmonitor.user.models import User, UsagePoint
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
@@ -89,6 +89,7 @@ def register():
                     city='',
                     state='',
                     zip_code=0,
+                    pge_bulk_id=0,
                     cell_phone=0,)
         db.session.add(user)
         db.session.commit()
@@ -106,14 +107,13 @@ def about():
 
 @blueprint.route('/charts')
 def charts():
-    """About page."""
-    #oauth.get_access_token('https://api.pge.com/datacustodian/oauth/v2/token', )
-
-    r = requests.get(
-    'https://api.pge.com/datacustodian/oauth/v2/authorize?client_id={}&redirect_uri=https://solarmonitor.epirtle.com/oauth-redirect&scope=357&response_type=code'.format(config.PGE_CLIENT_CREDENTIALS['client_key']), cert=(config.SSL_CERTS["crt"], config.SSL_CERTS["key"]))
-
-    print r.text
-
+    """Electricity Usage Chart
+    #####################
+    Batch Subscription (Standard and EEF 3rd parties)
+    You can also request usage and billing information via the batch bulk asynchronous API for all of your customer authorizations for usage/billing data (i.e. Subscriptions).
+    Example Batch Bulk Request URL
+    https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/{BulkID}?published-min={startDate}&publishedmax={endDate}
+    """
 
     return render_template('public/data_chart.html')
 
@@ -132,10 +132,6 @@ def test():
 
     api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
 
-
-
-
-
     return render_template('public/test.html')
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])
@@ -152,18 +148,59 @@ def oauth_redirect():
 
 @blueprint.route('/notifications', methods=['GET', 'POST'])
 def notifications():
-    """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available """
+    """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available  """
     if request.method == 'POST':
-        print request.data
-        bulk_root = ET.fromstring(request.data)
-        xml_dict = parse(request.data)
+        xml_dict = parse(request.data) #Create dictionary from XML using jxmlease library
 
-        session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
-        session['bulk_data'] = []
+        client_credentials = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
+
+        bulk_data = []
         for resource in xml_dict[u'ns0:BatchList'][u'ns0:resources']:
-            session['bulk_data'].append(api.simple_request(resource, session['client_credentials'][u'client_access_token']))
+            """When a get request is made to the bulk data url, PGE will respond by posting XML data to this view function. The xml data will have one or more url's
+            that can be used to access the bulk data. The urls look identical the bulk data url, but there is an extra paramater at the end.
+            ex. https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/50098?correlationID=f5ee53cf-247b-4a2f-abdc-7f650fecb1b5
 
-        for resource in session['bulk_data']:
-            send_email("admin <admin@solarmonitor.epirtle.com>", "incoming post data", ['dan@danwins.com'], resource['data'])
+            This for-loop will grab all of these url's and make a get request to each one. PGE will then respond to the GET request by returning the bulk data
+            XML immediately, which is then added to the bulk_data list for processing.
+            """
+            bulk_data.append(api.simple_request(resource, client_credentials))
+
+        for resource in bulk_data:
+            """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
+            database.
+            """
+            data = parse(resource)
+
+            reading_type = {}
+
+            for resource in data[u'ns1:feed'][u'ns1:entry']:
+
+                if u'ns0:ReadingType' in resource[u'ns1:content']:
+                    reading_type['commodity_type'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:commodity']
+                    reading_type['flow_direction'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:flowDirection']
+                    reading_type['unit_of_measure'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:uom']
+                    reading_type['measuring_period'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:measuringPeriod']
+                    reading_type['power_of_ten_multiplier'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:powerOfTenMultiplier']
+                    reading_type['accumulation_behavior'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:accumulationBehaviour']
+
+                if u'ns0:IntervalBlock' in resource[u'ns1:content']:
+
+                    for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
+                        reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
+                        reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
+                        reading_type['interval_value'] = reading[u'ns0:value']
+
+                        usage_point = UsagePoint(user_id=1,
+                            commodity_type=reading_type['commodity_type'],
+                            measuring_period=reading_type['measuring_period'],
+                            interval_value=reading_type['interval_value'],
+                            interval_start=reading_type['interval_start'],
+                            interval_duration=reading_type['interval_duration'],
+                            flow_direction=reading_type['flow_direction'],
+                            unit_of_measure=reading_type['unit_of_measure'],
+                            power_of_ten_multiplier=reading_type['power_of_ten_multiplier'],
+                            accumulation_behavior=reading_type['accumulation_behavior'])
+                        db.session.add(usage_point)
+                        db.session.commit()
 
     return render_template('public/oauth.html', page_title='Notification Bucket')

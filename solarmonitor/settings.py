@@ -20,6 +20,7 @@ class Config(object):
     #client_id and client_key are the same thing
     PGE_CLIENT_CREDENTIALS = {'client_key': 'b5020eaae0f34c56a62726ff6f059b45', 'client_secret_key': '69f7ad97530447f49d9468373cf2fc4f'}
     REG_ACCESS_TOKEN = '5fe3233d-c9f8-4ff9-9f63-3d02dc534c3c'
+    TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
 
 class ProdConfig(Config):
     """Production configuration."""
