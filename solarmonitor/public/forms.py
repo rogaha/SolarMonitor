@@ -9,3 +9,8 @@ class LoginForm(Form):
     username = StringField('User Name', validators=[Required(), Length(1, 64)])
     password = PasswordField ('Password', validators=[Required()])
     submit = SubmitField('Log In')
+
+class DateSelectForm(Form):
+    start_date = StringField('Start Date')
+    end_date = StringField('Start Date')
+    submit = SubmitField('Download Data')

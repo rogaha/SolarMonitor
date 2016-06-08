@@ -9,8 +9,69 @@
 
 
 
+  <form class="form-horizontal" action="{{ url_for('public.charts') }}" method="post">
+    {{ form.hidden_tag() }}
+  <fieldset>
 
+  <!-- Form Name -->
+  <legend>Import PGE Data</legend>
 
+  <!-- Text input-->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="textinput">Start Date</label>
+    <div class="col-md-4">
+    {{ form.start_date(class="form-control input-md", id="datepicker1") }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#datepicker1').datepicker({
+
+          format: 'yyyy-mm-dd',
+
+        })
+                ;
+
+    })
+    </script>
+
+    </div>
+  </div>
+
+  <!-- Text input-->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="textinput">End Date</label>
+    <div class="col-md-4">
+    {{ form.end_date(class="form-control input-md", id="datepicker2") }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#datepicker2').datepicker({
+
+          format: 'yyyy-mm-dd',
+
+        })
+                ;
+
+    })
+    </script>
+
+    </div>
+  </div>
+
+  <!-- Button -->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="singlebutton"></label>
+    <div class="col-md-4">
+      {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </div>
+
+  </fieldset>
+  </form>
+
+{{ test }}
 
 
 </div><!-- /.jumbotron -->

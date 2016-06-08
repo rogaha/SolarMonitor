@@ -4,7 +4,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for,
 from flask_login import login_required, login_user, logout_user, current_user
 
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
-from solarmonitor.public.forms import LoginForm
+from solarmonitor.public.forms import LoginForm, DateSelectForm
 from solarmonitor.user.forms import RegistrationForm
 from solarmonitor.user.models import User, UsagePoint
 from solarmonitor.utils import flash_errors
@@ -108,7 +108,7 @@ def about():
     """About page."""
     return render_template('public/about.html')
 
-@blueprint.route('/charts')
+@blueprint.route('/charts', methods=['GET', 'POST'])
 def charts():
     """Electricity Usage Chart
     #####################
@@ -118,22 +118,35 @@ def charts():
     https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/{BulkID}?published-min={startDate}&publishedmax={endDate}
     """
 
-    return render_template('public/data_chart.html')
+    form = DateSelectForm()
+
+    if form.validate_on_submit():
+        session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
+        session['resource_authorization'] = api.simple_request(
+            'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',
+            session['client_credentials'][u'client_access_token']
+            )
+
+        start_date_epoch = datetime.datetime.strptime(form.start_date.data, '%Y-%m-%d').strftime('%Y-%m%dT%H:%M:%S%Z')
+        end_date_epoch = datetime.datetime.strptime(form.end_date.data, '%Y-%m-%d').strftime('%Y-%m%dT%H:%M:%S%Z')
+
+        print start_date_epoch, end_date_epoch
+
+        xml_dict = parse(session['resource_authorization']['data'])
+        bulk_url = xml_dict[u'ns1:feed'][u'ns1:entry'][1][u'ns1:content'][u'ns0:Authorization'][u'ns0:resourceURI']
+        bulk_url += '?published-min={}&publishedmax={}' .format(start_date_epoch, end_date_epoch)
+
+        print bulk_url
+
+        api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
+
+    return render_template('public/data_chart.html', form=form)
 
 @blueprint.route('/test')
 def test():
     """Testing"""
 
-    session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
-    session['resource_authorization'] = api.simple_request(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',
-        session['client_credentials'][u'client_access_token']
-        )
 
-    xml_dict = parse(session['resource_authorization']['data'])
-    bulk_url = xml_dict[u'ns1:feed'][u'ns1:entry'][1][u'ns1:content'][u'ns0:Authorization'][u'ns0:resourceURI']
-
-    api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
 
     return render_template('public/test.html')
 
@@ -154,6 +167,8 @@ def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available  """
     if request.method == 'POST':
         xml_dict = parse(request.data) #Create dictionary from XML using jxmlease library
+
+        xml_dict.prettyprint()
 
         client_credentials = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
 
