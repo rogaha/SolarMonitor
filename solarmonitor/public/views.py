@@ -17,10 +17,11 @@ import xml.etree.cElementTree as ET
 
 import datetime
 from datetime import timedelta
+import pytz
 
 
 
-
+local = pytz.timezone ('US/Eastern')
 
 config = Config()
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
@@ -216,7 +217,7 @@ def charts(modify=None):
         ).order_by(UsagePoint.interval_start.asc()).all()
 
     outgoing_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in outgoing_electric_list]
-    outgoing_labels = [x.interval_start.strftime('%m/%d %H:00') for x in outgoing_electric_list]
+    outgoing_labels = [x.interval_start.strftime('%m/%d %H:%S') for x in outgoing_electric_list]
 
     incoming_electric_list = UsagePoint.query.filter(
         (UsagePoint.flow_direction==1)&
@@ -225,7 +226,7 @@ def charts(modify=None):
         ).order_by(UsagePoint.interval_start.asc()).all()
 
     incoming_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in incoming_electric_list]
-    incoming_labels = [x.interval_start.strftime('%m/%d %H:00') for x in incoming_electric_list]
+    incoming_labels = [x.interval_start.strftime('%m/%d %H:%S') for x in incoming_electric_list]
 
     #Add default data to the form, so you know what you picked last time
     date_select_form.start_date.data = start_date_pge.strftime('%Y-%m-%d')
@@ -312,7 +313,7 @@ def notifications():
                             commodity_type=reading_type['commodity_type'],
                             measuring_period=reading_type['measuring_period'],
                             interval_value=reading_type['interval_value'],
-                            interval_start=datetime.datetime.fromtimestamp(int(reading_type['interval_start'])),
+                            interval_start=datetime.datetime.fromtimestamp(int(reading_type['interval_start'])) + timedelta(hours=7),
                             interval_duration=reading_type['interval_duration'],
                             flow_direction=reading_type['flow_direction'],
                             unit_of_measure=reading_type['unit_of_measure'],

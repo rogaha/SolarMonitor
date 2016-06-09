@@ -5,8 +5,6 @@
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">
 
-  <h1>Data Chart</h1>
-
   <div class="row">
       <div class="col-md-4">
   <form class="form-horizontal" action="{{ url_for('public.charts') }}" method="post">
@@ -254,7 +252,7 @@ margin-top:50px
   Incoming Electric Hourly Data <br>
   {{ incoming_electric|safe }}
   <hr>
-  Outgoing Electric Hourly Labels
+  Outgoing Electric Hourly Labels <br>
   {{ outgoing_labels|safe }}
   <hr>
   Outgoing Electric Hourly Data <br>
