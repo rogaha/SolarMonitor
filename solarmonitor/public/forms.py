@@ -14,4 +14,9 @@ class DateSelectForm(Form):
     start_date = StringField('Start Date')
     end_date = StringField('Start Date')
     data_time_unit = SelectField('Time Unit', choices=[('Daily', 'Daily'), ('Hourly', 'Hourly')])
+    submit = SubmitField('Select Date Range')
+
+class DownloadDataForm(Form):
+    start_date = StringField('Start Date')
+    end_date = StringField('Start Date')
     submit = SubmitField('Download Data')

@@ -7,10 +7,10 @@
 
   <h1>Data Chart</h1>
 
-
-
+  <div class="row">
+      <div class="col-md-4">
   <form class="form-horizontal" action="{{ url_for('public.charts') }}" method="post">
-    {{ form.hidden_tag() }}
+    {{ download_data_form.hidden_tag() }}
   <fieldset>
 
   <!-- Form Name -->
@@ -20,18 +20,14 @@
   <div class="form-group">
     <label class="col-md-4 control-label" for="textinput">Start Date</label>
     <div class="col-md-4">
-    {{ form.start_date(class="form-control input-md", id="datepicker1") }}
+    {{ download_data_form.start_date(class="form-control input-md", id="datepicker1", autocomplete="off") }}
 
     <script type="text/javascript">
 
     $(document).ready(function() {
         $('#datepicker1').datepicker({
-
           format: 'yyyy-mm-dd',
-
-        })
-                ;
-
+        });
     })
     </script>
 
@@ -42,18 +38,70 @@
   <div class="form-group">
     <label class="col-md-4 control-label" for="textinput">End Date</label>
     <div class="col-md-4">
-    {{ form.end_date(class="form-control input-md", id="datepicker2") }}
+    {{ download_data_form.end_date(class="form-control input-md", id="datepicker2", autocomplete="off") }}
 
     <script type="text/javascript">
 
     $(document).ready(function() {
         $('#datepicker2').datepicker({
-
           format: 'yyyy-mm-dd',
+        });
+    })
+    </script>
 
-        })
-                ;
+    </div>
+  </div>
 
+
+  <!-- Button -->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="singlebutton"></label>
+    <div class="col-md-4">
+      {{ download_data_form.submit(class="btn btn-primary") }}
+    </div>
+  </div>
+
+  </fieldset>
+  </form>
+</div>
+<div class="col-md-4">
+  <form class="form-horizontal" action="{{ url_for('public.charts') }}" method="post">
+    {{ date_select_form.hidden_tag() }}
+  <fieldset>
+
+  <!-- Form Name -->
+  <legend>Select Data to View</legend>
+
+  <!-- Text input-->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="textinput">Start Date</label>
+    <div class="col-md-4">
+    {{ date_select_form.start_date(class="form-control input-md", id="datepicker3", autocomplete="off") }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#datepicker3').datepicker({
+          format: 'yyyy-mm-dd',
+        });
+    })
+    </script>
+
+    </div>
+  </div>
+
+  <!-- Text input-->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="textinput">End Date</label>
+    <div class="col-md-4">
+    {{ date_select_form.end_date(class="form-control input-md", id="datepicker4", autocomplete="off") }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#datepicker4').datepicker({
+          format: 'yyyy-mm-dd',
+        });
     })
     </script>
 
@@ -64,7 +112,7 @@
   <div class="form-group">
     <label class="col-md-4 control-label" for="singlebutton">Time Unit</label>
     <div class="col-md-4">
-      {{ form.data_time_unit(class="form-control input-md") }}
+      {{ date_select_form.data_time_unit(class="form-control input-md") }}
     </div>
   </div>
 
@@ -72,14 +120,21 @@
   <div class="form-group">
     <label class="col-md-4 control-label" for="singlebutton"></label>
     <div class="col-md-4">
-      {{ form.submit(class="btn btn-primary") }}
+      {{ date_select_form.submit(class="btn btn-primary") }}
     </div>
   </div>
 
   </fieldset>
   </form>
-
+</div>
+</div>
 </div><!-- /.jumbotron -->
+<style type="text/css">
+.datepicker {
+margin-top:50px
+
+}
+</style>
 <div class="row">
     <div class="col-sm-4">
 
@@ -92,7 +147,7 @@
       data: {
           labels: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_label|safe }} {% else %}  {{ outgoing_labels|safe }} {% endif %},
           datasets: [{
-              label: 'Outgoing Electric (Sold to Grid)',
+              label: 'Outgoing Electric (Sold to Grid) kWh',
               data: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_data|safe }} {% else %}  {{ outgoing_electric|safe }} {% endif %},
               borderWidth: 1
           }]
@@ -122,7 +177,7 @@
       data: {
           labels: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_label|safe }} {% else %}  {{ incoming_labels|safe }} {% endif %},
           datasets: [{
-              label: 'Incoming Electric (Usage)',
+              label: 'Incoming Electric (Usage) kWh',
               data: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_data|safe }} {% else %}  {{ incoming_electric|safe }} {% endif %},
               borderWidth: 1
           }]
@@ -141,42 +196,75 @@
 
     </div>
     <div class="col-sm-4">
-      <p>Debug Data</p>
 
-<p>Start Date: {{ session['start_date_pge'] }}<br>
+      <canvas id="myChart3" width="100" height="100"></canvas>
 
-End Date:{{ session['end_date_pge'] }}</br><br>
+      <script>
+      var ctx = document.getElementById("myChart3");
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_label|safe }} {% else %}  {{ outgoing_labels|safe }} {% endif %},
+            datasets: [{
+                label: 'Combined Electric (+/-) kWh',
+                data: {% if session['data_time_unit'] == "Daily"%}{{ daily_combined_electric_usage|safe }} {% else %}{{ hourly_combined_electric_usage|safe }}{% endif %} ,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+      });
+      </script>
 
-<a class="btn btn-primary" href="{{ url_for('public.charts', modify='clear') }}"> Clear Dates</a>
-
-<a class="btn btn-primary" href="{{ url_for('public.charts', modify='delete-data') }}"> Delete All Data</a>
-
-</p>
-
-<p>
-{{ incoming_electric_daily_data }}
-
-<br><br>
-
-{{ incoming_electric_daily_label}}
-</p>
-
-      {{ incoming_labels|safe }}
-
-    {% for reading in outgoing_electric %}
-
-    {{ reading }},
-
-    {% endfor %}
-
-    <hr>
-
-    {% for reading in incoming_electric %}
-
-    {{ reading }},
-
-    {% endfor %}
     </div>
 </div>
+
+<div class="row">
+    <div class="col-sm-4">
+
+      <p>Debug Data</p>
+
+  <p>Start Date: {{ session['start_date_pge'] }}<br>
+
+  End Date:{{ session['end_date_pge'] }}</br><br>
+
+  <a class="btn btn-primary" href="{{ url_for('public.charts', modify='clear') }}"> Clear Session</a>
+
+  <a class="btn btn-primary" href="{{ url_for('public.charts', modify='delete-data') }}"> Clear Database</a>
+
+  </p>
+
+  <hr>
+  Incoming Electric Daily Data<br>
+  {{ incoming_electric_daily_data }}
+  <hr>
+  Incoming Electric Daily Labels<br>
+  {{ incoming_electric_daily_label}}
+  <hr>
+  Incoming Electric Hourly Labels<br>
+  {{ incoming_labels|safe }}
+  <hr>
+  Incoming Electric Hourly Data <br>
+  {{ incoming_electric|safe }}
+  <hr>
+  Outgoing Electric Hourly Labels
+  {{ outgoing_labels|safe }}
+  <hr>
+  Outgoing Electric Hourly Data <br>
+  {{ outgoing_electric|safe }}
+
+  <br><br><br><br>
+
+
+
+    </div>
+  </div>
 
 {% endblock %}

@@ -4,7 +4,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for,
 from flask_login import login_required, login_user, logout_user, current_user
 
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
-from solarmonitor.public.forms import LoginForm, DateSelectForm
+from solarmonitor.public.forms import LoginForm, DateSelectForm, DownloadDataForm
 from solarmonitor.user.forms import RegistrationForm
 from solarmonitor.user.models import User, UsagePoint
 from solarmonitor.utils import flash_errors
@@ -114,13 +114,11 @@ def about():
 @blueprint.route('/charts/session/<modify>', methods=['GET', 'POST'])
 def charts(modify=None):
     """Electricity Usage Chart
-    Batch Subscription (Standard and EEF 3rd parties)
-    You can also request usage and billing information via the batch bulk asynchronous API for all of your customer authorizations for usage/billing data (i.e. Subscriptions).
-    Example Batch Bulk Request URL
-    https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/{BulkID}?published-min={startDate}&published-max={endDate}
+
     """
 
-    form = DateSelectForm()
+    date_select_form = DateSelectForm(prefix="date_select_form")
+    download_data_form = DownloadDataForm(prefix="download_data_form")
 
     if modify == 'clear':
         session.clear()
@@ -134,25 +132,29 @@ def charts(modify=None):
     if 'start_date_pge' in session:
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
     else:
-        start_date_pge = datetime.datetime.strptime('2016-06-01', '%Y-%m-%d')
+        start_date_pge = datetime.datetime.now() - timedelta(days=1)
 
     if 'end_date_pge' in session:
         end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
     else:
-        end_date_pge = datetime.datetime.strptime('2016-06-02', '%Y-%m-%d')
+        end_date_pge = datetime.datetime.now()
 
+    if date_select_form.validate_on_submit():
+        session['data_time_unit'] = date_select_form.data_time_unit.data
+        session['start_date_pge'] = date_select_form.start_date.data
+        session['end_date_pge'] = date_select_form.end_date.data
+        start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
+        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
 
-
-    if form.validate_on_submit():
+    if download_data_form.validate_on_submit():
         session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
         session['resource_authorization'] = api.simple_request(
             'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',
             session['client_credentials'][u'client_access_token']
             )
 
-        session['data_time_unit'] = form.data_time_unit.data
-        session['start_date_pge'] = form.start_date.data
-        session['end_date_pge'] = form.end_date.data
+        session['start_date_pge'] = download_data_form.start_date.data
+        session['end_date_pge'] = download_data_form.end_date.data
 
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
         end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
@@ -167,15 +169,7 @@ def charts(modify=None):
 
         print api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
 
-    incoming_electric_list = UsagePoint.query.filter(
-        (UsagePoint.flow_direction==1)&
-        (UsagePoint.interval_start>=start_date_pge)&
-        (UsagePoint.interval_start<end_date_pge)
-        ).order_by(UsagePoint.interval_start.asc()).all()
-
-    incoming_electric = [x.interval_value * (10**x.power_of_ten_multiplier) for x in incoming_electric_list]
-    incoming_labels = [x.interval_start.strftime('%m/%d %H:00') for x in incoming_electric_list]
-
+    """This next section will grab the data and organize it into usage by day."""
     incoming_electric_daily_data = []
     incoming_electric_daily_label = []
     outgoing_electric_daily_data = []
@@ -202,10 +196,10 @@ def charts(modify=None):
                 outgoing_interval_value = 0
 
                 for datapoint in incoming_electric_daily:
-                    incoming_interval_value += (datapoint.interval_value * (10**datapoint.power_of_ten_multiplier))
+                    incoming_interval_value += (datapoint.interval_value * (10**(datapoint.power_of_ten_multiplier -3)))
 
                 for datapoint in outgoing_electric_daily:
-                    outgoing_interval_value += (datapoint.interval_value * (10**datapoint.power_of_ten_multiplier))
+                    outgoing_interval_value += (datapoint.interval_value * (10**(datapoint.power_of_ten_multiplier -3)))
 
                 incoming_electric_daily_data.append(incoming_interval_value)
                 incoming_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
@@ -214,21 +208,36 @@ def charts(modify=None):
                 outgoing_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
                 n += 1
 
-
+    """This next section will grab the data and organize it into usage by hour."""
     outgoing_electric_list = UsagePoint.query.filter(
         (UsagePoint.flow_direction==19)&
         (UsagePoint.interval_start>=start_date_pge)&
         (UsagePoint.interval_start<end_date_pge)
         ).order_by(UsagePoint.interval_start.asc()).all()
 
-    outgoing_electric = [x.interval_value * (10**x.power_of_ten_multiplier) for x in outgoing_electric_list]
+    outgoing_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in outgoing_electric_list]
     outgoing_labels = [x.interval_start.strftime('%m/%d %H:00') for x in outgoing_electric_list]
 
-    if not any([incoming_electric_list, outgoing_electric_list]):
-        flash('No data yet, try refreshing the page.')
+    incoming_electric_list = UsagePoint.query.filter(
+        (UsagePoint.flow_direction==1)&
+        (UsagePoint.interval_start>=start_date_pge)&
+        (UsagePoint.interval_start<end_date_pge)
+        ).order_by(UsagePoint.interval_start.asc()).all()
+
+    incoming_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in incoming_electric_list]
+    incoming_labels = [x.interval_start.strftime('%m/%d %H:00') for x in incoming_electric_list]
+
+    #Add default data to the form, so you know what you picked last time
+    date_select_form.start_date.data = start_date_pge.strftime('%Y-%m-%d')
+    date_select_form.end_date.data = (end_date_pge - timedelta(days=1)).strftime('%Y-%m-%d')
+
+    """This section merges both incoming and outgoing daily electric usage """
+    daily_combined_electric_usage = [x - y for x, y in zip(incoming_electric_daily_data, outgoing_electric_daily_data)]
+
+    hourly_combined_electric_usage = [x - y for x, y in zip(incoming_electric, outgoing_electric)]
 
 
-    return render_template('public/data_chart.html', form=form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels, incoming_electric_daily_data=incoming_electric_daily_data, incoming_electric_daily_label=incoming_electric_daily_label, outgoing_electric_daily_data=outgoing_electric_daily_data, outgoing_electric_daily_label=outgoing_electric_daily_label)
+    return render_template('public/data_chart.html', date_select_form=date_select_form, download_data_form=download_data_form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels, incoming_electric_daily_data=incoming_electric_daily_data, incoming_electric_daily_label=incoming_electric_daily_label, outgoing_electric_daily_data=outgoing_electric_daily_data, outgoing_electric_daily_label=outgoing_electric_daily_label, daily_combined_electric_usage=daily_combined_electric_usage, hourly_combined_electric_usage=hourly_combined_electric_usage)
 
 @blueprint.route('/test')
 def test():
