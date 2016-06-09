@@ -60,6 +60,14 @@
     </div>
   </div>
 
+  <!-- SelectField -->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="singlebutton">Time Unit</label>
+    <div class="col-md-4">
+      {{ form.data_time_unit(class="form-control input-md") }}
+    </div>
+  </div>
+
   <!-- Button -->
   <div class="form-group">
     <label class="col-md-4 control-label" for="singlebutton"></label>
@@ -82,10 +90,10 @@
     var myChart = new Chart(ctx, {
       type: 'bar',
       data: {
-          labels: {{ outgoing_labels|safe }},
+          labels: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_label|safe }} {% else %}  {{ outgoing_labels|safe }} {% endif %},
           datasets: [{
               label: 'Outgoing Electric (Sold to Grid)',
-              data: {{ outgoing_electric|safe }},
+              data: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_data|safe }} {% else %}  {{ outgoing_electric|safe }} {% endif %},
               borderWidth: 1
           }]
       },
@@ -112,10 +120,10 @@
     var myChart = new Chart(ctx, {
       type: 'bar',
       data: {
-          labels: {{ incoming_labels|safe }},
+          labels: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_label|safe }} {% else %}  {{ incoming_labels|safe }} {% endif %},
           datasets: [{
               label: 'Incoming Electric (Usage)',
-              data: {{ incoming_electric|safe }},
+              data: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_data|safe }} {% else %}  {{ incoming_electric|safe }} {% endif %},
               borderWidth: 1
           }]
       },
@@ -134,6 +142,23 @@
     </div>
     <div class="col-sm-4">
       <p>Debug Data</p>
+
+<p>Start Date: {{ session['start_date_pge'] }}<br>
+
+End Date:{{ session['end_date_pge'] }}</br><br>
+
+<a class="btn btn-primary" href="{{ url_for('public.charts', modify='clear') }}"> Clear Dates</a>
+
+</p>
+
+<p>
+{{ incoming_electric_daily_data }}
+
+<br><br>
+
+{{ incoming_electric_daily_label}}
+</p>
+
       {{ incoming_labels|safe }}
 
     {% for reading in outgoing_electric %}

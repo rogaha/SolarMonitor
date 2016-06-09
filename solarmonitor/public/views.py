@@ -16,6 +16,7 @@ from jxmlease import parse
 import xml.etree.cElementTree as ET
 
 import datetime
+from datetime import timedelta
 
 
 
@@ -110,7 +111,8 @@ def about():
     return render_template('public/about.html')
 
 @blueprint.route('/charts', methods=['GET', 'POST'])
-def charts():
+@blueprint.route('/charts/session/<modify>', methods=['GET', 'POST'])
+def charts(modify=None):
     """Electricity Usage Chart
     Batch Subscription (Standard and EEF 3rd parties)
     You can also request usage and billing information via the batch bulk asynchronous API for all of your customer authorizations for usage/billing data (i.e. Subscriptions).
@@ -120,15 +122,21 @@ def charts():
 
     form = DateSelectForm()
 
+    if modify == 'clear':
+        session.clear()
+        return redirect(url_for('public.charts'))
+
     if 'start_date_pge' in session:
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
     else:
         start_date_pge = datetime.datetime.strptime('2016-06-01', '%Y-%m-%d')
 
     if 'end_date_pge' in session:
-        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d')
+        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
     else:
         end_date_pge = datetime.datetime.strptime('2016-06-02', '%Y-%m-%d')
+
+
 
     if form.validate_on_submit():
         session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
@@ -137,6 +145,8 @@ def charts():
             session['client_credentials'][u'client_access_token']
             )
 
+        if form.data_time_unit.data == "Daily":
+            session['data_time_unit'] = "Daily"
         session['start_date_pge'] = form.start_date.data
         session['end_date_pge'] = form.end_date.data
 
@@ -156,24 +166,65 @@ def charts():
     incoming_electric_list = UsagePoint.query.filter(
         (UsagePoint.flow_direction==1)&
         (UsagePoint.interval_start>=start_date_pge)&
-        (UsagePoint.interval_start<=end_date_pge)
+        (UsagePoint.interval_start<end_date_pge)
         ).order_by(UsagePoint.interval_start.asc()).all()
 
     incoming_electric = [x.interval_value * (10**x.power_of_ten_multiplier) for x in incoming_electric_list]
     incoming_labels = [x.interval_start.strftime('%m/%d %H:00') for x in incoming_electric_list]
 
+    incoming_electric_daily_data = []
+    incoming_electric_daily_label = []
+    outgoing_electric_daily_data = []
+    outgoing_electric_daily_label = []
+
+    if 'data_time_unit' in session:
+        if session['data_time_unit'] == "Daily":
+            delta = end_date_pge - start_date_pge
+            n = 0
+            while n < delta.days:
+                incoming_electric_daily = UsagePoint.query.filter(
+                    (UsagePoint.flow_direction==1)&
+                    (UsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
+                    (UsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
+                    ).order_by(UsagePoint.interval_start.asc()).all()
+
+                outgoing_electric_daily = UsagePoint.query.filter(
+                    (UsagePoint.flow_direction==19)&
+                    (UsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
+                    (UsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
+                    ).order_by(UsagePoint.interval_start.asc()).all()
+
+                incoming_interval_value = 0
+                outgoing_interval_value = 0
+
+                for datapoint in incoming_electric_daily:
+                    incoming_interval_value += datapoint.interval_value
+
+                for datapoint in outgoing_electric_daily:
+                    outgoing_interval_value += datapoint.interval_value
+
+                incoming_electric_daily_data.append(incoming_interval_value * (10**x.power_of_ten_multiplier))
+                incoming_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
+
+                outgoing_electric_daily_data.append(outgoing_interval_value * (10**x.power_of_ten_multiplier))
+                outgoing_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
+                n += 1
+
 
     outgoing_electric_list = UsagePoint.query.filter(
         (UsagePoint.flow_direction==19)&
         (UsagePoint.interval_start>=start_date_pge)&
-        (UsagePoint.interval_start<=end_date_pge)
+        (UsagePoint.interval_start<end_date_pge)
         ).order_by(UsagePoint.interval_start.asc()).all()
 
     outgoing_electric = [x.interval_value * (10**x.power_of_ten_multiplier) for x in outgoing_electric_list]
     outgoing_labels = [x.interval_start.strftime('%m/%d %H:00') for x in outgoing_electric_list]
 
+    if not any([incoming_electric_list, outgoing_electric_list]):
+        flash('No data yet, try refreshing the page.')
 
-    return render_template('public/data_chart.html', form=form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels)
+
+    return render_template('public/data_chart.html', form=form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels, incoming_electric_daily_data=incoming_electric_daily_data, incoming_electric_daily_label=incoming_electric_daily_label, outgoing_electric_daily_data=outgoing_electric_daily_data, outgoing_electric_daily_label=outgoing_electric_daily_label)
 
 @blueprint.route('/test')
 def test():
