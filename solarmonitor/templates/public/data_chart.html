@@ -17,7 +17,7 @@
   <!-- Text input-->
   <div class="form-group">
     <label class="col-md-4 control-label" for="textinput">Start Date</label>
-    <div class="col-md-4">
+    <div class="col-md-6">
     {{ download_data_form.start_date(class="form-control input-md", id="datepicker1", autocomplete="off") }}
 
     <script type="text/javascript">
@@ -35,7 +35,7 @@
   <!-- Text input-->
   <div class="form-group">
     <label class="col-md-4 control-label" for="textinput">End Date</label>
-    <div class="col-md-4">
+    <div class="col-md-6">
     {{ download_data_form.end_date(class="form-control input-md", id="datepicker2", autocomplete="off") }}
 
     <script type="text/javascript">
@@ -54,7 +54,7 @@
   <!-- Button -->
   <div class="form-group">
     <label class="col-md-4 control-label" for="singlebutton"></label>
-    <div class="col-md-4">
+    <div class="col-md-6">
       {{ download_data_form.submit(class="btn btn-primary") }}
     </div>
   </div>
@@ -73,7 +73,7 @@
   <!-- Text input-->
   <div class="form-group">
     <label class="col-md-4 control-label" for="textinput">Start Date</label>
-    <div class="col-md-4">
+    <div class="col-md-6">
     {{ date_select_form.start_date(class="form-control input-md", id="datepicker3", autocomplete="off") }}
 
     <script type="text/javascript">
@@ -91,7 +91,7 @@
   <!-- Text input-->
   <div class="form-group">
     <label class="col-md-4 control-label" for="textinput">End Date</label>
-    <div class="col-md-4">
+    <div class="col-md-6">
     {{ date_select_form.end_date(class="form-control input-md", id="datepicker4", autocomplete="off") }}
 
     <script type="text/javascript">
@@ -134,22 +134,39 @@ margin-top:50px
 }
 </style>
 <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-6">
 
     <canvas id="myChart" width="100" height="100"></canvas>
 
     <script>
+    var data = {
+    labels: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_label|safe }} {% else %}  {{ outgoing_labels|safe }} {% endif %},
+    datasets: [
+        {
+            label: 'Outgoing Electric (Sold to Grid) kWh',
+            backgroundColor: "rgba(127,191,63,0.2)",
+            borderColor: "rgba(9,174,9,1)",
+            borderWidth: 1,
+            hoverBackgroundColor: "rgba(127,191,63,0.4)",
+            hoverBorderColor: "rgba(9,174,9,1)",
+            data: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_data|safe }} {% else %}  {{ outgoing_electric|safe }} {% endif %},
+        },
+
+        {
+            label: 'Incoming Electric (Usage) kWh',
+            backgroundColor: "rgba(255,99,132,0.2)",
+            borderColor: "rgba(255,99,132,1)",
+            borderWidth: 1,
+            hoverBackgroundColor: "rgba(255,99,132,0.4)",
+            hoverBorderColor: "rgba(255,99,132,1)",
+            data: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_data|safe }} {% else %}  {{ incoming_electric|safe }} {% endif %},
+        }
+    ]
+};
     var ctx = document.getElementById("myChart");
     var myChart = new Chart(ctx, {
       type: 'bar',
-      data: {
-          labels: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_label|safe }} {% else %}  {{ outgoing_labels|safe }} {% endif %},
-          datasets: [{
-              label: 'Outgoing Electric (Sold to Grid) kWh',
-              data: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_data|safe }} {% else %}  {{ outgoing_electric|safe }} {% endif %},
-              borderWidth: 1
-          }]
-      },
+      data: data,
       options: {
           scales: {
               yAxes: [{
@@ -164,36 +181,8 @@ margin-top:50px
 
     </div>
 
-    <div class="col-sm-4">
 
-    <canvas id="myChart2" width="100" height="100"></canvas>
-
-    <script>
-    var ctx = document.getElementById("myChart2");
-    var myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-          labels: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_label|safe }} {% else %}  {{ incoming_labels|safe }} {% endif %},
-          datasets: [{
-              label: 'Incoming Electric (Usage) kWh',
-              data: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_data|safe }} {% else %}  {{ incoming_electric|safe }} {% endif %},
-              borderWidth: 1
-          }]
-      },
-      options: {
-          scales: {
-              yAxes: [{
-                  ticks: {
-                      beginAtZero:true
-                  }
-              }]
-          }
-      }
-    });
-    </script>
-
-    </div>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
 
       <canvas id="myChart3" width="100" height="100"></canvas>
 
