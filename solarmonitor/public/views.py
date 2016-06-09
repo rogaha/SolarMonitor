@@ -126,6 +126,11 @@ def charts(modify=None):
         session.clear()
         return redirect(url_for('public.charts'))
 
+    if modify == 'delete-data':
+        UsagePoint.query.delete()
+        db.session.commit()
+        return redirect(url_for('public.charts'))
+
     if 'start_date_pge' in session:
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
     else:
@@ -198,15 +203,15 @@ def charts(modify=None):
                 outgoing_interval_value = 0
 
                 for datapoint in incoming_electric_daily:
-                    incoming_interval_value += datapoint.interval_value
+                    incoming_interval_value += (datapoint.interval_value * (10**datapoint.power_of_ten_multiplier))
 
                 for datapoint in outgoing_electric_daily:
-                    outgoing_interval_value += datapoint.interval_value
+                    outgoing_interval_value += (datapoint.interval_value * (10**datapoint.power_of_ten_multiplier))
 
-                incoming_electric_daily_data.append(incoming_interval_value * (10**x.power_of_ten_multiplier))
+                incoming_electric_daily_data.append(incoming_interval_value)
                 incoming_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
 
-                outgoing_electric_daily_data.append(outgoing_interval_value * (10**x.power_of_ten_multiplier))
+                outgoing_electric_daily_data.append(outgoing_interval_value)
                 outgoing_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
                 n += 1
 
