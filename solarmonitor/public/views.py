@@ -150,13 +150,12 @@ def charts(modify=None):
             session['client_credentials'][u'client_access_token']
             )
 
-        if form.data_time_unit.data == "Daily":
-            session['data_time_unit'] = "Daily"
+        session['data_time_unit'] = form.data_time_unit.data
         session['start_date_pge'] = form.start_date.data
         session['end_date_pge'] = form.end_date.data
 
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
-        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d')
+        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
 
         print start_date_pge, end_date_pge
 
