@@ -313,7 +313,7 @@ def notifications():
                             commodity_type=reading_type['commodity_type'],
                             measuring_period=reading_type['measuring_period'],
                             interval_value=reading_type['interval_value'],
-                            interval_start=datetime.datetime.fromtimestamp(int(reading_type['interval_start'])) + timedelta(hours=7),
+                            interval_start=datetime.datetime.fromtimestamp(int(reading_type['interval_start'])) - timedelta(hours=7),
                             interval_duration=reading_type['interval_duration'],
                             flow_direction=reading_type['flow_direction'],
                             unit_of_measure=reading_type['unit_of_measure'],
