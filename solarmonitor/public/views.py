@@ -16,7 +16,7 @@ from jxmlease import parse
 import xml.etree.cElementTree as ET
 
 import datetime
-import rfc3339
+
 
 
 
@@ -112,14 +112,23 @@ def about():
 @blueprint.route('/charts', methods=['GET', 'POST'])
 def charts():
     """Electricity Usage Chart
-    #####################
     Batch Subscription (Standard and EEF 3rd parties)
     You can also request usage and billing information via the batch bulk asynchronous API for all of your customer authorizations for usage/billing data (i.e. Subscriptions).
     Example Batch Bulk Request URL
-    https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/{BulkID}?published-min={startDate}&publishedmax={endDate}
+    https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/{BulkID}?published-min={startDate}&published-max={endDate}
     """
 
     form = DateSelectForm()
+
+    if 'start_date_pge' in session:
+        start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
+    else:
+        start_date_pge = datetime.datetime.strptime('2016-06-01', '%Y-%m-%d')
+
+    if 'end_date_pge' in session:
+        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d')
+    else:
+        end_date_pge = datetime.datetime.strptime('2016-06-02', '%Y-%m-%d')
 
     if form.validate_on_submit():
         session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
@@ -128,27 +137,40 @@ def charts():
             session['client_credentials'][u'client_access_token']
             )
 
-        start_date_epoch = datetime.datetime.strptime(form.start_date.data, '%Y-%m-%d').strftime('%s')
-        end_date_epoch = datetime.datetime.strptime(form.end_date.data, '%Y-%m-%d').strftime('%s')
+        session['start_date_pge'] = form.start_date.data
+        session['end_date_pge'] = form.end_date.data
 
-        print start_date_epoch, end_date_epoch
+        start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
+        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d')
+
+        print start_date_pge, end_date_pge
 
         xml_dict = parse(session['resource_authorization']['data'])
         bulk_url = xml_dict[u'ns1:feed'][u'ns1:entry'][1][u'ns1:content'][u'ns0:Authorization'][u'ns0:resourceURI']
-        bulk_url += '?published-min={}&published-max={}' .format('2016-06-01T19:08:186Z', '2016-06-08T19:08:186Z')
+        bulk_url += '?published-min={}&published-max={}' .format(start_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'), end_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'))
 
         print bulk_url
 
         print api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
 
-    incoming_electric_list = UsagePoint.query.filter_by(flow_direction=1).all()
-    incoming_electric = [x.interval_value for x in incoming_electric_list]
-    incoming_labels = [x.interval_start.strftime('%d/%m %H:00') for x in incoming_electric_list]
+    incoming_electric_list = UsagePoint.query.filter(
+        (UsagePoint.flow_direction==1)&
+        (UsagePoint.interval_start>=start_date_pge)&
+        (UsagePoint.interval_start<=end_date_pge)
+        ).order_by(UsagePoint.interval_start.asc()).all()
+
+    incoming_electric = [x.interval_value * (10**x.power_of_ten_multiplier) for x in incoming_electric_list]
+    incoming_labels = [x.interval_start.strftime('%m/%d %H:00') for x in incoming_electric_list]
 
 
-    outgoing_electric_list = UsagePoint.query.filter_by(flow_direction=19).all()
-    outgoing_electric = [x.interval_value for x in outgoing_electric_list]
-    outgoing_labels = [x.interval_start.strftime('%d/%m %H:00') for x in outgoing_electric_list]
+    outgoing_electric_list = UsagePoint.query.filter(
+        (UsagePoint.flow_direction==19)&
+        (UsagePoint.interval_start>=start_date_pge)&
+        (UsagePoint.interval_start<=end_date_pge)
+        ).order_by(UsagePoint.interval_start.asc()).all()
+
+    outgoing_electric = [x.interval_value * (10**x.power_of_ten_multiplier) for x in outgoing_electric_list]
+    outgoing_labels = [x.interval_start.strftime('%m/%d %H:00') for x in outgoing_electric_list]
 
 
     return render_template('public/data_chart.html', form=form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels)
