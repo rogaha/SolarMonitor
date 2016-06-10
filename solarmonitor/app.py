@@ -8,6 +8,9 @@ from solarmonitor.extensions import bcrypt, db, login_manager
 from solarmonitor.settings import ProdConfig
 from solarmonitor.public.forms import LoginForm
 
+from celery import Celery
+celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL)
+
 
 def create_app(config_object=ProdConfig):
     """An application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
@@ -20,6 +23,8 @@ def create_app(config_object=ProdConfig):
     register_blueprints(app)
     register_errorhandlers(app)
     register_logger(app)
+
+    celery.conf.update(app.config)
 
     @app.context_processor
     def inject_login_form():

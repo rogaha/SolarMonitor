@@ -3,6 +3,8 @@ cffi==1.6.0
 requests==2.9.1
 jxmlease==1.0.1
 pytz==2016.4
+celery==3.1.23
+redis==2.10.5
 
 
 # Flask

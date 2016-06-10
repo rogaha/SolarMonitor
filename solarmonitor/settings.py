@@ -21,6 +21,8 @@ class Config(object):
     PGE_CLIENT_CREDENTIALS = {'client_key': 'b5020eaae0f34c56a62726ff6f059b45', 'client_secret_key': '69f7ad97530447f49d9468373cf2fc4f'}
     REG_ACCESS_TOKEN = '5fe3233d-c9f8-4ff9-9f63-3d02dc534c3c'
     TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
+    CELERY_BROKER_URL = 'redis://h:p1d07gclbsm4e7bd5ensfq27vqe@ec2-107-22-162-129.compute-1.amazonaws.com:16169'
+    CELERY_RESULT_BACKEND = 'redis://h:p1d07gclbsm4e7bd5ensfq27vqe@ec2-107-22-162-129.compute-1.amazonaws.com:16169'
 
 class ProdConfig(Config):
     """Production configuration."""
