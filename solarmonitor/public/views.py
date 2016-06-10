@@ -356,10 +356,10 @@ def notifications():
             database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
             """
 
-            task = process_xml(resource['data']).apply_async()
+            task = process_xml.delay((resource['data']))
 
             print "task id:", task.id
-            
+
     return render_template('public/oauth.html', page_title='Notification Bucket')
 
 @blueprint.route('/status/<task_id>', methods=['GET', 'POST'])
