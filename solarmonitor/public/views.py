@@ -20,6 +20,7 @@ from datetime import timedelta
 import pytz
 
 from solarmonitor.utils import celery
+from celery.task.control import inspect
 
 @celery.task(bind=True)
 def process_xml(self, xml):
@@ -321,6 +322,9 @@ def test():
 @blueprint.route('/oauth', methods=['GET', 'POST'])
 def oauth():
     """	The OAuth URL you provide here will be used to direct customers to your customer login page to complete the authorization."""
+    i = inspect()
+    print i.scheduled()
+    print i.active()
     return render_template('public/oauth.html')
 
 @blueprint.route('/oauth-redirect', methods=['GET', 'POST'])
