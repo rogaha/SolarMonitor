@@ -9,7 +9,7 @@ from solarmonitor.settings import ProdConfig
 from solarmonitor.public.forms import LoginForm
 
 from celery import Celery
-celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL)
+celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfig.CELERY_RESULT_BACKEND)
 
 
 def create_app(config_object=ProdConfig):

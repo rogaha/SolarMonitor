@@ -4,7 +4,7 @@ from flask import flash
 
 from celery import Celery
 from solarmonitor.settings import ProdConfig
-celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL)
+celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfig.CELERY_RESULT_BACKEND)
 
 
 def flash_errors(form, category='warning'):
