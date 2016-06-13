@@ -23,6 +23,16 @@ class UsagePoint(db.Model):
     def __repr__(self):
         return '<UsagePoint {}>' .format(self.id)
 
+class CeleryTask(db.Model):
+    __tablename__ = 'usagepoints'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    task_id = db.Column(db.Integer)
+    task_status = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<UsagePoint {}>' .format(self.id)
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +50,7 @@ class User(UserMixin, db.Model):
     role_id = db.Column(db.Integer)
     password_hash = db.Column(db.String(128))
     usage_points = db.relationship('UsagePoint', backref="user", cascade="all, delete-orphan", lazy='dynamic')
+    celery_tasks = db.relationship('CeleryTask', backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
 
     @property

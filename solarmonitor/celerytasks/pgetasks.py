@@ -1,6 +1,6 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
-from solarmonitor.user.models import UsagePoint
+from solarmonitor.user.models import UsagePoint, CeleryTask
 import datetime
 from datetime import timedelta
 
@@ -69,5 +69,7 @@ def process_xml(self, xml):
                     self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
 
-
+        celery_task = CeleryTask.query.filter_by(task_id=self.id).first()
+        celery_task.task_status = 1
+        db.session.commit()
     return {'status': 'Task completed!'}

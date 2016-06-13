@@ -6,7 +6,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm, DateSelectForm, DownloadDataForm
 from solarmonitor.user.forms import RegistrationForm
-from solarmonitor.user.models import User, UsagePoint
+from solarmonitor.user.models import User, UsagePoint, CeleryTask
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.celerytasks.pgetasks import process_xml, add
@@ -262,7 +262,7 @@ def oauth_redirect():
 @blueprint.route('/notifications', methods=['GET', 'POST'])
 def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available  """
-    task_ids = []
+
     if request.method == 'POST':
         xml_dict = parse(request.data) #Create dictionary from XML using jxmlease library
 
@@ -288,11 +288,12 @@ def notifications():
 
             task = process_xml.delay((resource['data']))
 
-            task_ids.append(task.id)
+            
+            celery_task = CeleryTask(task_id=task.id, task_status=0, user_id=1)
+            db.session.add(celery_task)
+            db.session.commit()
 
             print "task id:", task.id
-
-    session['celery_tasks'] = task_ids
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
 
