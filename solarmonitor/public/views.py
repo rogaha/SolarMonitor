@@ -285,7 +285,8 @@ def notifications():
             """
 
             task = process_xml.delay((resource['data']))
-
+            session['celery_tasks'] = []
+            session['celery_tasks'].append(task.id)
             print "task id:", task.id
 
     return render_template('public/oauth.html', page_title='Notification Bucket')

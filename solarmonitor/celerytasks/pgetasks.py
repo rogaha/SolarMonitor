@@ -67,7 +67,6 @@ def process_xml(self, xml):
                         print 'usage_point already in database'
 
                     self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
-                    print index, 'of', len(data[u'ns1:feed'][u'ns1:entry'])
 
 
 
