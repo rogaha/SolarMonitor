@@ -281,19 +281,19 @@ def notifications():
             """
             bulk_data.append(api.simple_request(resource, client_credentials[u'client_access_token']))
 
-        for resource in bulk_data:
-            """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
-            database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
-            """
 
-            task = process_xml.delay((resource['data']))
+        """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
+        database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
+        """
 
-            
-            celery_task = CeleryTask(task_id=task.id, task_status=0, user_id=1)
-            db.session.add(celery_task)
-            db.session.commit()
+        task = process_xml.delay((bulk_data[0]['data']))
 
-            print "task id:", task.id
+
+        celery_task = CeleryTask(task_id=task.id, task_status=0, user_id=1)
+        db.session.add(celery_task)
+        db.session.commit()
+
+        print "task id:", task.id
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
 
