@@ -32,11 +32,10 @@ def process_xml(self, xml):
                 reading_type['unit_of_measure'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:uom']
                 try:
                     reading_type['measuring_period'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:measuringPeriod']
-                except Exception as e:
-                    print e
-                    print resource[u'ns1:content']
-                    print resource[u'ns1:content'][u'ns0:ReadingType']
-                    pass
+                except:
+                    print 'No measuring Period'
+                    reading_type['measuring_period'] = 99
+
                 reading_type['power_of_ten_multiplier'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:powerOfTenMultiplier']
                 reading_type['accumulation_behavior'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:accumulationBehaviour']
 
