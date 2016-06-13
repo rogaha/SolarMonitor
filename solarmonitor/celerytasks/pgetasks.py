@@ -61,8 +61,6 @@ def process_xml(self, xml):
                     if duplicate_check == None:
                         db.session.add(usage_point)
                         db.session.commit()
-                    else:
-                        print 'usage_point already in database'
 
                     self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
