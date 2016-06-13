@@ -59,8 +59,26 @@
     </div>
   </div>
 
-  </fieldset>
-  </form>
+
+
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="singlebutton"></label>
+    <div class="col-md-6">
+        <div id="success_text" style="visibility:hidden">
+        <input class="btn btn-success" value="Get New Data" onClick="location.href='/charts';">
+        </div>
+
+        <div class="progress" style="visibility:hidden" id="progress_bar">
+          <div id="percent_bar" class="progress-bar progress-bar-success progress-bar-striped active" style="min-width: 2em;" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+            0%
+          </div>
+        </div>
+    </div>
+  </div>
+
+</fieldset>
+</form>
+
 </div>
 <div class="col-md-4">
   <form class="form-horizontal" action="{{ url_for('public.charts') }}" method="post">
@@ -231,6 +249,7 @@ margin-top:50px
                 console.log(data);
                 for (var key in data) {
                     $("#progress_bar").removeAttr("style")
+                    var task_id = data[key];
                     $.ajax({
                       url: "/status/" + data[key],
                       type: "GET",
@@ -245,13 +264,13 @@ margin-top:50px
                         if (data['state'] === 'SUCCESS') {
                           $("#progress_bar").find('#percent_bar').css({"min-width":"2em", "width": '100%'});
                           $("#progress_bar").find('#percent_bar').text('100%');
-                          $("#progress_bar").css({'visibility': 'hidden'})
+                          $("#progress_bar").css({'visibility': 'hidden'});
                           $.ajax({
-                            url: "/status/" + data[key] + '/mark_complete'
-                            type: "GET"
+                            url: "/status/" + task_id + '/mark_complete',
+                            type: "GET",
                             success: function(data) {
                               $("#success_text").removeAttr("style");
-                              $("#progress_bar").text(data['response']);
+                              console.log( "<p>" + data['response'] + "</p>" );
                             }
                           })
                         }
@@ -269,15 +288,7 @@ margin-top:50px
 
 </script>
 
-<div id="success_text" style="visibility:hidden">
 
-</div>
-
-      <div class="progress" style="visibility:hidden" id="progress_bar">
-        <div id="percent_bar" class="progress-bar progress-bar-success progress-bar-striped active" style="min-width: 2em;" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
-          0%
-        </div>
-      </div>
 
   <p>Start Date: {{ session['start_date_pge'] }}<br>
 

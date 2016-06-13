@@ -297,14 +297,14 @@ def notifications():
 @blueprint.route('/status/<task_id>', methods=['GET', 'POST'])
 @blueprint.route('/status/<task_id>/<change_status>', methods=['GET', 'POST'])
 def taskstatus(task_id=None, change_status=None):
-    if task_id =="mark_complete":
+    if change_status == "mark_complete":
         celery_task = CeleryTask.query.filter_by(task_id=task_id).first()
         celery_task.task_status = 1
         db.session.commit()
         response = {'response': 'task {} completed'.format(task_id)}
         return jsonify(response)
 
-    if task_id =="task_check":
+    if task_id == "task_check":
         unfinished_tasks = CeleryTask.query.filter_by(task_status=0).all()
 
         unfinished_tasks_dict = {}
