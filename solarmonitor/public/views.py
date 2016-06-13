@@ -24,6 +24,8 @@ from celery.task.control import inspect
 
 @celery.task
 def add(x, y):
+    print x
+    print y
     return x + y
 
 local = pytz.timezone ('US/Eastern')
