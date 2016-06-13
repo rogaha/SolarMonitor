@@ -19,7 +19,12 @@ import datetime
 from datetime import timedelta
 import pytz
 
+from solarmonitor.utils import celery
+from celery.task.control import inspect
 
+@celery.task
+def add(x, y):
+    return x + y
 
 local = pytz.timezone ('US/Eastern')
 
@@ -244,7 +249,7 @@ def charts(modify=None):
 def test():
     """Testing"""
 
-
+    add.delay(1, 2)
 
     return render_template('public/test.html')
 
