@@ -242,6 +242,7 @@ def charts(modify=None):
 def test():
     """Testing"""
 
+    session['celery_tasks'] = ['test']
     add.delay(1,2)
 
     return render_template('public/test.html')
@@ -261,6 +262,7 @@ def oauth_redirect():
 @blueprint.route('/notifications', methods=['GET', 'POST'])
 def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available  """
+    session['celery_tasks'] = []
     if request.method == 'POST':
         xml_dict = parse(request.data) #Create dictionary from XML using jxmlease library
 
@@ -285,7 +287,7 @@ def notifications():
             """
 
             task = process_xml.delay((resource['data']))
-            session['celery_tasks'] = []
+
             session['celery_tasks'].append(task.id)
             print "task id:", task.id
 
