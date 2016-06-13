@@ -24,7 +24,7 @@ class UsagePoint(db.Model):
         return '<UsagePoint {}>' .format(self.id)
 
 class CeleryTask(db.Model):
-    __tablename__ = 'usagepoints'
+    __tablename__ = 'celerytasks'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     task_id = db.Column(db.Integer)
