@@ -1,5 +1,5 @@
 from solarmonitor.extensions import db
-from solarmonitor.settings import Config
+from solarmonitor.settings import Config, ProdConfig
 from solarmonitor.user.models import UsagePoint
 import datetime
 from datetime import timedelta
@@ -33,7 +33,7 @@ def process_xml(self, xml):
 
         if u'ns0:IntervalBlock' in resource[u'ns1:content']:
             from solarmonitor.app import create_app
-            app = create_app(Config)
+            app = create_app(ProdConfig)
             with app.app_context():
                 for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
                     reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
