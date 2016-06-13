@@ -262,6 +262,7 @@ def oauth_redirect():
 @blueprint.route('/notifications', methods=['GET', 'POST'])
 def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available  """
+    task_ids = []
     if request.method == 'POST':
         xml_dict = parse(request.data) #Create dictionary from XML using jxmlease library
 
@@ -287,9 +288,11 @@ def notifications():
 
             task = process_xml.delay((resource['data']))
 
-            session[task.id] = task.id
+            task_ids.append(task.id)
 
             print "task id:", task.id
+
+    session['celery_tasks'] = task_ids
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
 
