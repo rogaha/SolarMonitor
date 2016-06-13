@@ -19,22 +19,22 @@ def process_xml(self, xml):
 
     reading_type = {}
     data = parse(xml)
-    data.prettyprint()
 
-    for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
+    from solarmonitor.app import create_app
+    app = create_app(ProdConfig)
+    with app.app_context():
 
-        if u'ns0:ReadingType' in resource[u'ns1:content']:
-            reading_type['commodity_type'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:commodity']
-            reading_type['flow_direction'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:flowDirection']
-            reading_type['unit_of_measure'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:uom']
-            reading_type['measuring_period'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:measuringPeriod']
-            reading_type['power_of_ten_multiplier'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:powerOfTenMultiplier']
-            reading_type['accumulation_behavior'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:accumulationBehaviour']
+        for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
 
-        if u'ns0:IntervalBlock' in resource[u'ns1:content']:
-            from solarmonitor.app import create_app
-            app = create_app(ProdConfig)
-            with app.app_context():
+            if u'ns0:ReadingType' in resource[u'ns1:content']:
+                reading_type['commodity_type'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:commodity']
+                reading_type['flow_direction'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:flowDirection']
+                reading_type['unit_of_measure'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:uom']
+                reading_type['measuring_period'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:measuringPeriod']
+                reading_type['power_of_ten_multiplier'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:powerOfTenMultiplier']
+                reading_type['accumulation_behavior'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:accumulationBehaviour']
+
+            if u'ns0:IntervalBlock' in resource[u'ns1:content']:
                 for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
                     reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
                     reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
@@ -66,7 +66,9 @@ def process_xml(self, xml):
                     else:
                         print 'usage_point already in database'
 
-                    self.update_state(state='PROGRESS',
-                                      meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
+                    self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
+                    print index, 'of', len(data[u'ns1:feed'][u'ns1:entry'])
+
+
 
     return {'status': 'Task completed!'}
