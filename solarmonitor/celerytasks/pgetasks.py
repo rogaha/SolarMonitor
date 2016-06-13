@@ -32,42 +32,41 @@ def process_xml(self, xml):
             reading_type['accumulation_behavior'] = resource[u'ns1:content'][u'ns0:ReadingType'][u'ns0:accumulationBehaviour']
 
         if u'ns0:IntervalBlock' in resource[u'ns1:content']:
+            from solarmonitor.app import create_app
+            app = create_app(Config)
+            with app.app_context():
+                for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
+                    reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
+                    reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
+                    reading_type['interval_value'] = reading[u'ns0:value']
 
-            for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
-                reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
-                reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
-                reading_type['interval_value'] = reading[u'ns0:value']
+                    usage_point = UsagePoint(
+                        user_id=50098,
+                        commodity_type=reading_type['commodity_type'],
+                        measuring_period=reading_type['measuring_period'],
+                        interval_value=reading_type['interval_value'],
+                        interval_start=datetime.datetime.fromtimestamp(int(reading_type['interval_start'])) - timedelta(hours=7),
+                        interval_duration=reading_type['interval_duration'],
+                        flow_direction=reading_type['flow_direction'],
+                        unit_of_measure=reading_type['unit_of_measure'],
+                        power_of_ten_multiplier=reading_type['power_of_ten_multiplier'],
+                        accumulation_behavior=reading_type['accumulation_behavior']
+                        )
 
-                usage_point = UsagePoint(
-                    user_id=50098,
-                    commodity_type=reading_type['commodity_type'],
-                    measuring_period=reading_type['measuring_period'],
-                    interval_value=reading_type['interval_value'],
-                    interval_start=datetime.datetime.fromtimestamp(int(reading_type['interval_start'])) - timedelta(hours=7),
-                    interval_duration=reading_type['interval_duration'],
-                    flow_direction=reading_type['flow_direction'],
-                    unit_of_measure=reading_type['unit_of_measure'],
-                    power_of_ten_multiplier=reading_type['power_of_ten_multiplier'],
-                    accumulation_behavior=reading_type['accumulation_behavior']
-                    )
+                    duplicate_check = UsagePoint.query.filter_by(
+                        user_id=50098,
+                        interval_value=usage_point.interval_value,
+                        flow_direction=usage_point.flow_direction,
+                        interval_start=usage_point.interval_start
+                        ).first()
 
-                duplicate_check = UsagePoint.query.filter_by(
-                    user_id=50098,
-                    interval_value=usage_point.interval_value,
-                    flow_direction=usage_point.flow_direction,
-                    interval_start=usage_point.interval_start
-                    ).first()
-
-                if duplicate_check == None:
-                    from solarmonitor.app import create_app
-                    app = create_app(Config)
-                    with app.app_context():
+                    if duplicate_check == None:
                         db.session.add(usage_point)
                         db.session.commit()
-                else:
-                    print 'usage_point already in database'
+                    else:
+                        print 'usage_point already in database'
 
-                self.update_state(state='PROGRESS',
-                                  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
+                    self.update_state(state='PROGRESS',
+                                      meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
     return {'status': 'Task completed!'}
