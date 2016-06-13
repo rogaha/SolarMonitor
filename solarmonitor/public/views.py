@@ -287,7 +287,7 @@ def notifications():
 
             task = process_xml.delay((resource['data']))
 
-            session['celery_tasks'] = task.id
+            session[task.id] = task.id
 
             print "task id:", task.id
 
