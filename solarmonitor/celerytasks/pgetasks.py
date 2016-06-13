@@ -1,5 +1,6 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config
+from solarmonitor.user.models import UsagePoint
 
 from solarmonitor.utils import celery
 from jxmlease import parse
