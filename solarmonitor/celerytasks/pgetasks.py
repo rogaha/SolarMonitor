@@ -2,6 +2,7 @@ from solarmonitor.extensions import db
 from solarmonitor.settings import Config
 
 from solarmonitor.utils import celery
+from jxmlease import parse
 
 @celery.task
 def add(x, y):
