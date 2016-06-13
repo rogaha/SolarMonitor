@@ -7,13 +7,6 @@ from datetime import timedelta
 from solarmonitor.utils import celery
 from jxmlease import parse
 
-@celery.task
-def add(x, y):
-    print x
-    print y
-    return x + y
-
-
 @celery.task(bind=True)
 def process_xml(self, xml):
 
@@ -73,8 +66,4 @@ def process_xml(self, xml):
 
                     self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
-
-        celery_task = CeleryTask.query.filter_by(task_id=self.request.id).first()
-        celery_task.task_status = 1
-        db.session.commit()
     return {'status': 'Task completed!'}

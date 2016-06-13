@@ -9,7 +9,7 @@ from solarmonitor.user.forms import RegistrationForm
 from solarmonitor.user.models import User, UsagePoint, CeleryTask
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
-from solarmonitor.celerytasks.pgetasks import process_xml, add
+from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 import requests
 
@@ -242,9 +242,6 @@ def charts(modify=None):
 def test():
     """Testing"""
 
-    session['celery_tasks'] = ['test']
-    add.delay(1,2)
-
     return render_template('public/test.html')
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])
@@ -298,7 +295,25 @@ def notifications():
     return render_template('public/oauth.html', page_title='Notification Bucket')
 
 @blueprint.route('/status/<task_id>', methods=['GET', 'POST'])
-def taskstatus(task_id):
+@blueprint.route('/status/<task_id>/<change_status>', methods=['GET', 'POST'])
+def taskstatus(task_id=None, change_status=None):
+    if task_id =="mark_complete":
+        celery_task = CeleryTask.query.filter_by(task_id=task_id).first()
+        celery_task.task_status = 1
+        db.session.commit()
+        response = {'response': 'task {} completed'.format(task_id)}
+        return jsonify(response)
+
+    if task_id =="task_check":
+        unfinished_tasks = CeleryTask.query.filter_by(task_status=0).all()
+
+        unfinished_tasks_dict = {}
+        for task in unfinished_tasks:
+            unfinished_tasks_dict[task.id] = task.task_id
+
+        return jsonify(unfinished_tasks_dict)
+
+
     task = process_xml.AsyncResult(task_id)
     if task.state == 'PENDING':
 
@@ -326,6 +341,3 @@ def taskstatus(task_id):
             'status': str(task.info),  # this is the exception raised
         }
     return jsonify(response)
-
-
-    return render_template('public/oauth.html', page_title='Notification Bucket')
