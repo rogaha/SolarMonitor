@@ -27,7 +27,7 @@ class CeleryTask(db.Model):
     __tablename__ = 'celerytasks'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    task_id = db.Column(db.Integer)
+    task_id = db.Column(db.String(50))
     task_status = db.Column(db.Integer)
 
     def __repr__(self):
