@@ -21,6 +21,7 @@ def process_xml(self, xml):
 
         if  data[u'ns1:feed'].get('second', None) == None:
             self.update_state(state='FAILURE')
+            raise Ignore()
             return {'status': 'No Data to Import'}
 
         for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
