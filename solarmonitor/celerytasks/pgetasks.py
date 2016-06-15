@@ -19,6 +19,10 @@ def process_xml(self, xml):
     app = create_app(ProdConfig)
     with app.app_context():
 
+        if  data[u'ns1:feed'].get('second', None) == None:
+            self.update_state(state='FAILURE')
+            return {'status': 'No Data to Import'}
+
         for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
 
             if u'ns0:ReadingType' in resource[u'ns1:content']:
