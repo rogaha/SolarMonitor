@@ -11,6 +11,7 @@ from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
+from solarmonitor.solaredge.se_api import SolarEdgeApi
 import requests
 
 from jxmlease import parse
@@ -241,6 +242,11 @@ def charts(modify=None):
 @blueprint.route('/test')
 def test():
     """Testing"""
+
+    se = SolarEdgeApi()
+
+    print se.site_list().status_code
+
 
     return render_template('public/test.html')
 

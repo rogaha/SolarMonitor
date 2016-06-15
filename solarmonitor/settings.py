@@ -23,6 +23,9 @@ class Config(object):
     TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
     CELERY_BROKER_URL = 'redis://h:p7lrds43veon7v3llv8bhttt9fn@ec2-107-22-162-129.compute-1.amazonaws.com:17989'
     CELERY_RESULT_BACKEND = 'redis://h:p7lrds43veon7v3llv8bhttt9fn@ec2-107-22-162-129.compute-1.amazonaws.com:17989'
+    SOLAREDGE_API_KEY = 'TMLKODSHJ7ZCHH430FV7SA98Y3VCOM5X'
+    SOLAREDGE_SITE_ID = '237846'
+
 
 class ProdConfig(Config):
     """Production configuration."""
