@@ -5,10 +5,10 @@ import pytest
 from webtest import TestApp
 
 from solarmonitor.app import create_app
-from solarmonitor.database import db as _db
+from solarmonitor.extensions import db as _db
 from solarmonitor.settings import TestConfig
 
-from .factories import UserFactory
+from solarmonitor.user.models import User
 
 
 @pytest.yield_fixture(scope='function')
@@ -46,6 +46,21 @@ def db(app):
 @pytest.fixture
 def user(db):
     """A user for the tests."""
-    user = UserFactory(password='myprecious')
+    user = User(
+        email='user_testing@solarmonitor.com',
+        username='testing',
+        first_name='solarsolar',
+        last_name='solarsolarlast',
+        password='myprecious',
+        address_one='',
+        address_two='',
+        state='',
+        city='',
+        zip_code=0,
+        cell_phone='',
+        role_id=1,
+        pge_bulk_id=1
+        )
+    db.session.add(user)
     db.session.commit()
     return user

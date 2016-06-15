@@ -62,11 +62,7 @@ class User(UserMixin, db.Model):
         self.password_hash = bcrypt.generate_password_hash(password, 12)
 
     def verify_password(self, password):
-        try:
-            return bcrypt.check_password_hash(self.password_hash, password)
-        except:
-            return check_password_hash(self.password_hash, password)
-
+        return bcrypt.check_password_hash(self.password_hash, password)
 
 
     def __repr__(self):
