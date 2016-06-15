@@ -10,6 +10,8 @@ from jxmlease import parse
 @celery.task(bind=True)
 def process_xml(self, xml):
 
+    print xml
+
     reading_type = {}
     data = parse(xml)
 
