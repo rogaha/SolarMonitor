@@ -274,6 +274,20 @@ margin-top:50px
                             }
                           })
                         }
+                        if (data['state'] === 'FAILURE') {
+                          $("#progress_bar").find('#percent_bar').css({"min-width":"2em", "width": '100%'});
+                          $("#progress_bar").find('#percent_bar').text('Import Failed');
+                          $("#progress_bar").css({'visibility': 'hidden'});
+                          $.ajax({
+                            url: "/status/" + task_id + '/mark_complete',
+                            type: "GET",
+                            success: function(data) {
+                              $("#success_text").removeAttr("style");
+                              $("#success_text").text('Import Failed');
+                              console.log( "<p>" + data['response'] + "</p>" );
+                            }
+                          })
+                        }
                       }
                     })
 
