@@ -15,6 +15,7 @@ from solarmonitor.solaredge.se_api import SolarEdgeApi
 import requests
 
 from jxmlease import parse
+import json
 
 import datetime
 from datetime import timedelta
@@ -239,19 +240,66 @@ def charts(modify=None):
 
     return render_template('public/data_chart.html', date_select_form=date_select_form, download_data_form=download_data_form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels, incoming_electric_daily_data=incoming_electric_daily_data, incoming_electric_daily_label=incoming_electric_daily_label, outgoing_electric_daily_data=outgoing_electric_daily_data, outgoing_electric_daily_label=outgoing_electric_daily_label, daily_combined_electric_usage=daily_combined_electric_usage, hourly_combined_electric_usage=hourly_combined_electric_usage)
 
-@blueprint.route('/test')
-def test():
+@blueprint.route('/solaredge', methods=['GET', 'POST'])
+@blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
+def solar_edge(modify=None):
     """Testing"""
+    date_select_form = DateSelectForm()
+
+    if modify == 'clear':
+        session.clear()
+        return redirect(url_for('public.solar_edge'))
+
+    """Set some default dates if nothing has been entered in the form."""
+    if 'start_date_se' in session:
+        start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
+    else:
+        start_date_se = datetime.datetime.now() - timedelta(days=1)
+
+    if 'end_date_se' in session:
+        end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d') + timedelta(days=1)
+    else:
+        end_date_se = datetime.datetime.now()
+
+    """Load the form data into the session to save user selection"""
+    if date_select_form.validate_on_submit():
+        session['data_time_unit_se'] = date_select_form.data_time_unit.data
+        session['start_date_se'] = date_select_form.start_date.data
+        session['end_date_se'] = date_select_form.end_date.data
+        try:
+            start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
+            end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
+        except:
+            flash('Date entered, not in correct format.')
+            return redirect(url_for('public.solar_edge'))
+        return redirect(url_for('public.solar_edge'))
+
 
     se = SolarEdgeApi()
 
-    #print se.site_list().text
+    if 'data_time_unit_se' in session:
+        time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
+        se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846', time_unit).text)
+    else:
+        se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
 
-    print se.site_power_details('2016-06-01 01:00:00', '2016-06-16 23:00:00', '237846').text
-    #print se.site_power_measurements('2016-06-01', '2016-06-16', '237846').text
+    se_energy_data = []
+    se_energy_labels = []
+    for each in se_energy['energy']['values']:
+        if each['value'] == None:
+            se_energy_data.append(0)
+        else:
+            se_energy_data.append(each['value']/1000)
+        se_energy_labels.append(str(each['date']))
 
+    date_select_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
+    date_select_form.end_date.data = end_date_se.strftime('%Y-%m-%d')
 
-    return render_template('public/test.html')
+    return render_template('public/solar_edge.html',
+        se_energy_labels=se_energy_labels,
+        se_energy_data=se_energy_data,
+        date_select_form=date_select_form
+        )
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])
 def oauth():

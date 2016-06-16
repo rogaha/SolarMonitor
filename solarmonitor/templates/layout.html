@@ -99,11 +99,11 @@
                         <a href="{{ url_for('public.home') }}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
                     <li class="{% if request.url_rule.endpoint == 'public.charts' %} active {% endif %}">
-                        <a href="{{ url_for('public.charts') }}"><i class="fa fa-fw fa-bar-chart-o"></i> Charts</a>
+                        <a href="{{ url_for('public.charts') }}"><i class="fa fa-fw fa-bar-chart-o"></i> PGE Charts</a>
                     </li>
-
-
-
+                    <li class="{% if request.url_rule.endpoint == 'public.solar_edge' %} active {% endif %}">
+                        <a href="{{ url_for('public.solar_edge') }}"><i class="fa fa-fw fa-bar-chart-o"></i>Solar Edge Charts</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
