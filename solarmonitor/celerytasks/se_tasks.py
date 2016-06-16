@@ -2,7 +2,7 @@ from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
 from solarmonitor.user.models import SolarEdgeUsagePoint
 import datetime
-from datetime import timedelta
+from datetime import timedelta, date
 
 from solarmonitor.utils import celery
 
@@ -21,7 +21,7 @@ def process_se_data(self, json_data):
             usage_point.unit_of_measure = json_data['energy']['unit']
             usage_point.date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
 
-            if usage_point.date.date() == datetime.today().date():
+            if usage_point.date.date() == date.today():
                 duplicate_check = SolarEdgeUsagePoint.query.filter_by(date=usage_point.date).first()
                 if duplicate_check:
                     if each['value'] == None:
