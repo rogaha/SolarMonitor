@@ -10,7 +10,7 @@ from solarmonitor.utils import celery
 @celery.task(bind=True)
 def process_se_data(self, json_data):
 
-    for each in se_energy['energy']['values']:
+    for each in json_data['energy']['values']:
 
         usage_point = SolarEdgeUsagePoint()
         usage_point.user_id = 1
