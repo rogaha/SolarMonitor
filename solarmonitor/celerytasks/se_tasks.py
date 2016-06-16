@@ -21,7 +21,7 @@ def process_se_data(self, json_data):
             usage_point.unit_of_measure = json_data['energy']['unit']
             usage_point.date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
 
-            if usage_point.date.date() == datetime.today().date()
+            if usage_point.date.date() == datetime.today().date():
                 duplicate_check = SolarEdgeUsagePoint.query.filter_by(date=usage_point.date).first()
                 if duplicate_check:
                     if each['value'] == None:
@@ -30,7 +30,7 @@ def process_se_data(self, json_data):
                     else:
                         duplicate_check.value = each['value']
                         db.session.commit()
-                        
+
             else:
                 if each['value'] == None:
                     usage_point.value = 0
