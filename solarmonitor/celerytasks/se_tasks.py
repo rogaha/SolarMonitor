@@ -25,10 +25,10 @@ def process_se_data(self, json_data):
             else:
                 usage_point.value = each['value']
 
-            duplicate_check = SolarEdgeUsagePoint.query.filter_by(date=usage_point.date, value=usage_point.value).first()
+                duplicate_check = SolarEdgeUsagePoint.query.filter_by(date=usage_point.date, value=usage_point.value).first()
 
-            if duplicate_check:
-                print 'duplicate usage point'
-            else:
-                db.session.add(usage_point)
-                db.session.commit()
+                if duplicate_check:
+                    print 'duplicate usage point'
+                else:
+                    db.session.add(usage_point)
+                    db.session.commit()

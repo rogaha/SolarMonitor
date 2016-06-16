@@ -251,6 +251,13 @@ def solar_edge(modify=None):
         session.clear()
         return redirect(url_for('public.solar_edge'))
 
+    if modify == 'delete-data':
+        SolarEdgeUsagePoint.query.delete()
+        db.session.commit()
+        return redirect(url_for('public.solar_edge'))
+
+
+
     """Set some default dates if nothing has been entered in the form."""
     if 'start_date_se' in session:
         start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
@@ -275,27 +282,45 @@ def solar_edge(modify=None):
             return redirect(url_for('public.solar_edge'))
         return redirect(url_for('public.solar_edge'))
 
-
-    se = SolarEdgeApi()
-
-    if 'data_time_unit_se' in session:
-        time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
-        se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846', time_unit).text)
-    else:
-        se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
-
-    task = process_se_data.delay(se_energy)
-
-    total_energy_usage = json.loads(se.site_total_energy(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
+    days_between = (end_date_se) - start_date_se
+    database_check = SolarEdgeUsagePoint.query.filter(
+        (SolarEdgeUsagePoint.date>=start_date_se)&
+        (SolarEdgeUsagePoint.date<=end_date_se)
+        ).all()
 
     se_energy_data = []
     se_energy_labels = []
-    for each in se_energy['energy']['values']:
-        if each['value'] == None:
-            se_energy_data.append(0)
+
+    print len(database_check), days_between.days
+
+    if len(database_check) == days_between.days:
+        print 'in database!!'
+        for each in database_check:
+            se_energy_data.append(each.value)
+            se_energy_labels.append(each.date.strftime('%Y-%m-%d'))
+
+
+    else:
+        print 'NOTT!!'
+        se = SolarEdgeApi()
+
+        if 'data_time_unit_se' in session:
+            time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
+            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846', time_unit).text)
         else:
-            se_energy_data.append(each['value']/1000)
-        se_energy_labels.append(str(each['date']))
+            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
+
+        task = process_se_data.delay(se_energy)
+
+        total_energy_usage = json.loads(se.site_total_energy(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
+
+
+        for each in se_energy['energy']['values']:
+            if each['value'] == None:
+                se_energy_data.append(0)
+            else:
+                se_energy_data.append(each['value']/1000)
+            se_energy_labels.append(str(each['date']))
 
     date_select_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
     date_select_form.end_date.data = end_date_se.strftime('%Y-%m-%d')
