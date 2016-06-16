@@ -245,7 +245,10 @@ def test():
 
     se = SolarEdgeApi()
 
-    print se.site_list().status_code
+    #print se.site_list().text
+
+    print se.site_power_details('2016-06-01 01:00:00', '2016-06-16 23:00:00', '237846').text
+    #print se.site_power_measurements('2016-06-01', '2016-06-16', '237846').text
 
 
     return render_template('public/test.html')
