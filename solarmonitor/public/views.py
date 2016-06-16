@@ -6,10 +6,11 @@ from flask_login import login_required, login_user, logout_user, current_user
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm, DateSelectForm, DownloadDataForm
 from solarmonitor.user.forms import RegistrationForm
-from solarmonitor.user.models import User, UsagePoint, CeleryTask
+from solarmonitor.user.models import User, UsagePoint, CeleryTask, SolarEdgeUsagePoint
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.celerytasks.pgetasks import process_xml
+from solarmonitor.celerytasks.se_tasks import process_se_data
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.solaredge.se_api import SolarEdgeApi
 import requests
@@ -243,7 +244,7 @@ def charts(modify=None):
 @blueprint.route('/solaredge', methods=['GET', 'POST'])
 @blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
 def solar_edge(modify=None):
-    """Testing"""
+    """Solar Edge API"""
     date_select_form = DateSelectForm()
 
     if modify == 'clear':
@@ -283,6 +284,10 @@ def solar_edge(modify=None):
     else:
         se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
 
+    task = process_se_data.delay(se_energy)
+
+    total_energy_usage = json.loads(se.site_total_energy(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
+
     se_energy_data = []
     se_energy_labels = []
     for each in se_energy['energy']['values']:
@@ -298,7 +303,8 @@ def solar_edge(modify=None):
     return render_template('public/solar_edge.html',
         se_energy_labels=se_energy_labels,
         se_energy_data=se_energy_data,
-        date_select_form=date_select_form
+        date_select_form=date_select_form,
+        total_energy_usage=total_energy_usage
         )
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])
