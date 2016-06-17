@@ -256,6 +256,7 @@ def solar_edge(modify=None):
     if modify == 'delete-data':
         SolarEdgeUsagePoint.query.delete()
         db.session.commit()
+        session.clear()
         return redirect(url_for('public.solar_edge'))
 
 
@@ -287,6 +288,9 @@ def solar_edge(modify=None):
             (SolarEdgeUsagePoint.date>=start_date_se)&
             (SolarEdgeUsagePoint.date<=end_date_se)
             ).order_by(SolarEdgeUsagePoint.date.asc()).all()
+
+        if not solare_edge_data_pull:
+            flash('No data for that date range available. Pull from Solar Edge.')
 
         session['se_energy_data'] = []
         session['se_energy_labels'] = []
@@ -338,8 +342,6 @@ def solar_edge(modify=None):
 
     date_select_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
     date_select_form.end_date.data = end_date_se.strftime('%Y-%m-%d')
-    download_data_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
-    download_data_form.end_date.data = end_date_se.strftime('%Y-%m-%d')
 
     return render_template('public/solar_edge.html',
         date_select_form=date_select_form,
