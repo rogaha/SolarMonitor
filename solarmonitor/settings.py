@@ -21,11 +21,10 @@ class Config(object):
     PGE_CLIENT_CREDENTIALS = {'client_key': 'b5020eaae0f34c56a62726ff6f059b45', 'client_secret_key': '69f7ad97530447f49d9468373cf2fc4f'}
     REG_ACCESS_TOKEN = '5fe3233d-c9f8-4ff9-9f63-3d02dc534c3c'
     TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
-    CELERY_BROKER_URL = 'redis://h:p7lrds43veon7v3llv8bhttt9fn@ec2-107-22-162-129.compute-1.amazonaws.com:17989'
-    CELERY_RESULT_BACKEND = 'redis://h:p7lrds43veon7v3llv8bhttt9fn@ec2-107-22-162-129.compute-1.amazonaws.com:17989'
+    CELERY_BROKER_URL = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-163-252-131.compute-1.amazonaws.com:13639'
+    CELERY_RESULT_BACKEND = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-163-252-131.compute-1.amazonaws.com:13639'
     SOLAREDGE_API_KEY = 'TMLKODSHJ7ZCHH430FV7SA98Y3VCOM5X'
     SOLAREDGE_SITE_ID = '237846'
-
 
 class ProdConfig(Config):
     """Production configuration."""
