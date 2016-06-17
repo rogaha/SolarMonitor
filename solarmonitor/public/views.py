@@ -245,7 +245,9 @@ def charts(modify=None):
 @blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
 def solar_edge(modify=None):
     """Solar Edge API"""
-    date_select_form = DateSelectForm()
+
+    date_select_form = DateSelectForm(prefix="date_select_form")
+    download_data_form = DownloadDataForm(prefix="download_data_form")
 
     if modify == 'clear':
         session.clear()
@@ -255,7 +257,6 @@ def solar_edge(modify=None):
         SolarEdgeUsagePoint.query.delete()
         db.session.commit()
         return redirect(url_for('public.solar_edge'))
-
 
 
     """Set some default dates if nothing has been entered in the form."""
@@ -273,38 +274,46 @@ def solar_edge(modify=None):
     if date_select_form.validate_on_submit():
         session['data_time_unit_se'] = date_select_form.data_time_unit.data
         session['start_date_se'] = date_select_form.start_date.data
-        if datetime.datetime.strptime(date_select_form.end_date.data, '%Y-%m-%d').date() > date.today():
-            session['end_date_se'] = date.today().strftime('%Y-%m-%d')
-        else:
-            session['end_date_se'] = date_select_form.end_date.data
+        session['end_date_se'] = date_select_form.end_date.data
+
         try:
             start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
             end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
         except:
             flash('Date entered, not in correct format.')
             return redirect(url_for('public.solar_edge'))
+
+        solare_edge_data_pull = SolarEdgeUsagePoint.query.filter(
+            (SolarEdgeUsagePoint.date>=start_date_se)&
+            (SolarEdgeUsagePoint.date<=end_date_se)
+            ).order_by(SolarEdgeUsagePoint.date.asc()).all()
+
+        session['se_energy_data'] = []
+        session['se_energy_labels'] = []
+
+        for each in solare_edge_data_pull:
+            session['se_energy_data'].append(each.value)
+            session['se_energy_labels'].append(each.date.strftime('%Y-%m-%d'))
+
+        session['se_energy_data'] = [float(x)/1000 for x in session['se_energy_data']]
+
         return redirect(url_for('public.solar_edge'))
 
-    days_between = (end_date_se + timedelta(days=1)) - start_date_se
-    database_check = SolarEdgeUsagePoint.query.filter(
-        (SolarEdgeUsagePoint.date>=start_date_se)&
-        (SolarEdgeUsagePoint.date<=end_date_se)
-        ).order_by(SolarEdgeUsagePoint.date.asc()).all()
 
-    se_energy_data = []
-    se_energy_labels = []
 
-    print len(database_check), days_between.days
 
-    if len(database_check) == days_between.days:
-        data_source = 1
-        for each in database_check:
-            se_energy_data.append(each.value)
-            se_energy_labels.append(each.date.strftime('%Y-%m-%d'))
 
-        se_energy_data = [float(x)/1000 for x in se_energy_data]
-    else:
-        data_source = 2
+    if download_data_form.validate_on_submit():
+        session['start_date_se'] = download_data_form.start_date.data
+        session['end_date_se'] = download_data_form.end_date.data
+
+        try:
+            start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
+            end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
+        except:
+            flash('Date entered, not in correct format.')
+            return redirect(url_for('public.solar_edge'))
+
         se = SolarEdgeApi()
 
         if 'data_time_unit_se' in session:
@@ -315,23 +324,26 @@ def solar_edge(modify=None):
 
         task = process_se_data.delay(se_energy)
 
-
+        session['se_energy_data'] = []
+        session['se_energy_labels'] = []
 
         for each in se_energy['energy']['values']:
             if each['value'] == None:
-                se_energy_data.append(0)
+                session['se_energy_data'].append(0)
             else:
-                se_energy_data.append(each['value']/1000)
-            se_energy_labels.append(str(each['date']))
+                session['se_energy_data'].append(each['value']/1000)
+            session['se_energy_labels'].append(str(each['date']))
+
+        return redirect(url_for('public.solar_edge'))
 
     date_select_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
     date_select_form.end_date.data = end_date_se.strftime('%Y-%m-%d')
+    download_data_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
+    download_data_form.end_date.data = end_date_se.strftime('%Y-%m-%d')
 
     return render_template('public/solar_edge.html',
-        se_energy_labels=se_energy_labels,
-        se_energy_data=se_energy_data,
         date_select_form=date_select_form,
-        data_source=data_source
+        download_data_form=download_data_form,
         )
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])

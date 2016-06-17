@@ -7,24 +7,24 @@
 
   <div class="row">
       <div class="col-md-4">
-        <p class="alert alert-info">{% if data_source == 1 %}Data is from database.{% else %}Data from SolarEdge API{% endif %}</p>
+
         <form class="form-horizontal" action="{{ url_for('public.solar_edge') }}" method="post">
-          {{ date_select_form.hidden_tag() }}
+          {{ download_data_form.hidden_tag() }}
         <fieldset>
 
         <!-- Form Name -->
-        <legend>Select Data to View</legend>
+        <legend>Import Solar Edge Data</legend>
 
         <!-- Text input-->
         <div class="form-group">
           <label class="col-md-4 control-label" for="textinput">Start Date</label>
           <div class="col-md-6">
-          {{ date_select_form.start_date(class="form-control input-md", id="datepicker3", autocomplete="off") }}
+          {{ download_data_form.start_date(class="form-control input-md", id="datepicker1", autocomplete="off") }}
 
           <script type="text/javascript">
 
           $(document).ready(function() {
-              $('#datepicker3').datepicker({
+              $('#datepicker1').datepicker({
                 format: 'yyyy-mm-dd',
               });
           })
@@ -37,12 +37,12 @@
         <div class="form-group">
           <label class="col-md-4 control-label" for="textinput">End Date</label>
           <div class="col-md-6">
-          {{ date_select_form.end_date(class="form-control input-md", id="datepicker4", autocomplete="off") }}
+          {{ download_data_form.end_date(class="form-control input-md", id="datepicker2", autocomplete="off") }}
 
           <script type="text/javascript">
 
           $(document).ready(function() {
-              $('#datepicker4').datepicker({
+              $('#datepicker2').datepicker({
                 format: 'yyyy-mm-dd',
               });
           })
@@ -51,28 +51,101 @@
           </div>
         </div>
 
-        <!-- SelectField -->
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="singlebutton">Time Unit</label>
-          <div class="col-md-4">
-            {{ date_select_form.data_time_unit(class="form-control input-md") }}
-          </div>
-        </div>
 
         <!-- Button -->
         <div class="form-group">
           <label class="col-md-4 control-label" for="singlebutton"></label>
-          <div class="col-md-4">
-            {{ date_select_form.submit(class="btn btn-primary") }}
+          <div class="col-md-6">
+            {{ download_data_form.submit(class="btn btn-primary") }}
+          </div>
+        </div>
+
+
+
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="singlebutton"></label>
+          <div class="col-md-6">
+              <div id="success_text" style="visibility:hidden">
+              <input class="btn btn-success" value="Get New Data" onClick="location.href='/charts';">
+              </div>
+
+              <div class="progress" style="visibility:hidden" id="progress_bar">
+                <div id="percent_bar" class="progress-bar progress-bar-success progress-bar-striped active" style="min-width: 2em;" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                  0%
+                </div>
+              </div>
           </div>
         </div>
 
         </fieldset>
         </form>
 
+
+
+
 </div>
 <div class="col-md-4">
+  <form class="form-horizontal" action="{{ url_for('public.solar_edge') }}" method="post">
+    {{ date_select_form.hidden_tag() }}
+  <fieldset>
 
+  <!-- Form Name -->
+  <legend>Select Data to View</legend>
+
+  <!-- Text input-->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="textinput">Start Date</label>
+    <div class="col-md-6">
+    {{ date_select_form.start_date(class="form-control input-md", id="datepicker3", autocomplete="off") }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#datepicker3').datepicker({
+          format: 'yyyy-mm-dd',
+        });
+    })
+    </script>
+
+    </div>
+  </div>
+
+  <!-- Text input-->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="textinput">End Date</label>
+    <div class="col-md-6">
+    {{ date_select_form.end_date(class="form-control input-md", id="datepicker4", autocomplete="off") }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#datepicker4').datepicker({
+          format: 'yyyy-mm-dd',
+        });
+    })
+    </script>
+
+    </div>
+  </div>
+
+  <!-- SelectField -->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="singlebutton">Time Unit</label>
+    <div class="col-md-4">
+      {{ date_select_form.data_time_unit(class="form-control input-md") }}
+    </div>
+  </div>
+
+  <!-- Button -->
+  <div class="form-group">
+    <label class="col-md-4 control-label" for="singlebutton"></label>
+    <div class="col-md-4">
+      {{ date_select_form.submit(class="btn btn-primary") }}
+    </div>
+  </div>
+
+  </fieldset>
+  </form>
 </div>
 </div>
 </div><!-- /.jumbotron -->
@@ -95,13 +168,13 @@ margin-top:50px
       var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {{ se_energy_labels|safe }},
+            labels: {{ session['se_energy_labels']|safe }},
             datasets: [{
                 label: 'Solar Production kWh',
                 backgroundColor: "rgba(74,162,75,0.5)",
                 borderColor: "rgba(74,162,75,1)",
                 borderWidth: 1,
-                data: {{ se_energy_data|safe }} ,
+                data: {{ session['se_energy_data']|safe }} ,
                 borderWidth: 1
             }]
         },
