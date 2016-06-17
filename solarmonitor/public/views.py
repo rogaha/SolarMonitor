@@ -19,7 +19,7 @@ from jxmlease import parse
 import json
 
 import datetime
-from datetime import timedelta
+from datetime import timedelta, date
 import pytz
 
 local = pytz.timezone ('US/Eastern')
@@ -273,7 +273,10 @@ def solar_edge(modify=None):
     if date_select_form.validate_on_submit():
         session['data_time_unit_se'] = date_select_form.data_time_unit.data
         session['start_date_se'] = date_select_form.start_date.data
-        session['end_date_se'] = date_select_form.end_date.data
+        if datetime.datetime.strptime(date_select_form.end_date.data, '%Y-%m-%d').date() > date.today():
+            session['end_date_se'] = date.today().strftime('%Y-%m-%d')
+        else:
+            session['end_date_se'] = date_select_form.end_date.data
         try:
             start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
             end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
@@ -286,7 +289,7 @@ def solar_edge(modify=None):
     database_check = SolarEdgeUsagePoint.query.filter(
         (SolarEdgeUsagePoint.date>=start_date_se)&
         (SolarEdgeUsagePoint.date<=end_date_se)
-        ).all()
+        ).order_by(SolarEdgeUsagePoint.date.asc()).all()
 
     se_energy_data = []
     se_energy_labels = []
@@ -294,14 +297,14 @@ def solar_edge(modify=None):
     print len(database_check), days_between.days
 
     if len(database_check) == days_between.days:
-        print 'in database!!'
+        data_source = 1
         for each in database_check:
             se_energy_data.append(each.value)
             se_energy_labels.append(each.date.strftime('%Y-%m-%d'))
 
         se_energy_data = [float(x)/1000 for x in se_energy_data]
     else:
-        print 'NOTT!!'
+        data_source = 2
         se = SolarEdgeApi()
 
         if 'data_time_unit_se' in session:
@@ -327,7 +330,8 @@ def solar_edge(modify=None):
     return render_template('public/solar_edge.html',
         se_energy_labels=se_energy_labels,
         se_energy_data=se_energy_data,
-        date_select_form=date_select_form
+        date_select_form=date_select_form,
+        data_source=data_source
         )
 
 @blueprint.route('/oauth', methods=['GET', 'POST'])

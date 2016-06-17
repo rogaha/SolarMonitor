@@ -7,6 +7,7 @@
 
   <div class="row">
       <div class="col-md-4">
+        <p class="alert alert-info">{% if data_source == 1 %}Data is from database.{% else %}Data from SolarEdge API{% endif %}</p>
         <form class="form-horizontal" action="{{ url_for('public.solar_edge') }}" method="post">
           {{ date_select_form.hidden_tag() }}
         <fieldset>
