@@ -259,7 +259,6 @@ def solar_edge(modify=None):
         session.clear()
         return redirect(url_for('public.solar_edge'))
 
-
     """Set some default dates if nothing has been entered in the form."""
     if 'start_date_se' in session:
         start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
@@ -302,10 +301,6 @@ def solar_edge(modify=None):
         session['se_energy_data'] = [float(x)/1000 for x in session['se_energy_data']]
 
         return redirect(url_for('public.solar_edge'))
-
-
-
-
 
     if download_data_form.validate_on_submit():
         session['start_date_se'] = download_data_form.start_date.data

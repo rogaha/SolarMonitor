@@ -1,0 +1,80 @@
+# -*- coding: utf-8 -*-
+"""Functional tests using WebTest.
+
+See: http://webtest.readthedocs.org/
+"""
+from flask import url_for
+
+from solarmonitor.extensions import db
+from solarmonitor.user.models import User, UsagePoint, SolarEdgeUsagePoint
+
+import pytest
+
+@pytest.mark.usefixtures('db')
+class TestPublicRoutes200:
+    """The purpose of this test suite is to make sure that each url route returns a 200 status code.
+    It's essentially a quick way to make sure there are no show stopping errors in the template code,
+    or the server side code. This class tests all public routes, that do no require authentication.
+    """
+
+    def test_home(self, testapp):
+        """Home Page."""
+        res = testapp.get(url_for('public.home'))
+        assert res.status_code == 200
+
+    def test_about(self, testapp):
+        """About Page."""
+        res = testapp.get(url_for('public.about'))
+        assert res.status_code == 200
+
+    def test_logout(self, user, testapp):
+        """Logout Page."""
+
+        # Goes to homepage to login
+        res = testapp.get('/')
+        # Fills out login form in navbar
+        form = res.forms['loginForm']
+        form['username'] = user.username
+        form['password'] = 'myprecious'
+        # Submits
+        res = form.submit().follow()
+
+        #logout then redirects to home page
+        res = testapp.get(url_for('public.logout')).follow()
+        assert res.status_code == 200
+
+    def test_register(self, testapp):
+        """Register Page."""
+        res = testapp.get(url_for('public.register'))
+        assert res.status_code == 200
+
+    def test_notifications(self, testapp):
+        """Notification URL. Currently should return 200 if a visitor lands on it.
+        Should also return 200 if POST data is submitted from PGE.
+        """
+        res = testapp.get(url_for('public.notifications'))
+        assert res.status_code == 200
+
+    def test_oauth(self, testapp):
+        """This URL is part of the oauth process."""
+        res = testapp.get(url_for('public.oauth'))
+        assert res.status_code == 200
+
+    def test_oauth_redirect(self, testapp):
+        """This URL is part of the oauth process. Should return 200 currently,
+        but will be update to a 301 at some point when PGE is ready.
+        """
+        res = testapp.get(url_for('public.oauth_redirect'))
+        assert res.status_code == 200
+
+    def test_solar_edge_charts(self, testapp):
+        """Solar Edge chart page for downloading and viewing data.
+        """
+        res = testapp.get(url_for('public.solar_edge'))
+        assert res.status_code == 200
+
+    def test_pge_charts(self, testapp):
+        """PGE Chart page for downloading and viewing data.
+        """
+        res = testapp.get(url_for('public.charts'))
+        assert res.status_code == 200

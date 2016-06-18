@@ -12,7 +12,7 @@ class UsagePoint(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     commodity_type = db.Column(db.Integer)
     measuring_period = db.Column(db.Integer)
-    interval_start = db.Column(db.Integer)
+    interval_start = db.Column(db.DateTime)
     interval_duration = db.Column(db.Integer)
     interval_value = db.Column(db.Integer)
     flow_direction = db.Column(db.Integer)
