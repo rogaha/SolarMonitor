@@ -27,10 +27,10 @@ class SolarEdgeUsagePoint(db.Model):
     __tablename__ = 'solaredgeusagepoints'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    time_unit = db.Column(db.Integer)
-    unit_of_measure = db.Column(db.Integer)
-    date = db.Column(db.Integer)
-    value = db.Column(db.Integer)
+    time_unit = db.Column(db.String(50))
+    unit_of_measure = db.Column(db.String(50))
+    date = db.Column(db.Date)
+    value = db.Column(db.Numeric(20, 5))
 
     def __repr__(self):
         return '<SolarEdgeUsagePoint {}>' .format(self.id)
