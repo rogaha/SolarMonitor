@@ -151,7 +151,7 @@ def charts(modify=None):
     hourly_combined_electric_usage = [x - y for x, y in zip(incoming_electric, outgoing_electric)]
 
 
-    return render_template('public/data_chart.html', date_select_form=date_select_form, download_data_form=download_data_form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels, incoming_electric_daily_data=incoming_electric_daily_data, incoming_electric_daily_label=incoming_electric_daily_label, outgoing_electric_daily_data=outgoing_electric_daily_data, outgoing_electric_daily_label=outgoing_electric_daily_label, daily_combined_electric_usage=daily_combined_electric_usage, hourly_combined_electric_usage=hourly_combined_electric_usage)
+    return render_template('users/dashboard/data_chart.html', date_select_form=date_select_form, download_data_form=download_data_form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels, incoming_electric_daily_data=incoming_electric_daily_data, incoming_electric_daily_label=incoming_electric_daily_label, outgoing_electric_daily_data=outgoing_electric_daily_data, outgoing_electric_daily_label=outgoing_electric_daily_label, daily_combined_electric_usage=daily_combined_electric_usage, hourly_combined_electric_usage=hourly_combined_electric_usage)
 
 @blueprint.route('/solaredge', methods=['GET', 'POST'])
 @blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
@@ -250,7 +250,7 @@ def solar_edge(modify=None):
     date_select_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
     date_select_form.end_date.data = end_date_se.strftime('%Y-%m-%d')
 
-    return render_template('public/solar_edge.html',
+    return render_template('users/dashboard/solar_edge.html',
         date_select_form=date_select_form,
         download_data_form=download_data_form,
         )
