@@ -2,7 +2,7 @@
 """Test forms."""
 
 from solarmonitor.public.forms import LoginForm
-from solarmonitor.user.forms import RegistrationForm
+from solarmonitor.auth.forms import RegistrationForm
 from solarmonitor.user.models import User
 from solarmonitor.extensions import db
 

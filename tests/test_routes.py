@@ -40,12 +40,12 @@ class TestPublicRoutes200:
         res = form.submit().follow()
 
         #logout then redirects to home page
-        res = testapp.get(url_for('public.logout')).follow()
+        res = testapp.get(url_for('auth.logout')).follow()
         assert res.status_code == 200
 
     def test_register(self, testapp):
         """Register Page."""
-        res = testapp.get(url_for('public.register'))
+        res = testapp.get(url_for('auth.register'))
         assert res.status_code == 200
 
     def test_notifications(self, testapp):
@@ -70,11 +70,11 @@ class TestPublicRoutes200:
     def test_solar_edge_charts(self, testapp):
         """Solar Edge chart page for downloading and viewing data.
         """
-        res = testapp.get(url_for('public.solar_edge'))
+        res = testapp.get(url_for('dashboard.solar_edge'))
         assert res.status_code == 200
 
     def test_pge_charts(self, testapp):
         """PGE Chart page for downloading and viewing data.
         """
-        res = testapp.get(url_for('public.charts'))
+        res = testapp.get(url_for('dashboard.charts'))
         assert res.status_code == 200

@@ -2,7 +2,8 @@
 """The app module, containing the app factory function."""
 from flask import Flask, render_template
 
-from solarmonitor import public, user
+from solarmonitor import public, user, auth
+from solarmonitor.user import dashboard
 from solarmonitor.assets import assets
 from solarmonitor.extensions import bcrypt, db, login_manager
 from solarmonitor.settings import ProdConfig
@@ -47,6 +48,8 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(public.views.blueprint)
     app.register_blueprint(user.views.blueprint)
+    app.register_blueprint(auth.views.blueprint)
+    app.register_blueprint(dashboard.views.blueprint)
     return None
 
 

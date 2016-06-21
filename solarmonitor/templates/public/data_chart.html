@@ -7,7 +7,7 @@
 
   <div class="row">
       <div class="col-md-4">
-  <form class="form-horizontal" action="{{ url_for('public.charts') }}" method="post">
+  <form class="form-horizontal" action="{{ url_for('dashboard.charts') }}" method="post">
     {{ download_data_form.hidden_tag() }}
   <fieldset>
 
@@ -81,7 +81,7 @@
 
 </div>
 <div class="col-md-4">
-  <form class="form-horizontal" action="{{ url_for('public.charts') }}" method="post">
+  <form class="form-horizontal" action="{{ url_for('dashboard.charts') }}" method="post">
     {{ date_select_form.hidden_tag() }}
   <fieldset>
 
@@ -308,9 +308,9 @@ margin-top:50px
 
   End Date:{{ session['end_date_pge'] }}</br><br>
 
-  <a class="btn btn-primary" href="{{ url_for('public.charts', modify='clear') }}"> Clear Session</a>
+  <a class="btn btn-primary" href="{{ url_for('dashboard.charts', modify='clear') }}"> Clear Session</a>
 
-  <a class="btn btn-primary" href="{{ url_for('public.charts', modify='delete-data') }}"> Clear Database</a>
+  <a class="btn btn-primary" href="{{ url_for('dashboard.charts', modify='delete-data') }}"> Clear Database</a>
 
   </p>
 
