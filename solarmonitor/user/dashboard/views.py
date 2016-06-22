@@ -13,6 +13,7 @@ from solarmonitor.user.models import User, UsagePoint, CeleryTask, SolarEdgeUsag
 from solarmonitor.public.forms import DateSelectForm, DownloadDataForm
 from solarmonitor.extensions import db
 import requests
+import json
 
 import datetime
 from datetime import timedelta, date
