@@ -11,6 +11,7 @@ from solarmonitor.solaredge.se_api import SolarEdgeApi
 from solarmonitor.mailgun.mailgun_api import send_email
 from solarmonitor.user.models import User, UsagePoint, CeleryTask, SolarEdgeUsagePoint
 from solarmonitor.public.forms import DateSelectForm, DownloadDataForm
+from solarmonitor.extensions import db
 import requests
 
 import datetime
@@ -35,13 +36,15 @@ def charts(modify=None):
     download_data_form = DownloadDataForm(prefix="download_data_form")
 
     if modify == 'clear':
-        session.clear()
-        return redirect(url_for('public.charts'))
+        session.pop('start_date_pge', None)
+        session.pop('end_date_pge', None)
+        session.pop('data_time_unit', None)
+        return redirect(url_for('dashboard.charts'))
 
     if modify == 'delete-data':
         UsagePoint.query.delete()
         db.session.commit()
-        return redirect(url_for('public.charts'))
+        return redirect(url_for('dashboard.charts'))
 
     if 'start_date_pge' in session:
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
@@ -162,14 +165,15 @@ def solar_edge(modify=None):
     download_data_form = DownloadDataForm(prefix="download_data_form")
 
     if modify == 'clear':
-        session.clear()
-        return redirect(url_for('public.solar_edge'))
+        session.pop('start_date_se', None)
+        session.pop('end_date_se', None)
+        session.pop('data_time_unit_se', None)
+        return redirect(url_for('dashboard.solar_edge'))
 
     if modify == 'delete-data':
         SolarEdgeUsagePoint.query.delete()
         db.session.commit()
-        session.clear()
-        return redirect(url_for('public.solar_edge'))
+        return redirect(url_for('dashboard.solar_edge'))
 
     """Set some default dates if nothing has been entered in the form."""
     if 'start_date_se' in session:
@@ -193,7 +197,7 @@ def solar_edge(modify=None):
             end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
         except:
             flash('Date entered, not in correct format.')
-            return redirect(url_for('public.solar_edge'))
+            return redirect(url_for('dashboard.solar_edge'))
 
         solare_edge_data_pull = SolarEdgeUsagePoint.query.filter(
             (SolarEdgeUsagePoint.date>=start_date_se)&
@@ -212,7 +216,7 @@ def solar_edge(modify=None):
 
         session['se_energy_data'] = [float(x)/1000 for x in session['se_energy_data']]
 
-        return redirect(url_for('public.solar_edge'))
+        return redirect(url_for('dashboard.solar_edge'))
 
     if download_data_form.validate_on_submit():
         session['start_date_se'] = download_data_form.start_date.data
@@ -223,7 +227,7 @@ def solar_edge(modify=None):
             end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
         except:
             flash('Date entered, not in correct format.')
-            return redirect(url_for('public.solar_edge'))
+            return redirect(url_for('dashboard.solar_edge'))
 
         se = SolarEdgeApi()
 
@@ -245,7 +249,7 @@ def solar_edge(modify=None):
                 session['se_energy_data'].append(each['value']/1000)
             session['se_energy_labels'].append(str(each['date']))
 
-        return redirect(url_for('public.solar_edge'))
+        return redirect(url_for('dashboard.solar_edge'))
 
     date_select_form.start_date.data = start_date_se.strftime('%Y-%m-%d')
     date_select_form.end_date.data = end_date_se.strftime('%Y-%m-%d')

@@ -6,9 +6,9 @@
 <div class="jumbotron">
 
   <div class="row">
-      <div class="col-md-4"> 
+      <div class="col-md-4">
 
-        <form class="form-horizontal" action="{{ url_for('dashboard.solar_edge') }}" method="post">
+        <form id="solar_edge_data_pull" class="form-horizontal" action="{{ url_for('dashboard.solar_edge') }}" method="post">
           {{ download_data_form.hidden_tag() }}
         <fieldset>
 
@@ -85,7 +85,7 @@
 
 </div>
 <div class="col-md-4">
-  <form class="form-horizontal" action="{{ url_for('dashboard.solar_edge') }}" method="post">
+  <form id="solar_edge_data_view" class="form-horizontal" action="{{ url_for('dashboard.solar_edge') }}" method="post">
     {{ date_select_form.hidden_tag() }}
   <fieldset>
 
