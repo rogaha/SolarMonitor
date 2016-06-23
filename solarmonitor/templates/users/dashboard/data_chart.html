@@ -7,7 +7,7 @@
 
   <div class="row">
       <div class="col-md-4">
-  <form class="form-horizontal" action="{{ url_for('dashboard.charts') }}" method="post">
+  <form id="pge_data_pull" class="form-horizontal" action="{{ url_for('dashboard.charts') }}" method="post">
     {{ download_data_form.hidden_tag() }}
   <fieldset>
 
@@ -242,7 +242,7 @@ margin-top:50px
 (function poll() {
     setTimeout(function() {
         $.ajax({
-            url: "/status/task_check",
+            url: "status/task_check",
             type: "GET",
             success: function(data) {
 
@@ -251,7 +251,7 @@ margin-top:50px
                     $("#progress_bar").removeAttr("style")
                     var task_id = data[key];
                     $.ajax({
-                      url: "/status/" + data[key],
+                      url: "status/" + data[key],
                       type: "GET",
                       success: function(data) {
                         console.log(data['current'])
@@ -266,7 +266,7 @@ margin-top:50px
                           $("#progress_bar").find('#percent_bar').text('100%');
                           $("#progress_bar").css({'visibility': 'hidden'});
                           $.ajax({
-                            url: "/status/" + task_id + '/mark_complete',
+                            url: "status/" + task_id + '/mark_complete',
                             type: "GET",
                             success: function(data) {
                               $("#success_text").removeAttr("style");
@@ -279,7 +279,7 @@ margin-top:50px
                           $("#progress_bar").find('#percent_bar').text('Import Failed');
                           $("#progress_bar").css({'visibility': 'hidden'});
                           $.ajax({
-                            url: "/status/" + task_id + '/mark_complete',
+                            url: "status/" + task_id + '/mark_complete',
                             type: "GET",
                             success: function(data) {
                               $("#success_text").removeAttr("style");

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}
+
+      SolarMonitor Homepage
+        {% endblock %}
+    </title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/grayscale.css') }}" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" type="text/javascript"></script>
+
+    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <link rel='stylesheet prefetch' href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900|RobotoDraft:400,100,300,500,700,900'>
+
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/font-awesome4/css/font-awesome.min.css') }}">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">
+                    <img class="logo" src="{{ url_for('static', filename='img/logo.png') }}">
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#features">Features</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#pricing">Pricing</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#contact">Contact</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#more">More <i class="fa fa-caret-down"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Intro Header -->
+    <header class="intro">
+        <div class="intro-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <div class="module form-module">
+                          <div class="toggle"><i class="fa fa-times fa-plus"></i>
+                            <div class="tooltip">Click Me</div>
+                          </div>
+                          <div class="form">
+                            <h2>Login to your account</h2>
+                            <form>
+                              <input type="text" placeholder="Username"/>
+                              <input type="password" placeholder="Password"/>
+                              <button>Login</button>
+                            </form>
+                          </div>
+                          <div class="form">
+                            <h2>Create an account</h2>
+                            <form>
+                              <input type="text" placeholder="Username"/>
+                              <input type="password" placeholder="Password"/>
+                              <input type="email" placeholder="Email Address"/>
+                              <input type="tel" placeholder="Phone Number"/>
+                              <button>Register</button>
+                            </form>
+                          </div>
+                          <div class="cta"><a href="#">Forgot your password?</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="features" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <p><img class="logo" src="{{ url_for('static', filename='img/logo-large.png') }}"></p>
+                <p>Kevin shankle biltong jowl pancetta, beef ribs boudin. Cupim ham hock ribeye, strip steak swine bacon kielbasa corned beef. T-bone bacon jerky pork loin biltong capicola filet mignon. Beef prosciutto pork belly short loin porchetta, pork corned beef meatball hamburger tail tongue bacon.</p>
+                <p>Pork sirloin ball tip meatloaf frankfurter, ham cow tail rump pastrami filet mignon pancetta prosciutto chicken tri-tip. Sirloin ham hock andouille, cow chicken cupim ball tip. Ball tip ribeye brisket bacon prosciutto.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="pricing" class="content-section text-center">
+        <div class="download-section">
+            <div class="container">
+                <div class="col-lg-8">
+                  <!-- PRICING TABLE STYLE 1-->
+                          <div class="container">
+                              <div class="row">
+                                  <div class="col-md-3 col-sm-6 col-xs-12 float-shadow">
+                                      <div class="price_table_container">
+                                          <div class="price_table_heading">Starter</div>
+                                          <div class="price_table_body">
+                                              <div class="price_table_row cost warning-bg"><strong>$ 19</strong><span>/MONTH</span></div>
+                                              <div class="price_table_row">1 Website</div>
+                                              <div class="price_table_row">10 GB Storage</div>
+                                              <div class="price_table_row">10 GB Bandwidth</div>
+                                              <div class="price_table_row">10 Email Addresses</div>
+                                              <div class="price_table_row">Free Backup</div>
+                                              <div class="price_table_row">Full Time Support</div>
+                                          </div>
+                                          <a href="#" class="btn btn-warning btn-lg btn-block">Sign Up</a>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-3 col-sm-6 col-xs-12 float-shadow">
+                                      <div class="recommended"><strong><span class="fa fa-heart" aria-hidden="true"></span> RECOMMENDED</strong></div>
+                                      <div class="price_table_container">
+                                          <div class="price_table_heading">Basic</div>
+                                          <div class="price_table_body">
+                                              <div class="price_table_row cost primary-bg"><strong>$ 29</strong><span>/MONTH</span></div>
+                                              <div class="price_table_row">10 Websites</div>
+                                              <div class="price_table_row">100 GB Storage</div>
+                                              <div class="price_table_row">100 GB Bandwidth</div>
+                                              <div class="price_table_row">50 Email Addresses</div>
+                                              <div class="price_table_row">Free Backup</div>
+                                              <div class="price_table_row">Full Time Support</div>
+                                          </div>
+                                          <a href="#" class="btn btn-primary btn-lg btn-block">Sign Up</a>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-3 col-sm-6 col-xs-12 float-shadow">
+                                      <div class="price_table_container">
+                                          <div class="price_table_heading">Premium</div>
+                                          <div class="price_table_body">
+                                              <div class="price_table_row cost success-bg"><strong>$ 39</strong><span>/MONTH</span></div>
+                                              <div class="price_table_row">100 Websites</div>
+                                              <div class="price_table_row">1 TB Storage</div>
+                                              <div class="price_table_row">1 TB Bandwidth</div>
+                                              <div class="price_table_row">100 Email Addresses</div>
+                                              <div class="price_table_row">Free Backup</div>
+                                              <div class="price_table_row">Full Time Support</div>
+                                          </div>
+                                          <a href="#" class="btn btn-success btn-lg btn-block">Sign Up</a>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-3 col-sm-6 col-xs-12 float-shadow">
+                                      <div class="price_table_container">
+                                          <div class="price_table_heading">Master</div>
+                                          <div class="price_table_body">
+                                              <div class="price_table_row cost info-bg"><strong>$ 60</strong><span>/MONTH</span></div>
+                                              <div class="price_table_row">Unlimited Websites</div>
+                                              <div class="price_table_row">10 TB Storage</div>
+                                              <div class="price_table_row">100 TB Bandwidth</div>
+                                              <div class="price_table_row">1000 Email Addresses</div>
+                                              <div class="price_table_row">Free Backup</div>
+                                              <div class="price_table_row">Full Time Support</div>
+                                          </div>
+                                          <a href="#" class="btn btn-info btn-lg btn-block">Sign Up</a>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <!-- PRICING TABLE STYLE 1-->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Contact Solar Monitor</h2>
+                <p>Bacon ipsum dolor amet ribeye alcatra biltong chuck cupim strip steak ham hock. Sausage pork cupim short ribs fatback, picanha ground round brisket. Ham hock rump jowl fatback filet mignon, chicken chuck. Hamburger venison ham ribeye fatback strip steak picanha pig porchetta doner bacon cupim.</p>
+
+                <ul class="list-inline banner-social-buttons">
+                    <li>
+                        <a href="#" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="btn btn-default btn-lg"><i class="fa fa-google-plus fa-fw"></i> <span class="network-name">Google+</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>Copyright &copy; Solar Monitor 2016</p>
+        </div>
+    </footer>
+
+
+
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="{{ url_for('static', filename='js/jquery.easing.min.js') }}"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="{{ url_for('static', filename='js/grayscale.js') }}"></script>
+
+</body>
+
+
+
+
+</html>
