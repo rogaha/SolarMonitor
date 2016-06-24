@@ -3,6 +3,7 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for, session, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 
+from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm
 from solarmonitor.auth.forms import RegistrationForm
