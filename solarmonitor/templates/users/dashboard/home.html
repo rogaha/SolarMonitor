@@ -24,7 +24,28 @@
 
 {% block content %}
 <div class="body-content">
+<div class="row">
+  <div class="col col-xs-6">
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary">Reset Date Range</button>
+      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="caret"></span>
+        <span class="sr-only">Toggle Dropdown</span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#">30 days</a></li>
+        <li><a href="#">14 days</a></li>
+        <li><a href="#">7 days</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+<br>
     <div class="row">
+
 
   <div class="col col-xs-6">
     <canvas id="myChart" width="380" height="200"></canvas>
@@ -81,7 +102,7 @@ var myChart = new Chart(ctx, {
               }
           }],
           xAxes: [{
-            stacked: true
+              stacked: true
           }]
       }
   }
@@ -125,14 +146,14 @@ var myChart = new Chart(ctx, {
               }
           }],
           xAxes: [{
-            stacked: true
+              stacked: true
           }]
       }
   }
 });
 </script>
 
-<div class="col-md-10 col-md-offset-1">
+
       <div class="panel panel-default panel-table">
           <div class="panel-heading">
             <div class="row">
@@ -324,7 +345,7 @@ var myChart = new Chart(ctx, {
           {% endfor %}
 
         </div>
-      </div>
+
     </div>
 </div>
 {% endblock %}
