@@ -40,7 +40,7 @@ var data = {
 labels: {{ labels|safe }},
 datasets: [
     {
-        label: 'Production kWh',
+        label: 'Production %',
         backgroundColor: "rgba(43,83,207,0.2)",
         borderColor: "rgba(25,60,168,1)",
         borderWidth: 1,
@@ -49,7 +49,7 @@ datasets: [
         data: {{ production_percentage|safe }},
     },
     {
-        label: 'Net Input kWh',
+        label: 'Net Input %',
         backgroundColor: "rgba(127,191,63,0.2)",
         borderColor: "rgba(9,174,9,1)",
         borderWidth: 1,
@@ -58,7 +58,7 @@ datasets: [
         data: {{ net_input|safe }},
     },
     {
-        label: 'Net Usage kWh',
+        label: 'Net Usage %',
         backgroundColor: "rgba(168,25,25,0.2)",
         borderColor: "rgba(138,16,16,1)",
         borderWidth: 1,
@@ -99,26 +99,17 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(43,83,207,0.4)",
         hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ production_percentage|safe }},
+        data: {{ production|safe }},
     },
     {
-        label: 'Net Input kWh',
-        backgroundColor: "rgba(127,191,63,0.2)",
-        borderColor: "rgba(9,174,9,1)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(127,191,63,0.4)",
-        hoverBorderColor: "rgba(9,174,9,1)",
-        data: {{ net_input|safe }},
-    },
-    {
-        label: 'Net Usage kWh',
+        label: 'Net Usage',
         backgroundColor: "rgba(168,25,25,0.2)",
         borderColor: "rgba(138,16,16,1)",
         borderWidth: 1,
         hoverBackgroundColor: "rgba(168,25,25,0.4)",
         hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ net_usage_percentage|safe }},
-    },
+        data: {{ daily_combined_electric_usage|safe }},
+    }
 ]
 };
 var ctx = document.getElementById("myChart2");

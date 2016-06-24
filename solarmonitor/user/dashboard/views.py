@@ -65,20 +65,15 @@ def home():
     net_input = [((x/(x + y)) - 1) for x, y in zip(production, net_usage)]
     net_input = [x * 100 if x > 0 else 0 for x in net_input]
 
-
-
-
-    #incoming_data is the total energy needs for the day = 100%
-    #what percent of incoming_data is produced by the grid?
-    #what percent of incoming_data is above and beyond?
-
     return render_template('users/dashboard/home.html',
         energy_accounts=current_user.energy_accounts,
         breadcrumbs=breadcrumbs, heading=heading,
         production_percentage=production_percentage,
         net_usage_percentage=net_usage_percentage,
         net_input=net_input,
-        labels=incoming_labels
+        labels=incoming_labels,
+        production=production,
+        daily_combined_electric_usage=daily_combined_electric_usage
         )
 
 @blueprint.route('/energy_account/<int:account_id>', methods=['GET', 'POST'])
