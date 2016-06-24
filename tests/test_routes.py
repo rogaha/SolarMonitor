@@ -31,7 +31,7 @@ class TestPublicRoutes200:
         """Logout Page."""
 
         # Goes to homepage to login
-        res = testapp.get('/about')
+        res = testapp.get('/')
         # Fills out login form in navbar
         form = res.forms['loginForm']
         form['email'] = user.email
@@ -67,13 +67,29 @@ class TestPublicRoutes200:
         res = testapp.get(url_for('public.oauth_redirect'))
         assert res.status_code == 200
 
-    def test_solar_edge_charts(self, testapp):
+    def test_solar_edge_charts(self, user, testapp):
         """Solar Edge chart page for downloading and viewing data.
         """
+        # Goes to homepage
+        res = testapp.get('/')
+        # Fills out login form in navbar
+        form = res.forms['loginForm']
+        form['email'] = user.email
+        form['password'] = 'myprecious'
+        # Submits
+        res = form.submit().follow()
         res = testapp.get(url_for('dashboard.solar_edge'))
         assert res.status_code == 200
 
-    def test_pge_charts(self, testapp):
+    def test_pge_charts(self, user, testapp):
+        # Goes to homepage
+        res = testapp.get('/')
+        # Fills out login form in navbar
+        form = res.forms['loginForm']
+        form['email'] = user.email
+        form['password'] = 'myprecious'
+        # Submits
+        res = form.submit().follow()
         """PGE Chart page for downloading and viewing data.
         """
         res = testapp.get(url_for('dashboard.charts'))

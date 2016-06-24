@@ -52,6 +52,18 @@ def user(db):
         last_name='solarsolarlast',
         password='myprecious'
         )
+
+    energy_account = EnergyAccount(
+        address_one = '123 Unknown',
+        address_two = 'db.Column(db.String(255))',
+        city = 'Sacramento',
+        state = 'CA',
+        zip_code = '14545',
+        pge_bulk_id = '54468',
+        pge_access_token = '2151dsfsdf',
+        solar_edge_api_key = 'api_key'
+        )
+    user.energy_accounts.append(energy_account)
     db.session.add(user)
     db.session.commit()
     return user
