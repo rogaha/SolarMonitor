@@ -42,7 +42,7 @@ def home():
                 #    return abort(400)
 
                 return redirect(next or url_for('dashboard.home'))
-            flash('Invalid username or password')
+            flash('Invalid email address or password')
         else:
             flash_errors(form)
     return render_template('public/home.html', form=form, register_form=register_form)
