@@ -21,12 +21,9 @@ def process_xml(self, xml):
 
         bulk_id = data[u'ns1:feed'][u'ns1:link'].get_xml_attr("href").rsplit('/', 1)[-1]
 
-
-
         energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id).first()
 
-
-        celery_task = CeleryTask(task_id=task.id, task_status=0, energy_account_id=energy_account.id)
+        celery_task = CeleryTask(task_id=process_xml.request.id, task_status=0, energy_account_id=energy_account.id)
         db.session.add(celery_task)
         db.session.commit()
 
