@@ -28,7 +28,7 @@ oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 blueprint = Blueprint('dashboard', __name__, url_prefix='/users/dashboard', static_folder='../static')
 
 
-@blueprint.route('/', methods=['GET', 'POST'])
+@blueprint.route('', methods=['GET', 'POST'])
 @login_required
 def home():
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home'))]
@@ -331,7 +331,10 @@ def taskstatus(task_id=None, change_status=None):
         return jsonify(response)
 
     if task_id == "task_check":
-        unfinished_tasks = CeleryTask.query.filter_by(task_status=0).all()
+        unfinished_tasks = CeleryTask.query.filter(
+            (CeleryTask.task_status==0)&
+            (CeleryTask.energy_account_id==current_user.energy_accounts[0].id)
+            ).all()
 
         unfinished_tasks_dict = {}
         for task in unfinished_tasks:
