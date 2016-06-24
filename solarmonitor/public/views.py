@@ -9,6 +9,7 @@ from solarmonitor.auth.forms import RegistrationForm
 from solarmonitor.user.models import User
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
+from solarmonitor.pge.pge import Api, ClientCredentials
 
 from jxmlease import parse
 import json
@@ -16,6 +17,8 @@ import json
 config = Config()
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
+
+cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def home():
