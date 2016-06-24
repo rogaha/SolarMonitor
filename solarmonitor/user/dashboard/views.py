@@ -182,6 +182,8 @@ def solar_edge(modify=None):
         session.pop('start_date_se', None)
         session.pop('end_date_se', None)
         session.pop('data_time_unit_se', None)
+        session.pop('se_energy_data', None)
+        session.pop('se_energy_labels', None)
         return redirect(url_for('dashboard.solar_edge'))
 
     if modify == 'delete-data':
