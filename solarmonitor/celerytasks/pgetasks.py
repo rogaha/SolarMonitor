@@ -23,7 +23,7 @@ def process_xml(self, xml):
 
         print bulk_id
 
-        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id)
+        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id).first()
 
         print energy_account.id
 
