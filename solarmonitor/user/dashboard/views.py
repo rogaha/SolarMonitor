@@ -9,7 +9,7 @@ from solarmonitor.celerytasks.se_tasks import process_se_data
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.solaredge.se_api import SolarEdgeApi
 from solarmonitor.mailgun.mailgun_api import send_email
-from solarmonitor.user.models import User, UsagePoint, CeleryTask, SolarEdgeUsagePoint
+from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint
 from solarmonitor.public.forms import DateSelectForm, DownloadDataForm
 from solarmonitor.extensions import db
 import requests
@@ -43,7 +43,7 @@ def charts(modify=None):
         return redirect(url_for('dashboard.charts'))
 
     if modify == 'delete-data':
-        UsagePoint.query.delete()
+        PGEUsagePoint.query.delete()
         db.session.commit()
         return redirect(url_for('dashboard.charts'))
 
@@ -98,17 +98,17 @@ def charts(modify=None):
             delta = end_date_pge - start_date_pge
             n = 0
             while n < delta.days:
-                incoming_electric_daily = UsagePoint.query.filter(
-                    (UsagePoint.flow_direction==1)&
-                    (UsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
-                    (UsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
-                    ).order_by(UsagePoint.interval_start.asc()).all()
+                incoming_electric_daily = PGEUsagePoint.query.filter(
+                    (PGEUsagePoint.flow_direction==1)&
+                    (PGEUsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
+                    (PGEUsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
+                    ).order_by(PGEUsagePoint.interval_start.asc()).all()
 
-                outgoing_electric_daily = UsagePoint.query.filter(
-                    (UsagePoint.flow_direction==19)&
-                    (UsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
-                    (UsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
-                    ).order_by(UsagePoint.interval_start.asc()).all()
+                outgoing_electric_daily = PGEUsagePoint.query.filter(
+                    (PGEUsagePoint.flow_direction==19)&
+                    (PGEUsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
+                    (PGEUsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
+                    ).order_by(PGEUsagePoint.interval_start.asc()).all()
 
                 incoming_interval_value = 0
                 outgoing_interval_value = 0
@@ -127,20 +127,20 @@ def charts(modify=None):
                 n += 1
 
     """This next section will grab the data and organize it into usage by hour."""
-    outgoing_electric_list = UsagePoint.query.filter(
-        (UsagePoint.flow_direction==19)&
-        (UsagePoint.interval_start>=start_date_pge)&
-        (UsagePoint.interval_start<end_date_pge)
-        ).order_by(UsagePoint.interval_start.asc()).all()
+    outgoing_electric_list = PGEUsagePoint.query.filter(
+        (PGEUsagePoint.flow_direction==19)&
+        (PGEUsagePoint.interval_start>=start_date_pge)&
+        (PGEUsagePoint.interval_start<end_date_pge)
+        ).order_by(PGEUsagePoint.interval_start.asc()).all()
 
     outgoing_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in outgoing_electric_list]
     outgoing_labels = [x.interval_start.strftime('%m/%d %H:%S') for x in outgoing_electric_list]
 
-    incoming_electric_list = UsagePoint.query.filter(
-        (UsagePoint.flow_direction==1)&
-        (UsagePoint.interval_start>=start_date_pge)&
-        (UsagePoint.interval_start<end_date_pge)
-        ).order_by(UsagePoint.interval_start.asc()).all()
+    incoming_electric_list = PGEUsagePoint.query.filter(
+        (PGEUsagePoint.flow_direction==1)&
+        (PGEUsagePoint.interval_start>=start_date_pge)&
+        (PGEUsagePoint.interval_start<end_date_pge)
+        ).order_by(PGEUsagePoint.interval_start.asc()).all()
 
     incoming_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in incoming_electric_list]
     incoming_labels = [x.interval_start.strftime('%m/%d %H:%S') for x in incoming_electric_list]

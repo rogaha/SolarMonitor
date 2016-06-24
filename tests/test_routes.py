@@ -6,7 +6,7 @@ See: http://webtest.readthedocs.org/
 from flask import url_for
 
 from solarmonitor.extensions import db
-from solarmonitor.user.models import User, UsagePoint, SolarEdgeUsagePoint
+from solarmonitor.user.models import User, PGEUsagePoint, SolarEdgeUsagePoint
 
 import pytest
 
@@ -31,10 +31,10 @@ class TestPublicRoutes200:
         """Logout Page."""
 
         # Goes to homepage to login
-        res = testapp.get('/')
+        res = testapp.get('/about')
         # Fills out login form in navbar
         form = res.forms['loginForm']
-        form['username'] = user.username
+        form['email'] = user.email
         form['password'] = 'myprecious'
         # Submits
         res = form.submit().follow()

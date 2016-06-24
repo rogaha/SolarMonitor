@@ -28,16 +28,8 @@ def register():
         user = User(email=form.email.data,
                     first_name=form.first_name.data,
                     last_name=form.last_name.data,
-                    username=form.username.data,
                     password=form.password.data,
-                    role_id=1,
-                    address_one='',
-                    address_two='',
-                    city='',
-                    state='',
-                    zip_code=0,
-                    pge_bulk_id=0,
-                    cell_phone=0,)
+                    )
         db.session.add(user)
         db.session.commit()
         flash('Thank you for registering. You can now log in.', 'success')

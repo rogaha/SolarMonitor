@@ -14,10 +14,10 @@ class TestLoggingIn:
     def test_can_log_in_returns_200(self, user, testapp):
         """Login successful."""
         # Goes to homepage
-        res = testapp.get('/')
+        res = testapp.get('/about')
         # Fills out login form in navbar
         form = res.forms['loginForm']
-        form['username'] = user.username
+        form['email'] = user.email
         form['password'] = 'myprecious'
         # Submits
         res = form.submit().follow()
@@ -25,10 +25,10 @@ class TestLoggingIn:
 
     def test_sees_alert_on_log_out(self, user, testapp):
         #Show alert on logout.
-        res = testapp.get('/')
+        res = testapp.get('/about')
         # Fills out login form in navbar
         form = res.forms['loginForm']
-        form['username'] = user.username
+        form['email'] = user.email
         form['password'] = 'myprecious'
         # Submits
         res = form.submit().follow()
@@ -40,10 +40,10 @@ class TestLoggingIn:
     def test_sees_error_message_if_password_is_incorrect(self, user, testapp):
         #Show error if password is incorrect.
         # Goes to homepage
-        res = testapp.get('/')
+        res = testapp.get('/about')
         # Fills out login form, password incorrect
         form = res.forms['loginForm']
-        form['username'] = user.username
+        form['email'] = user.email
         form['password'] = 'wrong'
         # Submits
         res = form.submit()
@@ -51,17 +51,18 @@ class TestLoggingIn:
         assert 'Invalid username or password' in res
 
 
-    def test_sees_error_message_if_username_doesnt_exist(self, user, testapp):
+    def test_sees_error_message_if_email_doesnt_exist(self, user, testapp):
         #Show error if username doesn't exist.
         # Goes to homepage
-        res = testapp.get('/')
+        res = testapp.get('/about')
         # Fills out login form, password incorrect
         form = res.forms['loginForm']
-        form['username'] = 'unknown'
+        form['email'] = 'unknown@d.com'
         form['password'] = 'myprecious'
         # Submits
         res = form.submit()
         # sees error
+        print res
         assert 'Invalid username or password' in res
 
 
@@ -72,12 +73,11 @@ class TestRegistering:
         #Register a new user.
         old_count = len(User.query.all())
         # Goes to homepage
-        res = testapp.get('/')
+        res = testapp.get(url_for('auth.register'))
         # Clicks Create Account button
         res = res.click('Create account')
         # Fills out the form
         form = res.forms['RegistrationForm']
-        form['username'] = 'foobar'
         form['email'] = 'foo@bar.com'
         form['first_name'] = 'solar'
         form['last_name'] = 'solar'
@@ -96,7 +96,6 @@ class TestRegistering:
         res = testapp.get(url_for('auth.register'))
         # Fills out form, but passwords don't match
         form = res.forms['RegistrationForm']
-        form['username'] = 'foobar'
         form['email'] = 'foo@bar.com'
         form['first_name'] = 'solar'
         form['last_name'] = 'solar'
@@ -115,8 +114,7 @@ class TestRegistering:
         res = testapp.get(url_for('auth.register'))
         # Fills out form, but username is already registered
         form = res.forms['RegistrationForm']
-        form['username'] = user.username
-        form['email'] = 'foo@bar.com'
+        form['email'] = user.email
         form['first_name'] = 'solar'
         form['last_name'] = 'solar'
         form['password'] = 'secret'
@@ -124,4 +122,4 @@ class TestRegistering:
         # Submits
         res = form.submit()
         # sees error
-        assert 'Username already in use.' in res
+        assert 'Email already in use.' in res

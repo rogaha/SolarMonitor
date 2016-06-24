@@ -38,6 +38,16 @@ $('.navbar-collapse ul li a').click(function() {
 $('.toggle').click(function(){
   // Switches the Icon
   $(this).children('i').toggleClass('fa-plus');
+
+  if ($(this).children('div').text() === 'Close') {
+      $(this).children('div').text('Register');
+      $(this).children('div').css('right', '-65px');
+  } else {
+      $(this).children('div').text('Close');
+      $(this).children('div').css('right', '-45px');
+  }
+
+
   // Switches the forms
   $('.form').animate({
     height: "toggle",

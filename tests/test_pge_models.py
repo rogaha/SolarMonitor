@@ -5,17 +5,17 @@ import datetime as dt
 import pytest
 
 from solarmonitor.extensions import db
-from solarmonitor.user.models import UsagePoint
+from solarmonitor.user.models import PGEUsagePoint
 import datetime
 
 @pytest.mark.usefixtures('db')
 class TestUser:
     """User tests."""
 
-    def test_get_by_id(self, user):
+    def test_get_by_id(self, user, energy_account):
         """Get usagepoint by ID."""
-        pge_usage_point = UsagePoint(
-            user_id=user.id,
+        pge_usage_point = PGEUsagePoint(
+            energy_account_id=energy_account.id,
             commodity_type=1,
             measuring_period=3,
             interval_start=datetime.datetime.now(),
@@ -29,5 +29,5 @@ class TestUser:
         db.session.add(pge_usage_point)
         db.session.commit()
 
-        retrieved = UsagePoint.query.filter_by(id=pge_usage_point.id).first()
+        retrieved = PGEUsagePoint.query.filter_by(id=pge_usage_point.id).first()
         assert retrieved == pge_usage_point

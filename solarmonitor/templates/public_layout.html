@@ -89,20 +89,50 @@
                     <div class="col-md-8 col-md-offset-2">
                         <div class="module form-module">
                           <div class="toggle"><i class="fa fa-times fa-plus"></i>
-                            <div class="tooltip">Click Me</div>
+                            <div class="tooltip" style="opacity:1;">Register</div>
                           </div>
                           <div class="form">
+
+
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                            <div class="row">
+                              <div class="col-md-12">
+                                {% for category, message in messages %}
+                                <div class="alert alert-info">
+                                  <a class="close" title="Close" href="#" data-dismiss="alert">&times;</a>
+                                 {{message}}
+                                </div><!-- end .alert -->
+                                {% endfor %}
+                              </div><!-- end col-md -->
+                            </div><!-- end row -->
+                                {% endif %}
+                            {% endwith %}
+
+                            {% if current_user and current_user.is_authenticated %}
+                              <h2>Logged in as {{ current_user.first_name }}</h2>
+                              <p><a href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out"></i></a></p>
+                            {% elif login_form %}
+
                             <h2>Login to your account</h2>
-                            <form>
-                              <input type="text" placeholder="Username"/>
-                              <input type="password" placeholder="Password"/>
-                              <button>Login</button>
+                            <form id="loginForm" method="POST" action="/" role="login">
+                              {{ login_form.hidden_tag() }}
+                              <div class="form-group">
+                                {{ login_form.email(placeholder="Email") }}
+                                {{ login_form.password(placeholder="Password") }}
+                              </div>
+                              <button type="submit">Login</button>
                             </form>
+                            {% endif %}
+
+
+
                           </div>
                           <div class="form">
                             <h2>Create an account</h2>
                             <form>
-                              <input type="text" placeholder="Username"/>
+                              <input type="text" placeholder="First Name"/>
+                              <input type="text" placeholder="Last Name"/>
                               <input type="password" placeholder="Password"/>
                               <input type="email" placeholder="Email Address"/>
                               <input type="tel" placeholder="Phone Number"/>
@@ -215,6 +245,8 @@
             <div class="col-lg-8 col-lg-offset-2">
                 <h2>Contact Solar Monitor</h2>
                 <p>Bacon ipsum dolor amet ribeye alcatra biltong chuck cupim strip steak ham hock. Sausage pork cupim short ribs fatback, picanha ground round brisket. Ham hock rump jowl fatback filet mignon, chicken chuck. Hamburger venison ham ribeye fatback strip steak picanha pig porchetta doner bacon cupim.</p>
+
+
 
                 <ul class="list-inline banner-social-buttons">
                     <li>

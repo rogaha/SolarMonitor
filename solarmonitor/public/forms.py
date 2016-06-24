@@ -2,11 +2,11 @@
 """Public forms."""
 from flask_wtf import Form
 from wtforms import PasswordField, StringField, SubmitField, SelectField
-from wtforms.validators import Required, Length
+from wtforms.validators import Required, Length, Email
 
 
 class LoginForm(Form):
-    username = StringField('User Name', validators=[Required(), Length(1, 64)])
+    email = StringField('Email', validators=[Required(), Length(1, 64), Email()])
     password = PasswordField ('Password', validators=[Required()])
     submit = SubmitField('Log In')
 

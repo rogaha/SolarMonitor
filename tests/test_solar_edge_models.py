@@ -12,10 +12,10 @@ import datetime
 class TestUser:
     """User tests."""
 
-    def test_get_by_id(self, user):
+    def test_get_by_id(self, user, energy_account):
         """Get usagepoint by ID."""
         se_usage_point = SolarEdgeUsagePoint(
-            user_id=user.id,
+            energy_account_id=energy_account.id,
             time_unit='Wh',
             unit_of_measure='DAY',
             date=datetime.datetime.now(),

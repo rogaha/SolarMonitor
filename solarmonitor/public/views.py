@@ -24,10 +24,10 @@ def home():
     if request.method == 'POST':
         if form.validate_on_submit():
             try:
-                user = User.query.filter_by(username=form.username.data).first()
+                user = User.query.filter_by(email=form.email.data).first()
             except:
                 db.session.rollback()
-                user = User.query.filter_by(username=form.username.data).first()
+                user = User.query.filter_by(email=form.email.data).first()
             if user is not None and user.verify_password(form.password.data):
                 login_user(user, True)
                 next = request.args.get('next')

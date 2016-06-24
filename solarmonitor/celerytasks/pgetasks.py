@@ -1,6 +1,6 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
-from solarmonitor.user.models import UsagePoint, CeleryTask
+from solarmonitor.user.models import PGEUsagePoint, CeleryTask
 import datetime
 from datetime import timedelta
 
@@ -40,7 +40,7 @@ def process_xml(self, xml):
                     reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
                     reading_type['interval_value'] = reading[u'ns0:value']
 
-                    usage_point = UsagePoint(
+                    usage_point = PGEUsagePoint(
                         user_id=50098,
                         commodity_type=reading_type['commodity_type'],
                         measuring_period=reading_type['measuring_period'],
@@ -53,7 +53,7 @@ def process_xml(self, xml):
                         accumulation_behavior=reading_type['accumulation_behavior']
                         )
 
-                    duplicate_check = UsagePoint.query.filter_by(
+                    duplicate_check = PGEUsagePoint.query.filter_by(
                         user_id=50098,
                         interval_value=usage_point.interval_value,
                         flow_direction=usage_point.flow_direction,

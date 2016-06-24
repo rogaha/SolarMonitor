@@ -32,23 +32,3 @@ class TestDashboard:
 
         assert 'value="2016-06-05"' not in res
         assert 'value="2016-06-01"' not in res
-
-    def test_pge_clear_session(self, user, testapp):
-        # Goes to pge dashboard
-        res = testapp.get(url_for('dashboard.charts'))
-
-        # Fills out date select form
-        form = res.forms['pge_data_view']
-        form['date_select_form-start_date'] = '2016-05-01'
-        form['date_select_form-start_date'] = '2016-05-31'
-        form['date_select_form-start_date'] = 'daily'
-        # Submits
-        res = form.submit().follow()
-
-        assert 'value="2016-05-01"' in res
-        assert 'value="2016-05-31"' in res
-
-        res = testapp.get(url_for('dashboard.charts', modify='clear')).follow()
-
-        assert 'value="2016-05-01"' not in res
-        assert 'value="2016-05-31"' not in res

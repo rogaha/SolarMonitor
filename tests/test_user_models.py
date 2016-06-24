@@ -16,18 +16,9 @@ class TestUser:
         """Get user by ID."""
         user = User(
             email='user_testing@solarmonitor.com',
-            username='testing2',
             first_name='solarsolar',
             last_name='solarsolarlast',
-            password='myprecious',
-            address_one='',
-            address_two='',
-            state='',
-            city='',
-            zip_code=0,
-            cell_phone='',
-            role_id=1,
-            pge_bulk_id=1
+            password='myprecious'
             )
         db.session.add(user)
         db.session.commit()
@@ -40,18 +31,9 @@ class TestUser:
         with pytest.raises(Exception):
             user = User(
                 email='user_testing@solarmonitor.com',
-                username='testing2',
                 first_name='solarsolar',
                 last_name='solarsolarlast',
-                password=None,
-                address_one='',
-                address_two='',
-                state='',
-                city='',
-                zip_code=0,
-                cell_phone='',
-                role_id=1,
-                pge_bulk_id=1
+                password=None
                 )
             db.session.add(user)
             db.session.commit()
@@ -59,7 +41,7 @@ class TestUser:
 
     def test_check_password(self):
         """Check password."""
-        user = User(username='foo', email='foo@bar.com',
+        user = User(email='foo@bar.com',
                            password='foobarbaz123')
         assert user.verify_password('foobarbaz123') is True
         assert user.verify_password('barfoobaz') is False
