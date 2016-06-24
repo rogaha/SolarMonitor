@@ -50,7 +50,7 @@ class TestLoggingIn:
         # Submits
         res = form.submit()
         # sees error
-        assert 'Invalid username or password' in res
+        assert 'Invalid email address or password' in res
 
 
     def test_sees_error_message_if_email_doesnt_exist(self, user, testapp):
@@ -65,7 +65,7 @@ class TestLoggingIn:
         res = form.submit()
         # sees error
         print res
-        assert 'Invalid username or password' in res
+        assert 'Invalid email address or password' in res
 
 @pytest.mark.usefixtures('db')
 class TestRegistering:

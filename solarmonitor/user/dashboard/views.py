@@ -240,6 +240,11 @@ def solar_edge(modify=None):
         return redirect(url_for('dashboard.solar_edge'))
 
     if modify == 'delete-data':
+        session.pop('start_date_se', None)
+        session.pop('end_date_se', None)
+        session.pop('data_time_unit_se', None)
+        session.pop('se_energy_data', None)
+        session.pop('se_energy_labels', None)
         SolarEdgeUsagePoint.query.filter_by(energy_account_id=energy_account.id).delete()
         db.session.commit()
         return redirect(url_for('dashboard.solar_edge'))
