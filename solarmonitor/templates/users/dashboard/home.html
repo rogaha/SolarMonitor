@@ -188,7 +188,7 @@
                   <button type="button" class="btn btn-primary" id="submit">Save changes</button>
                   <script type="text/javascript">
                     $('#submit').click(function () {
-                    var url = "energy_account/" + $("#account_id").val();
+                    var url = "/users/dashboard/energy_account/" + $("#account_id").val();
                     var data = $('#energy_modify_form').serialize();
 
                     $.ajax({
