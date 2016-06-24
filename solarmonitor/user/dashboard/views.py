@@ -15,6 +15,8 @@ from solarmonitor.extensions import db
 import requests
 import json
 
+from jxmlease import parse
+
 import datetime
 from datetime import timedelta, date
 
