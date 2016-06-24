@@ -30,13 +30,25 @@ class EnergyAccount(db.Model):
     address_two = db.Column(db.String(255))
     city = db.Column(db.String(50))
     state = db.Column(db.String(50))
-    zip_code = db.Column(db.Integer)
-    pge_bulk_id = db.Column(db.Integer)
+    zip_code = db.Column(db.String(50))
+    pge_bulk_id = db.Column(db.String(50))
     pge_access_token = db.Column(db.String(255))
     solar_edge_api_key = db.Column(db.String(255))
     pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
+
+    def serialize(self):
+        return {
+            'nick_name': self.nick_name,
+            'address_one': self.address_one,
+            'address_two': self.address_two,
+            'city': self.city,
+            'state': self.state,
+            'zip_code': self.zip_code,
+            'pge_bulk_id': self.pge_bulk_id,
+            'solar_edge_api_key': self.solar_edge_api_key,
+        }
 
 
     def __repr__(self):

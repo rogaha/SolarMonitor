@@ -6,6 +6,22 @@
 <link href="{{ url_for('static', filename='css/energy_account_table.css') }}" rel="stylesheet">
 {% endblock %}
 
+{% block heading %}
+{{ heading }}
+{% endblock %}
+
+{% block sub_heading %}
+{{ sub_heading }}
+{% endblock %}
+
+{% block breadcrumbs %}
+  {% for crumb, icon, url in breadcrumbs %}
+    <li>
+        <i class="fa fa-{{ icon }}"></i>  <a href="{{ url }}">{{ crumb }}</a>
+    </li>
+  {% endfor %}
+{% endblock %}
+
 {% block content %}
 <div class="body-content">
     <div class="row">
@@ -30,28 +46,35 @@
                 <tr>
                     <th><em class="fa fa-cog"></em></th>
                     <th class="hidden-xs">ID</th>
-                    <th>Nick Name</th>
+                    <th>Nickname</th>
                     <th>Address</th>
-                    <th>Email</th>
+                    <th>PGE Bulk ID</th>
+                    <th>SolarEdge API Key</th>
                 </tr>
               </thead>
               <tbody>
                 {% for account in energy_accounts %}
                       <tr>
                         <td align="center">
-                          <a class="btn btn-default"><em class="fa fa-pencil"></em></a>
+                          <!-- Button trigger modal -->
+                          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#energy_account_modify_{{account.id}}">
+                            <em class="fa fa-pencil"></em>
+                          </button>
                           <a class="btn btn-danger"><em class="fa fa-trash"></em></a>
                         </td>
                         <td class="hidden-xs">{{ account.id }}</td>
-                        <td>{{ account.nick_name }}</td>
-                        <td>{{ account.address_one }}</td>
-                        <td>{{ current_user.email }}</td>
+                        <td id="account_nick_name">{{ account.nick_name }}</td>
+                        <td id="account_address_one">{{ account.address_one }}</td>
+                        <td id="account_pge_bulk_id">{{ account.pge_bulk_id }}</td>
+                        <td id="account_solar_edge_api_key">{{ account.solar_edge_api_key }}</td>
+
                       </tr>
                   {% endfor %}
                     </tbody>
             </table>
 
           </div>
+
           <div class="panel-footer">
             <div class="row">
               <div class="col col-xs-4">Page 1 of 1
@@ -68,12 +91,136 @@
               </div>
             </div>
           </div>
+
+          {% for account in energy_accounts %}
+          <!-- Modal -->
+          <div class="modal fade" id="energy_account_modify_{{ account.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Modify Energy Account</h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal" id="energy_modify_form">
+                    <fieldset>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">Account Nickname</label>
+                      <div class="col-md-4">
+                      <input id="nick_name" name="nick_name" type="text" placeholder="" class="form-control input-md" value="{{ account.nick_name }}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">Address One</label>
+                      <div class="col-md-4">
+                      <input id="address_one" name="address_one" type="text" placeholder="123 Example Lane" class="form-control input-md" value="{{ account.address_one }}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">Address Two</label>
+                      <div class="col-md-4">
+                      <input id="address_two" name="address_two" type="text" placeholder="APT B" class="form-control input-md" value="{{ account.address_two }}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">City</label>
+                      <div class="col-md-4">
+                      <input id="city" name="city" type="text" placeholder="Sacramento" class="form-control input-md" value="{{ account.city }}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="State">State</label>
+                      <div class="col-md-4">
+                      <input id="state" name="state" type="text" placeholder="CA" class="form-control input-md" value="{{ account.state }}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">Zip Code</label>
+                      <div class="col-md-4">
+                      <input id="zip_code" name="zip_code" type="text" placeholder="54679" class="form-control input-md" value="{{ account.zip_code }}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">PGE Bulk ID</label>
+                      <div class="col-md-4">
+                      <input id="pge_bulk_id" name="pge_bulk_id" type="text" placeholder="50098" class="form-control input-md" value="{{ account.pge_bulk_id }}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">Solar Edge API Key</label>
+                      <div class="col-md-4">
+                      <input id="solar_edge_api_key" name="solar_edge_api_key" type="text" placeholder="" class="form-control input-md" value="{{ account.solar_edge_api_key }}">
+
+                      </div>
+                    </div>
+
+                    <input id="account_id" type="hidden" name="account_id" value="{{ account.id }}">
+
+                    </fieldset>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" id="submit">Save changes</button>
+                  <script type="text/javascript">
+                    $('#submit').click(function () {
+                    var url = "energy_account/" + $("#account_id").val();
+                    var data = $('#energy_modify_form').serialize();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: data,
+                        success: function (data) {
+                            console.log(data);
+                            $('#energy_account_modify_' + $("#account_id").val()).modal('hide');
+
+                            $('#account_nick_name').text(data.nick_name);
+                            $('#account_pge_bulk_id').text(data.pge_bulk_id);
+                            $('#account_address_one').text(data.address_one);
+                            $('#account_solar_edge_api_key').text(data.solar_edge_api_key);
+
+
+
+
+
+                        }
+                    });
+
+                  });
+                  </script>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
         </div>
       </div>
-
-
-
-
     </div>
 </div>
 {% endblock %}

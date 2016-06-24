@@ -6,6 +6,12 @@
 
 /* Global Styles */
 
+.logo {
+    margin-top: -4px;
+}
+
+
+
 body {
     margin-top: 100px;
     background-color: #222;

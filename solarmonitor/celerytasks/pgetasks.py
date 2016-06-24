@@ -1,6 +1,6 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
-from solarmonitor.user.models import PGEUsagePoint, CeleryTask
+from solarmonitor.user.models import PGEUsagePoint, CeleryTask, EnergyAccount
 import datetime
 from datetime import timedelta
 
@@ -18,6 +18,14 @@ def process_xml(self, xml):
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
+
+        bulk_id = data[u'ns1:feed'][u'ns1:link'].get_xml_attr("href").rsplit('/', 1)[-1]
+
+        print bulk_id
+
+        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id)
+
+        print energy_account.id
 
         for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
 
@@ -41,7 +49,7 @@ def process_xml(self, xml):
                     reading_type['interval_value'] = reading[u'ns0:value']
 
                     usage_point = PGEUsagePoint(
-                        energy_account_id=50098,
+                        energy_account_id=energy_account.id,
                         commodity_type=reading_type['commodity_type'],
                         measuring_period=reading_type['measuring_period'],
                         interval_value=reading_type['interval_value'],
@@ -54,7 +62,7 @@ def process_xml(self, xml):
                         )
 
                     duplicate_check = PGEUsagePoint.query.filter_by(
-                        user_id=50098,
+                        energy_account_id=energy_account.id,
                         interval_value=usage_point.interval_value,
                         flow_direction=usage_point.flow_direction,
                         interval_start=usage_point.interval_start

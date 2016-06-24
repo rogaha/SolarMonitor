@@ -1,6 +1,23 @@
 
 {% extends "layout.html" %}
 
+{% block heading %}
+{{ heading }}
+{% endblock %}
+
+{% block sub_heading %}
+{{ sub_heading }}
+{% endblock %}
+
+{% block breadcrumbs %}
+  {% for crumb, icon, url in breadcrumbs %}
+    <li>
+        <i class="fa fa-{{ icon }}"></i>  <a href="{{ url }}">{{ crumb }}</a>
+    </li>
+  {% endfor %}
+{% endblock %}
+
+
 {% block content %}
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">

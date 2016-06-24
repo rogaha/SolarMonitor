@@ -89,7 +89,7 @@ def notifications():
         database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
         """
 
-        task = process_xml.delay((bulk_data[0]['data']))
+        task = process_xml.delay(bulk_data[0]['data'])
 
 
         celery_task = CeleryTask(task_id=task.id, task_status=0, user_id=1)

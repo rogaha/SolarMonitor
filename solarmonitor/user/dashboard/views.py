@@ -9,7 +9,7 @@ from solarmonitor.celerytasks.se_tasks import process_se_data
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.solaredge.se_api import SolarEdgeApi
 from solarmonitor.mailgun.mailgun_api import send_email
-from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint
+from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint, EnergyAccount
 from solarmonitor.public.forms import DateSelectForm, DownloadDataForm
 from solarmonitor.extensions import db
 import requests
@@ -29,14 +29,36 @@ blueprint = Blueprint('dashboard', __name__, url_prefix='/users/dashboard', stat
 @blueprint.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    return render_template('users/dashboard/home.html', energy_accounts=current_user.energy_accounts)
+    breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home'))]
+    heading = 'Dashboard'
 
+    return render_template('users/dashboard/home.html', energy_accounts=current_user.energy_accounts, breadcrumbs=breadcrumbs, heading=heading)
+
+@blueprint.route('/energy_account/<int:account_id>', methods=['GET', 'POST'])
+@login_required
+def modify_energy_account(account_id=None):
+    energy_account = EnergyAccount.query.filter_by(id=account_id).first()
+    energy_account.nick_name = request.form['nick_name']
+    energy_account.address_one = request.form['address_one']
+    energy_account.address_two = request.form['address_two']
+    energy_account.city = request.form['city']
+    energy_account.state = request.form['state']
+    energy_account.zip_code = request.form['zip_code']
+    energy_account.pge_bulk_id = request.form['pge_bulk_id']
+    energy_account.solar_edge_api_key = request.form['solar_edge_api_key']
+    db.session.commit()
+
+    result = energy_account.serialize()
+
+    return jsonify(result)
 
 @blueprint.route('/charts', methods=['GET', 'POST'])
 @blueprint.route('/charts/session/<modify>', methods=['GET', 'POST'])
 @login_required
 def charts(modify=None):
     """PGE Electricity Usage Chart"""
+    breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('PGE', 'bar-chart-o', url_for('dashboard.charts'))]
+    heading = 'PGE Electricity'
 
     energy_account = current_user.energy_accounts[0]
 
@@ -166,13 +188,31 @@ def charts(modify=None):
     hourly_combined_electric_usage = [x - y for x, y in zip(incoming_electric, outgoing_electric)]
 
 
-    return render_template('users/dashboard/data_chart.html', date_select_form=date_select_form, download_data_form=download_data_form, incoming_electric=incoming_electric, outgoing_electric=outgoing_electric, incoming_labels=incoming_labels, outgoing_labels=outgoing_labels, incoming_electric_daily_data=incoming_electric_daily_data, incoming_electric_daily_label=incoming_electric_daily_label, outgoing_electric_daily_data=outgoing_electric_daily_data, outgoing_electric_daily_label=outgoing_electric_daily_label, daily_combined_electric_usage=daily_combined_electric_usage, hourly_combined_electric_usage=hourly_combined_electric_usage)
+    return render_template('users/dashboard/data_chart.html',
+        breadcrumbs=breadcrumbs,
+        heading=heading,
+        date_select_form=date_select_form,
+        download_data_form=download_data_form,
+        incoming_electric=incoming_electric,
+        outgoing_electric=outgoing_electric,
+        incoming_labels=incoming_labels,
+        outgoing_labels=outgoing_labels,
+        incoming_electric_daily_data=incoming_electric_daily_data,
+        incoming_electric_daily_label=incoming_electric_daily_label,
+        outgoing_electric_daily_data=outgoing_electric_daily_data,
+        outgoing_electric_daily_label=outgoing_electric_daily_label,
+        daily_combined_electric_usage=daily_combined_electric_usage,
+        hourly_combined_electric_usage=hourly_combined_electric_usage
+    )
 
 @blueprint.route('/solaredge', methods=['GET', 'POST'])
 @blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
 @login_required
 def solar_edge(modify=None):
     """Solar Edge API"""
+    breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('Solar Edge', 'bar-chart-o', url_for('dashboard.solar_edge'))]
+    heading = 'Solar Edge Electricity'
+
     energy_account = current_user.energy_accounts[0]
 
     date_select_form = DateSelectForm(prefix="date_select_form")
@@ -274,6 +314,8 @@ def solar_edge(modify=None):
     return render_template('users/dashboard/solar_edge.html',
         date_select_form=date_select_form,
         download_data_form=download_data_form,
+        breadcrumbs=breadcrumbs,
+        heading=heading
         )
 
 @blueprint.route('/status/<task_id>', methods=['GET', 'POST'])
