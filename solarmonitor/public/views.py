@@ -93,11 +93,14 @@ def notifications():
         """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
         database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
         """
+        bulk_id = bulk_data[0]['data'][u'ns1:feed'][u'ns1:link'].get_xml_attr("href").rsplit('/', 1)[-1]
 
-        task = process_xml.delay(bulk_data[0]['data'])
+        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id).first()
+
+        task = process_xml.delay(bulk_data[0]['data'], energy_account.id)
 
 
-        celery_task = CeleryTask(task_id=task.id, task_status=0, user_id=1)
+        celery_task = CeleryTask(task_id=task.id, task_status=0, energy_account_id=energy_account.id)
         db.session.add(celery_task)
         db.session.commit()
 
