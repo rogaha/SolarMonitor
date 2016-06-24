@@ -8,7 +8,7 @@ from solarmonitor.utils import celery
 from jxmlease import parse
 
 @celery.task(bind=True)
-def process_xml(self, xml, energy_account_id):
+def process_xml(self, xml):
 
     print xml
 
@@ -19,7 +19,16 @@ def process_xml(self, xml, energy_account_id):
     app = create_app(ProdConfig)
     with app.app_context():
 
+        bulk_id = data[u'ns1:feed'][u'ns1:link'].get_xml_attr("href").rsplit('/', 1)[-1]
 
+
+
+        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id).first()
+
+
+        celery_task = CeleryTask(task_id=task.id, task_status=0, energy_account_id=energy_account.id)
+        db.session.add(celery_task)
+        db.session.commit()
 
 
         for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
@@ -44,7 +53,7 @@ def process_xml(self, xml, energy_account_id):
                     reading_type['interval_value'] = reading[u'ns0:value']
 
                     usage_point = PGEUsagePoint(
-                        energy_account_id=energy_account_id,
+                        energy_account_id=energy_account.id,
                         commodity_type=reading_type['commodity_type'],
                         measuring_period=reading_type['measuring_period'],
                         interval_value=reading_type['interval_value'],
@@ -57,7 +66,7 @@ def process_xml(self, xml, energy_account_id):
                         )
 
                     duplicate_check = PGEUsagePoint.query.filter_by(
-                        energy_account_id=energy_account_id,
+                        energy_account_id=energy_account.id,
                         interval_value=usage_point.interval_value,
                         flow_direction=usage_point.flow_direction,
                         interval_start=usage_point.interval_start
