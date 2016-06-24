@@ -23,7 +23,7 @@ def process_xml(self, xml):
 
         energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id).first()
 
-        celery_task = CeleryTask(task_id=process_xml.request.id, task_status=0, energy_account_id=energy_account.id)
+        celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
         db.session.add(celery_task)
         db.session.commit()
 

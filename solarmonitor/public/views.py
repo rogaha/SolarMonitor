@@ -94,13 +94,6 @@ def notifications():
         database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
         """
 
-
-
-
         task = process_xml.delay(bulk_data[0]['data'])
-
-
-
-
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
