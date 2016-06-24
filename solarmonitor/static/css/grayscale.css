@@ -464,6 +464,7 @@ body {
 .form-module input {
   outline: none;
   display: block;
+  color: #333333;
   width: 100%;
   border: 1px solid #d9d9d9;
   margin: 0 0 20px;

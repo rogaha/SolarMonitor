@@ -5,6 +5,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm
+from solarmonitor.auth.forms import RegistrationForm
 from solarmonitor.user.models import User
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
@@ -20,6 +21,7 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 def home():
     """Home page."""
     form = LoginForm(request.form)
+    register_form = RegistrationForm()
     # Handle logging in
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -34,11 +36,11 @@ def home():
                 #if not next_is_valid('next'):
                 #    return abort(400)
 
-                return redirect(next or url_for('public.home'))
+                return redirect(next or url_for('dashboard.home'))
             flash('Invalid username or password')
         else:
             flash_errors(form)
-    return render_template('public/home.html', form=form)
+    return render_template('public/home.html', form=form, register_form=register_form)
 
 @blueprint.route('/about')
 def about():

@@ -41,7 +41,7 @@ def process_xml(self, xml):
                     reading_type['interval_value'] = reading[u'ns0:value']
 
                     usage_point = PGEUsagePoint(
-                        user_id=50098,
+                        energy_account_id=50098,
                         commodity_type=reading_type['commodity_type'],
                         measuring_period=reading_type['measuring_period'],
                         interval_value=reading_type['interval_value'],

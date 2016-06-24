@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User dashboard views."""
 from flask import Blueprint, render_template, session, flash, redirect, request, url_for, jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 from solarmonitor.extensions import login_manager
 from solarmonitor.settings import Config
 from solarmonitor.celerytasks.pgetasks import process_xml
@@ -26,12 +26,19 @@ oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 blueprint = Blueprint('dashboard', __name__, url_prefix='/users/dashboard', static_folder='../static')
 
 
+@blueprint.route('/', methods=['GET', 'POST'])
+@login_required
+def home():
+    return render_template('users/dashboard/home.html', energy_accounts=current_user.energy_accounts)
+
+
 @blueprint.route('/charts', methods=['GET', 'POST'])
 @blueprint.route('/charts/session/<modify>', methods=['GET', 'POST'])
+@login_required
 def charts(modify=None):
-    """Electricity Usage Chart
+    """PGE Electricity Usage Chart"""
 
-    """
+    energy_account = current_user.energy_accounts[0]
 
     date_select_form = DateSelectForm(prefix="date_select_form")
     download_data_form = DownloadDataForm(prefix="download_data_form")
@@ -43,7 +50,7 @@ def charts(modify=None):
         return redirect(url_for('dashboard.charts'))
 
     if modify == 'delete-data':
-        PGEUsagePoint.query.delete()
+        PGEUsagePoint.query.filter_by(energy_account_id=energy_account.id).delete()
         db.session.commit()
         return redirect(url_for('dashboard.charts'))
 
@@ -100,12 +107,14 @@ def charts(modify=None):
             while n < delta.days:
                 incoming_electric_daily = PGEUsagePoint.query.filter(
                     (PGEUsagePoint.flow_direction==1)&
+                    (PGEUsagePoint.energy_account_id==energy_account.id)&
                     (PGEUsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
                     (PGEUsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
                     ).order_by(PGEUsagePoint.interval_start.asc()).all()
 
                 outgoing_electric_daily = PGEUsagePoint.query.filter(
                     (PGEUsagePoint.flow_direction==19)&
+                    (PGEUsagePoint.energy_account_id==energy_account.id)&
                     (PGEUsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
                     (PGEUsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
                     ).order_by(PGEUsagePoint.interval_start.asc()).all()
@@ -129,6 +138,7 @@ def charts(modify=None):
     """This next section will grab the data and organize it into usage by hour."""
     outgoing_electric_list = PGEUsagePoint.query.filter(
         (PGEUsagePoint.flow_direction==19)&
+        (PGEUsagePoint.energy_account_id==energy_account.id)&
         (PGEUsagePoint.interval_start>=start_date_pge)&
         (PGEUsagePoint.interval_start<end_date_pge)
         ).order_by(PGEUsagePoint.interval_start.asc()).all()
@@ -138,6 +148,7 @@ def charts(modify=None):
 
     incoming_electric_list = PGEUsagePoint.query.filter(
         (PGEUsagePoint.flow_direction==1)&
+        (PGEUsagePoint.energy_account_id==energy_account.id)&
         (PGEUsagePoint.interval_start>=start_date_pge)&
         (PGEUsagePoint.interval_start<end_date_pge)
         ).order_by(PGEUsagePoint.interval_start.asc()).all()
@@ -159,8 +170,10 @@ def charts(modify=None):
 
 @blueprint.route('/solaredge', methods=['GET', 'POST'])
 @blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
+@login_required
 def solar_edge(modify=None):
     """Solar Edge API"""
+    energy_account = current_user.energy_accounts[0]
 
     date_select_form = DateSelectForm(prefix="date_select_form")
     download_data_form = DownloadDataForm(prefix="download_data_form")
@@ -172,7 +185,7 @@ def solar_edge(modify=None):
         return redirect(url_for('dashboard.solar_edge'))
 
     if modify == 'delete-data':
-        SolarEdgeUsagePoint.query.delete()
+        SolarEdgeUsagePoint.query.filter_by(energy_account_id=energy_account.id).delete()
         db.session.commit()
         return redirect(url_for('dashboard.solar_edge'))
 
@@ -202,6 +215,7 @@ def solar_edge(modify=None):
 
         solare_edge_data_pull = SolarEdgeUsagePoint.query.filter(
             (SolarEdgeUsagePoint.date>=start_date_se)&
+            (SolarEdgeUsagePoint.energy_account_id==energy_account.id)&
             (SolarEdgeUsagePoint.date<=end_date_se)
             ).order_by(SolarEdgeUsagePoint.date.asc()).all()
 
@@ -238,7 +252,7 @@ def solar_edge(modify=None):
         else:
             se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
 
-        task = process_se_data.delay(se_energy)
+        task = process_se_data.delay(se_energy, energy_account.id)
 
         session['se_energy_data'] = []
         session['se_energy_labels'] = []

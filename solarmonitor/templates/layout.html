@@ -16,7 +16,7 @@
     </title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet"> 
 
     <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/sb-admin.css') }}" rel="stylesheet">
@@ -39,7 +39,10 @@
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+
     <![endif]-->
+    {% block header_add %}
+    {% endblock %}
 
 </head>
 
@@ -95,8 +98,8 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li class="{% if request.url_rule.endpoint == 'public.home' %} active {% endif %}">
-                        <a href="{{ url_for('public.home') }}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
+                    <li class="{% if request.url_rule.endpoint == 'dashboard.home' %} active {% endif %}">
+                        <a href="{{ url_for('dashboard.home') }}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
                     <li class="{% if request.url_rule.endpoint == 'public.charts' %} active {% endif %}">
                         <a href="{{ url_for('dashboard.charts') }}"><i class="fa fa-fw fa-bar-chart-o"></i> PGE Charts</a>

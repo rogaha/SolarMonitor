@@ -6,6 +6,8 @@ See: http://webtest.readthedocs.org/
 from flask import url_for
 
 from solarmonitor.user.models import User
+from solarmonitor.extensions import db
+import pytest
 
 
 class TestLoggingIn:
@@ -65,7 +67,7 @@ class TestLoggingIn:
         print res
         assert 'Invalid username or password' in res
 
-
+@pytest.mark.usefixtures('db')
 class TestRegistering:
     #Register a user.
 
@@ -73,9 +75,7 @@ class TestRegistering:
         #Register a new user.
         old_count = len(User.query.all())
         # Goes to homepage
-        res = testapp.get(url_for('auth.register'))
-        # Clicks Create Account button
-        res = res.click('Create account')
+        res = testapp.get(url_for('public.home'))
         # Fills out the form
         form = res.forms['RegistrationForm']
         form['email'] = 'foo@bar.com'
@@ -88,6 +88,22 @@ class TestRegistering:
         assert res.status_code == 200
         # A new user was created
         assert len(User.query.all()) == old_count + 1
+
+    def test_energy_account_created_upon_registering(self, user, testapp):
+        res = testapp.get(url_for('public.home'))
+        # Fills out the form
+        form = res.forms['RegistrationForm']
+        form['email'] = 'foo@bar.com'
+        form['first_name'] = 'solar'
+        form['last_name'] = 'solar'
+        form['password'] = 'secret'
+        form['password2'] = 'secret'
+        # Submits
+        res = form.submit().follow()
+
+        new_user = User.query.filter_by(email='foo@bar.com').first()
+
+        assert new_user.energy_accounts is not None
 
 
     def test_sees_error_message_if_passwords_dont_match(self, user, testapp):

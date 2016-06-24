@@ -25,6 +25,7 @@ permission_associations = db.Table('permissions_roles',
 class EnergyAccount(db.Model):
     __tablename__ = 'energy_accounts'
     id = db.Column(db.Integer, primary_key=True)
+    nick_name = db.Column(db.String(255))
     address_one = db.Column(db.String(255))
     address_two = db.Column(db.String(255))
     city = db.Column(db.String(50))
