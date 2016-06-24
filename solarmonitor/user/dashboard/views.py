@@ -7,6 +7,7 @@ from solarmonitor.settings import Config
 from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.celerytasks.se_tasks import process_se_data
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
+from solarmonitor.pge.pge_helpers import PGEHelper
 from solarmonitor.solaredge.se_api import SolarEdgeApi
 from solarmonitor.mailgun.mailgun_api import send_email
 from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint, EnergyAccount
@@ -34,7 +35,51 @@ def home():
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home'))]
     heading = 'Dashboard'
 
-    return render_template('users/dashboard/home.html', energy_accounts=current_user.energy_accounts, breadcrumbs=breadcrumbs, heading=heading)
+    start_date = datetime.date(2016, 6, 1)
+    end_date = datetime.date(2016, 6, 16)
+
+    energy_account = current_user.energy_accounts[0]
+
+    pge_helper = PGEHelper(start_date, end_date, energy_account.id)
+    incoming_data, incoming_labels, outgoing_data, outgoing_labels = pge_helper.get_daily_data_and_labels()
+
+    daily_combined_electric_usage = [x - y for x, y in zip(incoming_data, outgoing_data)]
+
+    solare_edge_data_pull = SolarEdgeUsagePoint.query.filter(
+        (SolarEdgeUsagePoint.date>=start_date)&
+        (SolarEdgeUsagePoint.energy_account_id==energy_account.id)&
+        (SolarEdgeUsagePoint.date<=end_date)
+        ).order_by(SolarEdgeUsagePoint.date.asc()).all()
+
+    production = []
+    for each in solare_edge_data_pull:
+        production.append(float(each.value)/1000)
+
+    net_usage = daily_combined_electric_usage
+
+    production_percentage = [(x/(x + y)*100 )for x, y in zip(production, net_usage)]
+    production_percentage = [x if x <=100 else 100 for x in production_percentage]
+
+    net_usage_percentage = [100-x for x in production_percentage]
+
+    net_input = [((x/(x + y)) - 1) for x, y in zip(production, net_usage)]
+    net_input = [x * 100 if x > 0 else 0 for x in net_input]
+
+
+
+
+    #incoming_data is the total energy needs for the day = 100%
+    #what percent of incoming_data is produced by the grid?
+    #what percent of incoming_data is above and beyond?
+
+    return render_template('users/dashboard/home.html',
+        energy_accounts=current_user.energy_accounts,
+        breadcrumbs=breadcrumbs, heading=heading,
+        production_percentage=production_percentage,
+        net_usage_percentage=net_usage_percentage,
+        net_input=net_input,
+        labels=incoming_labels
+        )
 
 @blueprint.route('/energy_account/<int:account_id>', methods=['GET', 'POST'])
 @login_required
@@ -123,41 +168,12 @@ def charts(modify=None):
     incoming_electric_daily_label = []
     outgoing_electric_daily_data = []
     outgoing_electric_daily_label = []
-
     if 'data_time_unit' in session:
         if session['data_time_unit'] == "Daily":
-            delta = end_date_pge - start_date_pge
-            n = 0
-            while n < delta.days:
-                incoming_electric_daily = PGEUsagePoint.query.filter(
-                    (PGEUsagePoint.flow_direction==1)&
-                    (PGEUsagePoint.energy_account_id==energy_account.id)&
-                    (PGEUsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
-                    (PGEUsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
-                    ).order_by(PGEUsagePoint.interval_start.asc()).all()
+            pge_helper = PGEHelper(start_date_pge, end_date_pge, energy_account.id)
 
-                outgoing_electric_daily = PGEUsagePoint.query.filter(
-                    (PGEUsagePoint.flow_direction==19)&
-                    (PGEUsagePoint.energy_account_id==energy_account.id)&
-                    (PGEUsagePoint.interval_start>=(start_date_pge + timedelta(days=n)))&
-                    (PGEUsagePoint.interval_start<(start_date_pge + timedelta(days=n+1)))
-                    ).order_by(PGEUsagePoint.interval_start.asc()).all()
+            incoming_electric_daily_data, incoming_electric_daily_label, outgoing_electric_daily_data, outgoing_electric_daily_label = pge_helper.get_daily_data_and_labels()
 
-                incoming_interval_value = 0
-                outgoing_interval_value = 0
-
-                for datapoint in incoming_electric_daily:
-                    incoming_interval_value += (datapoint.interval_value * (10**(datapoint.power_of_ten_multiplier -3)))
-
-                for datapoint in outgoing_electric_daily:
-                    outgoing_interval_value += (datapoint.interval_value * (10**(datapoint.power_of_ten_multiplier -3)))
-
-                incoming_electric_daily_data.append(incoming_interval_value)
-                incoming_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
-
-                outgoing_electric_daily_data.append(outgoing_interval_value)
-                outgoing_electric_daily_label.append((start_date_pge + timedelta(days=n)).strftime('%m/%d'))
-                n += 1
 
     """This next section will grab the data and organize it into usage by hour."""
     outgoing_electric_list = PGEUsagePoint.query.filter(
