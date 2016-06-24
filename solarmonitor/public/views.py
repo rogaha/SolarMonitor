@@ -19,6 +19,7 @@ config = Config()
 blueprint = Blueprint('public', __name__, static_folder='../static')
 
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
+api = Api(config.SSL_CERTS)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def home():
