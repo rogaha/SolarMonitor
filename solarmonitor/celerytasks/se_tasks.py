@@ -22,7 +22,10 @@ def process_se_data(self, json_data, energy_account_id):
             usage_point.date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
             usage_point.value = 0 if each['value'] == None else each['value']
 
-            duplicate_check = SolarEdgeUsagePoint.query.filter_by(date=usage_point.date).first()
+            duplicate_check = SolarEdgeUsagePoint.query.filter(
+                (SolarEdgeUsagePoint.date==usage_point.date)&
+                (SolarEdgeUsagePoint.energy_account_id==energy_account_id)
+                ).first()
 
             if duplicate_check:
                 duplicate_check.value = usage_point.value
