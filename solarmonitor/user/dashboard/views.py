@@ -87,7 +87,7 @@ def modify_energy_account(account_id=None):
     energy_account.state = request.form['state']
     energy_account.zip_code = request.form['zip_code']
     energy_account.pge_bulk_id = request.form['pge_bulk_id']
-    energy_account.solar_edge_api_key = request.form['solar_edge_api_key']
+    energy_account.solar_edge_site_id = request.form['solar_edge_site_id']
     db.session.commit()
 
     result = energy_account.serialize()
