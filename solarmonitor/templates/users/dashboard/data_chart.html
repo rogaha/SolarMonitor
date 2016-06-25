@@ -175,7 +175,7 @@ margin-top:50px
 
     <script>
     var data = {
-    labels: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_label|safe }} {% else %}  {{ outgoing_labels|safe }} {% endif %},
+    labels: {{ energy_account.pge_incoming_outgoing_graph(start_date, end_date)[2]|safe }},
     datasets: [
         {
             label: 'Outgoing Electric (Sold to Grid) kWh',
@@ -184,7 +184,7 @@ margin-top:50px
             borderWidth: 1,
             hoverBackgroundColor: "rgba(127,191,63,0.4)",
             hoverBorderColor: "rgba(9,174,9,1)",
-            data: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_data|safe }} {% else %}  {{ outgoing_electric|safe }} {% endif %},
+            data: {{ energy_account.pge_incoming_outgoing_graph(start_date, end_date)[1]|safe }},
         },
 
         {
@@ -194,7 +194,7 @@ margin-top:50px
             borderWidth: 1,
             hoverBackgroundColor: "rgba(255,99,132,0.4)",
             hoverBorderColor: "rgba(255,99,132,1)",
-            data: {% if session['data_time_unit'] == "Daily"%} {{ incoming_electric_daily_data|safe }} {% else %}  {{ incoming_electric|safe }} {% endif %},
+            data: {{ energy_account.pge_incoming_outgoing_graph(start_date, end_date)[0]|safe }},
         }
     ]
 };
@@ -226,10 +226,10 @@ margin-top:50px
       var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {% if session['data_time_unit'] == "Daily"%} {{ outgoing_electric_daily_label|safe }} {% else %}  {{ outgoing_labels|safe }} {% endif %},
+            labels: {{ energy_account.pge_incoming_outgoing_combined_graph(start_date, end_date)[1]|safe }},
             datasets: [{
                 label: 'Combined Electric (+/-) kWh',
-                data: {% if session['data_time_unit'] == "Daily"%}{{ daily_combined_electric_usage|safe }} {% else %}{{ hourly_combined_electric_usage|safe }}{% endif %} ,
+                data: {{ energy_account.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]|safe }},
                 borderWidth: 1
             }]
         },

@@ -54,11 +54,12 @@
   <div class="col col-xs-6">
     <canvas id="myChart2" width="380" height="200"></canvas>
   </div>
-
 </div>
+
 <script>
+
 var data = {
-labels: {{ labels|safe }},
+labels: {{ energy_account.production_net_usage_percentage_graph(start_date, end_date)[3]|safe }},
 datasets: [
     {
         label: 'Production %',
@@ -67,7 +68,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(43,83,207,0.4)",
         hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ production_percentage|safe }},
+        data: {{ energy_account.production_net_usage_percentage_graph(start_date, end_date)[0]|safe }},
     },
     {
         label: 'Net Input %',
@@ -76,7 +77,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(127,191,63,0.4)",
         hoverBorderColor: "rgba(9,174,9,1)",
-        data: {{ net_input|safe }},
+        data: {{ energy_account.production_net_usage_percentage_graph(start_date, end_date)[1]|safe }},
     },
     {
         label: 'Net Usage %',
@@ -85,7 +86,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(168,25,25,0.4)",
         hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ net_usage_percentage|safe }},
+        data: {{ energy_account.production_net_usage_percentage_graph(start_date, end_date)[2]|safe }},
     },
 ]
 };
@@ -111,7 +112,7 @@ var myChart = new Chart(ctx, {
 
 <script>
 var data = {
-labels: {{ labels|safe }},
+labels: {{ energy_account.production_net_usage_graph(start_date, end_date)[2]|safe }},
 datasets: [
     {
         label: 'Production kWh',
@@ -120,7 +121,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(43,83,207,0.4)",
         hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ production|safe }},
+        data: {{ energy_account.production_net_usage_graph(start_date, end_date)[0]|safe }},
     },
     {
         label: 'Net Usage',
@@ -129,7 +130,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(168,25,25,0.4)",
         hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ daily_combined_electric_usage|safe }},
+        data: {{ energy_account.production_net_usage_graph(start_date, end_date)[1]|safe }},
     }
 ]
 };

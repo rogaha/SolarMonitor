@@ -6,6 +6,11 @@ from flask_login import UserMixin
 from sqlalchemy.orm import relationship
 
 from solarmonitor.extensions import bcrypt, db
+import datetime
+from datetime import timedelta
+
+today = datetime.datetime.today().date()
+seven_days_ago = datetime.datetime.today().date() - timedelta(days=7)
 
 energy_accounts = db.Table('energy_accounts_users',
     db.Column('energy_account_id', db.Integer, db.ForeignKey('energy_accounts.id')),
@@ -37,6 +42,64 @@ class EnergyAccount(db.Model):
     pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
+
+    def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
+        production, labels = self.solar_edge_production_graph(start_date, end_date)
+        net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
+
+        return production, net_usage, labels
+
+    def production_net_usage_percentage_graph(self, start_date=seven_days_ago, end_date=today):
+        production, labels = self.solar_edge_production_graph(start_date, end_date)
+        net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
+
+        production_percentage = [(x/(x + y)*100 )for x, y in zip(production, net_usage)]
+        production_percentage = [x if x <=100 else 100 for x in production_percentage]
+
+        net_usage_percentage = [100-x for x in production_percentage]
+
+        net_input = [((x/(x + y)) - 1) for x, y in zip(production, net_usage)]
+        net_input = [x * 100 if x > 0 else 0 for x in net_input]
+
+        return production_percentage, net_input, net_usage_percentage, labels
+
+    def pge_incoming_outgoing_graph(self, start_date=seven_days_ago, end_date=today):
+        from solarmonitor.pge.pge_helpers import PGEHelper
+        pge_helper = PGEHelper(start_date, end_date, self.id)
+
+        """Set the variables """
+        incoming_data, incoming_labels, outgoing_data, outgoing_labels = pge_helper.get_daily_data_and_labels()
+
+        return incoming_data, outgoing_data, outgoing_labels
+
+    def pge_incoming_outgoing_combined_graph(self, start_date=seven_days_ago, end_date=today):
+        from solarmonitor.pge.pge_helpers import PGEHelper
+        pge_helper = PGEHelper(start_date, end_date, self.id)
+
+        """Set the variables """
+        incoming_data, incoming_labels, outgoing_data, outgoing_labels = pge_helper.get_daily_data_and_labels()
+
+        net_usage = [x - y for x, y in zip(incoming_data, outgoing_data)]
+
+        return net_usage, incoming_labels
+
+    def solar_edge_production_graph(self, start_date=seven_days_ago, end_date=today):
+        solar_edge_data_pull = SolarEdgeUsagePoint.query.filter(
+            (SolarEdgeUsagePoint.date>=start_date)&
+            (SolarEdgeUsagePoint.energy_account_id==self.id)&
+            (SolarEdgeUsagePoint.date<=end_date)
+            ).order_by(SolarEdgeUsagePoint.date.asc()).all()
+
+        se_energy_data = []
+        se_energy_labels = []
+
+        for each in solar_edge_data_pull:
+            se_energy_data.append(each.value)
+            se_energy_labels.append(each.date.strftime('%Y-%m-%d'))
+
+        se_energy_data = [float(x)/1000 for x in se_energy_data]
+
+        return se_energy_data, se_energy_labels
 
     def serialize(self):
         return {

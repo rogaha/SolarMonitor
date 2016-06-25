@@ -38,42 +38,15 @@ def home():
     start_date = datetime.date(2016, 6, 1)
     end_date = datetime.date(2016, 6, 16)
 
+    #TODO assumes for now that we want only the first energy account.
     energy_account = current_user.energy_accounts[0]
-
-    pge_helper = PGEHelper(start_date, end_date, energy_account.id)
-    incoming_data, incoming_labels, outgoing_data, outgoing_labels = pge_helper.get_daily_data_and_labels()
-
-    daily_combined_electric_usage = [x - y for x, y in zip(incoming_data, outgoing_data)]
-
-    solare_edge_data_pull = SolarEdgeUsagePoint.query.filter(
-        (SolarEdgeUsagePoint.date>=start_date)&
-        (SolarEdgeUsagePoint.energy_account_id==energy_account.id)&
-        (SolarEdgeUsagePoint.date<=end_date)
-        ).order_by(SolarEdgeUsagePoint.date.asc()).all()
-
-    production = []
-    for each in solare_edge_data_pull:
-        production.append(float(each.value)/1000)
-
-    net_usage = daily_combined_electric_usage
-
-    production_percentage = [(x/(x + y)*100 )for x, y in zip(production, net_usage)]
-    production_percentage = [x if x <=100 else 100 for x in production_percentage]
-
-    net_usage_percentage = [100-x for x in production_percentage]
-
-    net_input = [((x/(x + y)) - 1) for x, y in zip(production, net_usage)]
-    net_input = [x * 100 if x > 0 else 0 for x in net_input]
 
     return render_template('users/dashboard/home.html',
         energy_accounts=current_user.energy_accounts,
         breadcrumbs=breadcrumbs, heading=heading,
-        production_percentage=production_percentage,
-        net_usage_percentage=net_usage_percentage,
-        net_input=net_input,
-        labels=incoming_labels,
-        production=production,
-        daily_combined_electric_usage=daily_combined_electric_usage
+        energy_account=energy_account,
+        start_date=start_date,
+        end_date=end_date
         )
 
 @blueprint.route('/energy_account/<int:account_id>', methods=['GET', 'POST'])
@@ -134,6 +107,7 @@ def charts(modify=None):
         session['end_date_pge'] = date_select_form.end_date.data
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
         end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
+        return redirect(url_for('dashboard.charts'))
 
     if download_data_form.validate_on_submit():
         session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
@@ -148,74 +122,24 @@ def charts(modify=None):
         start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
         end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
 
-        print start_date_pge, end_date_pge
-
         xml_dict = parse(session['resource_authorization']['data'])
         bulk_url = xml_dict[u'ns1:feed'][u'ns1:entry'][1][u'ns1:content'][u'ns0:Authorization'][u'ns0:resourceURI']
         bulk_url += '?published-min={}&published-max={}' .format(start_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'), end_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'))
 
-        print bulk_url
 
+        print bulk_url, start_date_pge, end_date_pge
         print api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
 
-    """This next section will grab the data and organize it into usage by day."""
-    incoming_electric_daily_data = []
-    incoming_electric_daily_label = []
-    outgoing_electric_daily_data = []
-    outgoing_electric_daily_label = []
-    if 'data_time_unit' in session:
-        if session['data_time_unit'] == "Daily":
-            pge_helper = PGEHelper(start_date_pge, end_date_pge, energy_account.id)
-
-            incoming_electric_daily_data, incoming_electric_daily_label, outgoing_electric_daily_data, outgoing_electric_daily_label = pge_helper.get_daily_data_and_labels()
-
-
-    """This next section will grab the data and organize it into usage by hour."""
-    outgoing_electric_list = PGEUsagePoint.query.filter(
-        (PGEUsagePoint.flow_direction==19)&
-        (PGEUsagePoint.energy_account_id==energy_account.id)&
-        (PGEUsagePoint.interval_start>=start_date_pge)&
-        (PGEUsagePoint.interval_start<end_date_pge)
-        ).order_by(PGEUsagePoint.interval_start.asc()).all()
-
-    outgoing_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in outgoing_electric_list]
-    outgoing_labels = [x.interval_start.strftime('%m/%d %H:%S') for x in outgoing_electric_list]
-
-    incoming_electric_list = PGEUsagePoint.query.filter(
-        (PGEUsagePoint.flow_direction==1)&
-        (PGEUsagePoint.energy_account_id==energy_account.id)&
-        (PGEUsagePoint.interval_start>=start_date_pge)&
-        (PGEUsagePoint.interval_start<end_date_pge)
-        ).order_by(PGEUsagePoint.interval_start.asc()).all()
-
-    incoming_electric = [x.interval_value * (10**(x.power_of_ten_multiplier -3)) for x in incoming_electric_list]
-    incoming_labels = [x.interval_start.strftime('%m/%d %H:%S') for x in incoming_electric_list]
-
-    #Add default data to the form, so you know what you picked last time
-    date_select_form.start_date.data = start_date_pge.strftime('%Y-%m-%d')
-    date_select_form.end_date.data = (end_date_pge - timedelta(days=1)).strftime('%Y-%m-%d')
-
-    """This section merges both incoming and outgoing daily electric usage """
-    daily_combined_electric_usage = [x - y for x, y in zip(incoming_electric_daily_data, outgoing_electric_daily_data)]
-
-    hourly_combined_electric_usage = [x - y for x, y in zip(incoming_electric, outgoing_electric)]
-
+        return redirect(url_for('dashboard.charts'))
 
     return render_template('users/dashboard/data_chart.html',
         breadcrumbs=breadcrumbs,
         heading=heading,
         date_select_form=date_select_form,
         download_data_form=download_data_form,
-        incoming_electric=incoming_electric,
-        outgoing_electric=outgoing_electric,
-        incoming_labels=incoming_labels,
-        outgoing_labels=outgoing_labels,
-        incoming_electric_daily_data=incoming_electric_daily_data,
-        incoming_electric_daily_label=incoming_electric_daily_label,
-        outgoing_electric_daily_data=outgoing_electric_daily_data,
-        outgoing_electric_daily_label=outgoing_electric_daily_label,
-        daily_combined_electric_usage=daily_combined_electric_usage,
-        hourly_combined_electric_usage=hourly_combined_electric_usage
+        energy_account=energy_account,
+        start_date=start_date_pge,
+        end_date=end_date_pge
     )
 
 @blueprint.route('/solaredge', methods=['GET', 'POST'])
@@ -260,6 +184,8 @@ def solar_edge(modify=None):
     else:
         end_date_se = datetime.datetime.now()
 
+    session['se_energy_data'], session['se_energy_labels'] = energy_account.solar_edge_production_graph(start_date_se, end_date_se)
+
     """Load the form data into the session to save user selection"""
     if date_select_form.validate_on_submit():
         session['data_time_unit_se'] = date_select_form.data_time_unit.data
@@ -272,24 +198,6 @@ def solar_edge(modify=None):
         except:
             flash('Date entered, not in correct format.')
             return redirect(url_for('dashboard.solar_edge'))
-
-        solare_edge_data_pull = SolarEdgeUsagePoint.query.filter(
-            (SolarEdgeUsagePoint.date>=start_date_se)&
-            (SolarEdgeUsagePoint.energy_account_id==energy_account.id)&
-            (SolarEdgeUsagePoint.date<=end_date_se)
-            ).order_by(SolarEdgeUsagePoint.date.asc()).all()
-
-        if not solare_edge_data_pull:
-            flash('No data for that date range available. Pull from Solar Edge.')
-
-        session['se_energy_data'] = []
-        session['se_energy_labels'] = []
-
-        for each in solare_edge_data_pull:
-            session['se_energy_data'].append(each.value)
-            session['se_energy_labels'].append(each.date.strftime('%Y-%m-%d'))
-
-        session['se_energy_data'] = [float(x)/1000 for x in session['se_energy_data']]
 
         return redirect(url_for('dashboard.solar_edge'))
 
@@ -312,17 +220,8 @@ def solar_edge(modify=None):
         else:
             se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
 
+        """Send the data returned by the API to celery for async processing."""
         task = process_se_data.delay(se_energy, energy_account.id)
-
-        session['se_energy_data'] = []
-        session['se_energy_labels'] = []
-
-        for each in se_energy['energy']['values']:
-            if each['value'] == None:
-                session['se_energy_data'].append(0)
-            else:
-                session['se_energy_data'].append(each['value']/1000)
-            session['se_energy_labels'].append(str(each['date']))
 
         return redirect(url_for('dashboard.solar_edge'))
 

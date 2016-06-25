@@ -1,4 +1,4 @@
-from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint, EnergyAccount
+from solarmonitor.user.models import PGEUsagePoint
 from solarmonitor.extensions import db
 import datetime
 from datetime import timedelta, date

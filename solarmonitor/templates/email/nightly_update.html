@@ -25,14 +25,14 @@
 							<table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">&#13;
 								<tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">&#13;
 									<td class="content-block" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">&#13;
-										You have <strong style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">3 cost savings measures</strong> that you could take to earn more money.&#13;
+										{{ user.first_name }}, You have <strong style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">3 cost savings measures</strong> that you could take to earn more money.&#13;
 									</td>&#13;
 								</tr>&#13;
 								<tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">&#13;
 									<td class="content-block" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">&#13;
 										See your usage graph below:&#13;<br>
                     <br>
-                      <img src="https://solarmonitor.epirtle.com/selenium.png">
+                      <img src="https://solarmonitor.epirtle.com/get_graph/{{ energy_account.id }}_chart.png">
                   <!--<img src="http://myground.org:5000/selenium.png">-->
 									</td>&#13;
 								</tr>&#13;

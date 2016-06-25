@@ -7,7 +7,7 @@ from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm
 from solarmonitor.auth.forms import RegistrationForm
-from solarmonitor.user.models import User
+from solarmonitor.user.models import User, EnergyAccount
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.pge.pge import Api, ClientCredentials
@@ -24,18 +24,20 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
 
-@blueprint.route('/testest', methods=['GET', 'POST'])
-def testest():
-    return render_template('email/img_generator.html')
+@blueprint.route('/get_graph/<int:energy_account_id>', methods=['GET', 'POST'])
+def get_graph(energy_account_id=None):
+    energy_account = EnergyAccount.query.filter_by(id=energy_account_id)
+    return render_template('email/img_generator.html', energy_account=energy_account)
 
-@blueprint.route('/selenium.png', methods=['GET', 'POST'])
-def selenium_im_generator():
+@blueprint.route('/get_graph/<int:energy_account_id>_chart.png', methods=['GET', 'POST'])
+def selenium_im_generator(energy_account_id=None):
+    energy_account = EnergyAccount.query.filter_by(id=energy_account_id)
 
     from selenium import webdriver
 
     driver = webdriver.PhantomJS()
     driver.set_window_size(560, 300)
-    driver.get('https://solarmonitor.epirtle.com/testest')
+    driver.get('https://solarmonitor.epirtle.com/get_graph/{}'.format(energy_account.id))
     img = driver.get_screenshot_as_png()
 
     return send_file(io.BytesIO(img))
