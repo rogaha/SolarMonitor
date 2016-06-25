@@ -73,19 +73,13 @@ def run_server():
 
 @manager.command
 def email_users_graph_data():
-
-
     energy_accounts = EnergyAccount.query.all()
     print '\n \n \n \n RUNNING EMAIL NIGHTLY TASK \n \n \n \n \n '
 
     for account in energy_accounts:
         for user in account.users:
-
-
             html = render_template('email/nightly_update.html', energy_account=account, user=user)
-
             send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
-
 
 manager.add_command('server', Server())
 manager.add_command('shell', Shell(make_context=_make_context))
