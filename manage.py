@@ -82,14 +82,16 @@ def email_users_graph_data():
 
     for account in energy_accounts:
         for user in account.users:
+            try:
+                driver.get('https://google.com/')
+                img_url = 'img/graphs/screen_{}.png'.format(account.id)
+                driver.save_screenshot(url_for('static', filename=img_url))
 
-            driver.get('https://google.com/')
-            img_url = 'img/graphs/screen_{}.png'.format(account.id)
-            driver.save_screenshot(url_for('static', filename=img_url))
+                html = render_template('email/nightly_update.html', energy_account=account, user=user, img_url=img_url)
 
-            html = render_template('email/nightly_update.html', energy_account=account, user=user, img_url=img_url)
-
-            send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
+                send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
+            except Exception as e:
+                print e
 
 manager.add_command('server', Server())
 manager.add_command('shell', Shell(make_context=_make_context))
