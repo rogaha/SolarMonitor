@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Public section, including homepage and signup."""
-from flask import Blueprint, flash, redirect, render_template, request, url_for, session, jsonify
+from flask import Blueprint, flash, redirect, render_template, request, url_for, session, jsonify, send_file, make_response
 from flask_login import login_required, login_user, logout_user, current_user
 
 from solarmonitor.celerytasks.pgetasks import process_xml
@@ -21,6 +21,26 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
+
+@blueprint.route('/testest', methods=['GET', 'POST'])
+def testest():
+    return render_template('email/img_generator.html')
+
+@blueprint.route('/selenium.png', methods=['GET', 'POST'])
+def selenium_im_generator():
+
+    from selenium import webdriver
+
+    driver = webdriver.PhantomJS()
+    driver.set_window_size(400, 400)
+    driver.get('https://solarmonitor.epirtle.com')
+    img = driver.get_screenshot_as_png()
+
+    response = make_response(img)
+    response.headers['Content-Type'] = 'image/png'
+    response.headers['Content-Disposition'] = 'attachment; filename=selenium.png'
+
+    return response
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def home():

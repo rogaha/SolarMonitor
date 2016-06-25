@@ -73,25 +73,19 @@ def run_server():
 
 @manager.command
 def email_users_graph_data():
-    from selenium import webdriver
-    driver = webdriver.PhantomJS()
-    driver.set_window_size(1024, 768)
+
 
     energy_accounts = EnergyAccount.query.all()
     print '\n \n \n \n RUNNING EMAIL NIGHTLY TASK \n \n \n \n \n '
 
     for account in energy_accounts:
         for user in account.users:
-            try:
-                driver.get('https://google.com/')
-                img_url = 'img/graphs/screen_{}.png'.format(account.id)
-                driver.save_screenshot(url_for('static', filename=img_url))
 
-                html = render_template('email/nightly_update.html', energy_account=account, user=user, img_url=img_url)
 
-                send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
-            except Exception as e:
-                print e
+            html = render_template('email/nightly_update.html', energy_account=account, user=user, img_url=img_url)
+
+            send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
+
 
 manager.add_command('server', Server())
 manager.add_command('shell', Shell(make_context=_make_context))
