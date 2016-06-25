@@ -78,6 +78,7 @@ def email_users_graph_data():
     driver.set_window_size(1024, 768)
 
     energy_accounts = EnergyAccount.query.all()
+    print '\n \n \n \n RUNNING EMAIL NIGHTLY TASK \n \n \n \n \n '
 
     for account in energy_accounts:
         for user in account.users:
