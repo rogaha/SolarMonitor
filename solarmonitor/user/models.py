@@ -44,12 +44,14 @@ class EnergyAccount(db.Model):
     celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
 
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
+        """Solar Edge production vs Combined PGE data"""
         production, labels = self.solar_edge_production_graph(start_date, end_date)
         net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
 
         return production, net_usage, labels
 
     def production_net_usage_percentage_graph(self, start_date=seven_days_ago, end_date=today):
+        """Solar Edge Production vs Combined PGE data normalized to 100%"""
         production, labels = self.solar_edge_production_graph(start_date, end_date)
         net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
 
