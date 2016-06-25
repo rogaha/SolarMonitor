@@ -85,7 +85,7 @@ def email_users_graph_data():
 
             driver.get('https://google.com/')
             img_url = 'img/graphs/screen_{}.png'.format(account.id)
-            driver.save_screenshot('solarmonitor/static/{}'.format(img_url))
+            driver.save_screenshot(url_for('static', filename=img_url))
 
             html = render_template('email/nightly_update.html', energy_account=account, user=user, img_url=img_url)
 
