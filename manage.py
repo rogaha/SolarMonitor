@@ -78,6 +78,7 @@ def email_users_graph_data():
 
     for account in energy_accounts:
         for user in account.users:
+            print 'user: {}, energy_account: {}'.format(user.first_name, account.id)
             html = render_template('email/nightly_update.html', energy_account=account, user=user)
             send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
 

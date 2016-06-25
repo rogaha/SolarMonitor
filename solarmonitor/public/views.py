@@ -35,7 +35,7 @@ def get_graph(energy_account_id=None):
         start_date=start_date,
         end_date=end_date)
 
-@blueprint.route('/get_graph/<int:energy_account_id>_chart.png', methods=['GET', 'POST'])
+@blueprint.route('/get_graph/<int:energy_account_id>_charts.png', methods=['GET', 'POST'])
 def selenium_im_generator(energy_account_id=None):
     energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
 
