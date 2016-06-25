@@ -35,8 +35,8 @@ def home():
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home'))]
     heading = 'Dashboard'
 
-    start_date = datetime.date(2016, 6, 1)
-    end_date = datetime.date(2016, 6, 16)
+    start_date = datetime.datetime.today().date() - timedelta(days=7)
+    end_date = datetime.datetime.today().date()
 
     #TODO assumes for now that we want only the first energy account.
     energy_account = current_user.energy_accounts[0]
