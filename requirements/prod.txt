@@ -6,6 +6,7 @@ pytz==2016.4
 celery==3.1.23
 redis==2.10.5
 APScheduler==3.0.0
+selenium==2.53.5
 
 
 # Flask

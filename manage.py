@@ -74,6 +74,12 @@ def run_server():
 @manager.command
 def email_users_graph_data():
 
+    from selenium import webdriver
+    driver = webdriver.PhantomJS() # or add to your PATH
+    driver.set_window_size(1024, 768) # optional
+    driver.get('https://google.com/')
+    driver.save_screenshot('graphs/screen.png') # save a screenshot to disk
+
     html = render_template('email/nightly_update.html')
 
     send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your nightly update', 'dan@danwins.com', html)
