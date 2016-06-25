@@ -33,16 +33,92 @@
         <span class="sr-only">Toggle Dropdown</span>
       </button>
       <ul class="dropdown-menu">
-        <li><a href="#">30 days</a></li>
-        <li><a href="#">14 days</a></li>
-        <li><a href="#">7 days</a></li>
+        <li><a id="30days" href="#">30 days</a></li>
+        <li><a id="14days" href="#">14 days</a></li>
+        <li><a id="7days" href="#">7 days</a></li>
       </ul>
     </div>
 
   </div>
 
 </div>
+<script type="text/javascript">
 
+var today = moment().format("YYYY-MM-DD");
+
+  $('#30days').click(function () {
+  var account_id = $("#account_id").val();
+  var thirtyDaysAgo = moment().subtract(30, 'days').format("YYYY-MM-DD");
+  var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
+    $.ajax({
+        type: 'GET',
+        url: url,
+        success: function (data) {
+            console.log(data);
+            myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
+            myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
+            myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
+            myChart.data.labels = data.production_net_usage_percentage_graph.labels;
+            myChart.update();
+
+            myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
+            myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart2.data.labels = data.production_net_usage_graph.labels;
+            myChart2.update();
+        }
+    });
+  });
+
+  $('#14days').click(function () {
+  var account_id = $("#account_id").val();
+  var thirtyDaysAgo = moment().subtract(14, 'days').format("YYYY-MM-DD");
+  var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
+    $.ajax({
+        type: 'GET',
+        url: url,
+        success: function (data) {
+            console.log(data);
+            myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
+            myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
+            myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
+            myChart.data.labels = data.production_net_usage_percentage_graph.labels;
+            myChart.update();
+
+            myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
+            myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart2.data.labels = data.production_net_usage_graph.labels;
+            myChart2.update();
+        }
+    });
+  });
+
+  $('#7days').click(function () {
+  var account_id = $("#account_id").val();
+  var thirtyDaysAgo = moment().subtract(7, 'days').format("YYYY-MM-DD");
+  var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
+    $.ajax({
+        type: 'GET',
+        url: url,
+        success: function (data) {
+            console.log(data);
+            myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
+            myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
+            myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
+            myChart.data.labels = data.production_net_usage_percentage_graph.labels;
+            myChart.update();
+
+            myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
+            myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart2.data.labels = data.production_net_usage_graph.labels;
+            myChart2.update();
+        }
+    });
+  });
+
+
+
+
+</script>
 <br>
     <div class="row">
 
@@ -135,7 +211,7 @@ datasets: [
 ]
 };
 var ctx = document.getElementById("myChart2");
-var myChart = new Chart(ctx, {
+var myChart2 = new Chart(ctx, {
   type: 'bar',
   data: data,
   options: {
@@ -324,16 +400,10 @@ var myChart = new Chart(ctx, {
                         success: function (data) {
                             console.log(data);
                             $('#energy_account_modify_' + $("#account_id").val()).modal('hide');
-
                             $('#account_nick_name').text(data.nick_name);
                             $('#account_pge_bulk_id').text(data.pge_bulk_id);
                             $('#account_address_one').text(data.address_one);
                             $('#account_solar_edge_site_id').text(data.solar_edge_site_id);
-
-
-
-
-
                         }
                     });
 

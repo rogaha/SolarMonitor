@@ -49,6 +49,18 @@ def home():
         end_date=end_date
         )
 
+@blueprint.route('/graph/update/<int:account_id>/<start_date>/<end_date>', methods=['GET', 'POST'])
+@login_required
+def graph_update(account_id=None, start_date=None, end_date=None):
+    energy_account = EnergyAccount.query.filter_by(id=account_id).first()
+
+    s_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+    e_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+
+    result = energy_account.serialize_charts(s_date, e_date)
+
+    return jsonify(result)
+
 @blueprint.route('/energy_account/<int:account_id>', methods=['GET', 'POST'])
 @login_required
 def modify_energy_account(account_id=None):

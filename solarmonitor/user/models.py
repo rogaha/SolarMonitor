@@ -113,6 +113,39 @@ class EnergyAccount(db.Model):
             'solar_edge_site_id': self.solar_edge_site_id,
         }
 
+    def serialize_charts(self, start_date=seven_days_ago, end_date=today):
+        se_energy_data, se_energy_labels = self.solar_edge_production_graph(start_date, end_date)
+        net_usage, incoming_labels = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
+        incoming_data, outgoing_data, outgoing_labels = self.pge_incoming_outgoing_graph(start_date, end_date)
+        production_percentage, net_input, net_usage_percentage, labels = self.production_net_usage_percentage_graph(start_date, end_date)
+        production, net_usage_graph, graph_labels = self.production_net_usage_graph(start_date, end_date)
+
+        return {
+            'solar_edge_production_graph': {
+                'se_energy_data': se_energy_data,
+                'labels': se_energy_labels
+                },
+            'pge_incoming_outgoing_combined_graph': {
+                'net_usage': net_usage,
+                'labels': incoming_labels
+                },
+            'pge_incoming_outgoing_graph': {
+                'incoming_data': incoming_data,
+                'outgoing_data': outgoing_data,
+                'labels': outgoing_labels
+                },
+            'production_net_usage_percentage_graph':{
+                'production_percentage': production_percentage,
+                'net_input': net_input,
+                'net_usage_percentage': net_usage_percentage,
+                'labels': labels
+                },
+            'production_net_usage_graph': {
+                'production': production,
+                'net_usage': net_usage_graph,
+                'labels': graph_labels
+                }
+        }
 
     def __repr__(self):
         return '<EnergyAccount {}>' .format(self.id)
