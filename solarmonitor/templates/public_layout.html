@@ -111,6 +111,7 @@
 
                             {% if current_user and current_user.is_authenticated %}
                               <h2>Logged in as {{ current_user.first_name }} </h2>
+                              <p><a href="{{ url_for('dashboard.home') }}">Dashboard</p>
                               <p><a href="{{ url_for('auth.logout') }}">Logout <i class="fa fa-sign-out"></i></a></p>
                             {% elif login_form %}
 

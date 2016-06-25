@@ -14,7 +14,7 @@ from solarmonitor.app import create_app
 from solarmonitor.mailgun.mailgun_api import send_html_email
 #from solarmonitor.database import db
 from solarmonitor.settings import DevConfig, ProdConfig, Config
-from solarmonitor.user.models import User
+from solarmonitor.user.models import User, EnergyAccount
 
 CONFIG = ProdConfig if os.environ.get('SOLARMONITOR_ENV') == 'prod' else DevConfig
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -73,16 +73,22 @@ def run_server():
 
 @manager.command
 def email_users_graph_data():
-
     from selenium import webdriver
-    driver = webdriver.PhantomJS() # or add to your PATH
-    driver.set_window_size(1024, 768) # optional
-    driver.get('https://google.com/')
-    driver.save_screenshot('graphs/screen.png') # save a screenshot to disk
+    driver = webdriver.PhantomJS()
+    driver.set_window_size(1024, 768)
 
-    html = render_template('email/nightly_update.html')
+    energy_accounts = EnergyAccount.query.all()
 
-    send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your nightly update', 'dan@danwins.com', html)
+    for account in energy_accounts:
+        for user in account.users:
+
+            driver.get('https://google.com/')
+            img_url = 'img/graphs/screen_{}.png'.format(account.id)
+            driver.save_screenshot('solarmonitor/static/{}'.format(img_url))
+
+            html = render_template('email/nightly_update.html', energy_account=account, user=user, img_url=img_url)
+
+            send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
 
 manager.add_command('server', Server())
 manager.add_command('shell', Shell(make_context=_make_context))
