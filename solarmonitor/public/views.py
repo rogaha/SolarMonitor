@@ -11,6 +11,8 @@ from solarmonitor.user.models import User
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.pge.pge import Api, ClientCredentials
+from io import BytesIO
+import io
 
 from jxmlease import parse
 import json
@@ -32,15 +34,12 @@ def selenium_im_generator():
     from selenium import webdriver
 
     driver = webdriver.PhantomJS()
-    driver.set_window_size(400, 400)
-    driver.get('https://solarmonitor.epirtle.com')
+    driver.set_window_size(560, 300)
+    driver.get('https://solarmonitor.epirtle.com/testest')
     img = driver.get_screenshot_as_png()
 
-    response = make_response(img)
-    response.headers['Content-Type'] = 'image/png'
-    response.headers['Content-Disposition'] = 'attachment; filename=selenium.png'
+    return send_file(io.BytesIO(img))
 
-    return response
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def home():
