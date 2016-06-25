@@ -5,11 +5,13 @@ import os
 from glob import glob
 from subprocess import call
 
+from flask import render_template, url_for
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Command, Manager, Option, Server, Shell
 from flask_script.commands import Clean, ShowUrls
 
 from solarmonitor.app import create_app
+from solarmonitor.mailgun.mailgun_api import send_html_email
 #from solarmonitor.database import db
 from solarmonitor.settings import DevConfig, ProdConfig, Config
 from solarmonitor.user.models import User
@@ -70,8 +72,11 @@ def run_server():
     app.run(host='0.0.0.0', debug=True)
 
 @manager.command
-def email_dan():
-    print 'scheduled task DANDANDAND'
+def email_users_graph_data():
+
+    html = render_template('email/nightly_update.html')
+
+    send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your nightly update', 'dan@danwins.com', html)
 
 manager.add_command('server', Server())
 manager.add_command('shell', Shell(make_context=_make_context))
