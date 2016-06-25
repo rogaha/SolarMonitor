@@ -174,7 +174,7 @@ var myChart = new Chart(ctx, {
                     <th>Nickname</th>
                     <th>Address</th>
                     <th>PGE Bulk ID</th>
-                    <th>SolarEdge API Key</th>
+                    <th>SolarEdge Site ID</th>
                 </tr>
               </thead>
               <tbody>
@@ -191,7 +191,7 @@ var myChart = new Chart(ctx, {
                         <td id="account_nick_name">{{ account.nick_name }}</td>
                         <td id="account_address_one">{{ account.address_one }}</td>
                         <td id="account_pge_bulk_id">{{ account.pge_bulk_id }}</td>
-                        <td id="account_solar_edge_api_key">{{ account.solar_edge_api_key }}</td>
+                        <td id="account_solar_edge_site_id">{{ account.solar_edge_site_id }}</td>
 
                       </tr>
                   {% endfor %}
@@ -295,9 +295,9 @@ var myChart = new Chart(ctx, {
 
                     <!-- Text input-->
                     <div class="form-group">
-                      <label class="col-md-4 control-label" for="textinput">Solar Edge API Key</label>
+                      <label class="col-md-4 control-label" for="textinput">Solar Edge Site Id</label>
                       <div class="col-md-4">
-                      <input id="solar_edge_api_key" name="solar_edge_api_key" type="text" placeholder="" class="form-control input-md" value="{{ account.solar_edge_api_key }}">
+                      <input id="solar_edge_site_id" name="solar_edge_site_id" type="text" placeholder="" class="form-control input-md" value="{{ account.solar_edge_api_key }}">
 
                       </div>
                     </div>
@@ -327,7 +327,7 @@ var myChart = new Chart(ctx, {
                             $('#account_nick_name').text(data.nick_name);
                             $('#account_pge_bulk_id').text(data.pge_bulk_id);
                             $('#account_address_one').text(data.address_one);
-                            $('#account_solar_edge_api_key').text(data.solar_edge_api_key);
+                            $('#account_solar_edge_site_id').text(data.solar_edge_site_id);
 
 
 

@@ -61,7 +61,7 @@ def user(db):
         zip_code = '14545',
         pge_bulk_id = '54468',
         pge_access_token = '2151dsfsdf',
-        solar_edge_api_key = 'api_key'
+        solar_edge_site_id = 'api_key'
         )
     user.energy_accounts.append(energy_account)
     db.session.add(user)
@@ -79,7 +79,7 @@ def energy_account(db):
         zip_code = '14545',
         pge_bulk_id = '54468',
         pge_access_token = '2151dsfsdf',
-        solar_edge_api_key = 'api_key'
+        solar_edge_site_id = 'api_key'
         )
     db.session.add(energy_account)
     db.session.commit()
