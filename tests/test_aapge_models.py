@@ -6,8 +6,8 @@ import pytest
 
 from solarmonitor.extensions import db
 from solarmonitor.user.models import PGEUsagePoint
-from solarmonitor.pge.pge_helpers import generate_random_pge_data
-import datetime
+from tests.test_pge_models import generate_random_pge_data
+import datetime 
 
 @pytest.mark.usefixtures('db')
 class TestUser:
@@ -36,15 +36,6 @@ class TestUser:
     def test_add_sample_pge_data(self, user):
         generate_random_pge_data(number_of_data_rows=10, account_id=user.energy_accounts[0].id, numbers_of_days_ago=4)
 
+
         retrieved = PGEUsagePoint.query.filter_by(energy_account_id=user.energy_accounts[0].id).all()
         assert len(retrieved) is 10
-
-
-
-
-
-
-
-
-
-        

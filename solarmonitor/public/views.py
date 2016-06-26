@@ -39,6 +39,9 @@ def get_graph(energy_account_id=None):
 def selenium_img_generator(energy_account_id=None):
     energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
 
+    if energy_account == None:
+        return redirect(url_for('public.home'))
+
     from selenium import webdriver
 
     driver = webdriver.PhantomJS()

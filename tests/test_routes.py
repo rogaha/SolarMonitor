@@ -67,6 +67,36 @@ class TestPublicRoutes200:
         res = testapp.get(url_for('public.oauth_redirect'))
         assert res.status_code == 200
 
+    def test_get_graph(self, user, testapp):
+        """Solar Edge chart page for downloading and viewing data.
+        """
+        res = testapp.get(url_for('public.get_graph', energy_account_id=user.energy_accounts[0].id))
+        assert res.status_code == 200
+
+    def test_selenium_img_generator(self, user, testapp):
+        """Solar Edge chart page for downloading and viewing data.
+        """
+        res = testapp.get(url_for('public.selenium_img_generator', energy_account_id=user.energy_accounts[0].id))
+        assert res.status_code == 200
+
+        made_up_number = 5649875454
+        res = testapp.get(url_for('public.selenium_img_generator', energy_account_id=made_up_number))
+        assert res.status_code == 302
+
+    def test_dashboard_home(self, user, testapp):
+        """Solar Edge chart page for downloading and viewing data.
+        """
+        # Goes to homepage
+        res = testapp.get('/')
+        # Fills out login form in navbar
+        form = res.forms['loginForm']
+        form['email'] = user.email
+        form['password'] = 'myprecious'
+        # Submits
+        res = form.submit().follow()
+        res = testapp.get(url_for('dashboard.home'))
+        assert res.status_code == 200
+
     def test_solar_edge_charts(self, user, testapp):
         """Solar Edge chart page for downloading and viewing data.
         """

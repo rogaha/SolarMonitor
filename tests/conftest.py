@@ -10,7 +10,6 @@ from solarmonitor.settings import TestConfig
 
 from solarmonitor.user.models import User, EnergyAccount
 
-
 @pytest.yield_fixture(scope='function')
 def app():
     """An application for the tests."""
@@ -21,7 +20,6 @@ def app():
     yield _app
 
     ctx.pop()
-
 
 @pytest.fixture(scope='function')
 def testapp(app):
@@ -70,7 +68,7 @@ def user(db):
 
 @pytest.fixture
 def energy_account(db):
-    """A user for the tests."""
+    """An energy account for the tests."""
     energy_account = EnergyAccount(
         address_one = '123 Unknown',
         address_two = 'db.Column(db.String(255))',

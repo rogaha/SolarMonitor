@@ -3,6 +3,30 @@ from solarmonitor.extensions import db
 import datetime
 from datetime import timedelta, date
 
+def generate_random_pge_data(number_of_data_rows=10, account_id=1, numbers_of_days_ago=4):
+    import random
+    from datetime import datetime, timedelta
+    flow_direction = [19, 1]
+    energy_value = [0, 500, 7900, 543700, 1034600, 1444300, 1404700, 1297200, 850204, 839500, 374400, 116900]
+    start_date = datetime.today() - timedelta(days=numbers_of_days_ago)
+    n = 0
+    while n < number_of_data_rows:
+        pge_usage_point = PGEUsagePoint(
+            energy_account_id=account_id,
+            commodity_type=1,
+            measuring_period=3,
+            interval_start=start_date + timedelta(hours=n),
+            interval_duration=1,
+            interval_value=random.choice(energy_value),
+            flow_direction=random.choice(flow_direction),
+            unit_of_measure=5,
+            power_of_ten_multiplier=-3,
+            accumulation_behavior=4
+            )
+        db.session.add(pge_usage_point)
+        db.session.commit()
+        n += 1
+
 class PGEHelper:
 
     def __init__(self, start_date, end_date, energy_account_id):
