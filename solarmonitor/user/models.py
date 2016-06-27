@@ -54,18 +54,14 @@ class EnergyAccount(db.Model):
         """Solar Edge Production vs Combined PGE data normalized to 100%"""
         production, labels = self.solar_edge_production_graph(start_date, end_date)
         net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
-        try:
-            production_percentage = [(x/(x + y)*100 )for x, y in zip(production, net_usage)]
-            production_percentage = [x if x <=100 else 100 for x in production_percentage]
 
-            net_usage_percentage = [100-x for x in production_percentage]
+        production_percentage = [(x/(x + y)*100) if (x + y) != 0 else 0 for x, y in zip(production, net_usage)]
+        production_percentage = [x if x <=100 else 100 for x in production_percentage]
 
-            net_input = [((x/(x + y)) - 1) for x, y in zip(production, net_usage)]
-            net_input = [x * 100 if x > 0 else 0 for x in net_input]
-        except ZeroDivisionError as e:
-            delta = end_date - start_date
-            print production, net_usage
-            production_percentage, net_input, net_usage_percentage, labels = [0] * delta.days, [0] * delta.days, [0] * delta.days, ['Div/0 Error'] * delta.days
+        net_usage_percentage = [100-x for x in production_percentage]
+
+        net_input = [((x/(x + y)) - 1) if (x + y) != 0 else 0 for x, y in zip(production, net_usage)]
+        net_input = [x * 100 if x > 0 else 0 for x in net_input]
 
         return production_percentage, net_input, net_usage_percentage, labels
 
