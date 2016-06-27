@@ -76,6 +76,8 @@ class EnergyAccount(db.Model):
 
     def pge_incoming_outgoing_combined_graph(self, start_date=seven_days_ago, end_date=today):
         from solarmonitor.pge.pge_helpers import PGEHelper
+        """All the PGE data is listed in each row in the DB by hour. Since we are outputting all the data
+        in daily format, the PGE helper will group the data into daily format for us using the get_daily_data_and_labels method."""
         pge_helper = PGEHelper(start_date, end_date, self.id)
 
         """Set the variables """
@@ -99,6 +101,7 @@ class EnergyAccount(db.Model):
             se_energy_data.append(each.value)
             se_energy_labels.append(each.date.strftime('%m/%d'))
 
+        """Convert to kWh"""
         se_energy_data = [float(x)/1000 for x in se_energy_data]
 
         return se_energy_data, se_energy_labels
