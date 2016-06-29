@@ -69,10 +69,10 @@ class PGEHelper:
                 outgoing_interval_value += (datapoint.interval_value * (10**(datapoint.power_of_ten_multiplier -3)))
 
             incoming_electric_daily_data.append(incoming_interval_value)
-            incoming_electric_daily_label.append((self.start_date + timedelta(days=n)).strftime('%m/%d'))
+            incoming_electric_daily_label.append((self.start_date + timedelta(days=n)))
 
             outgoing_electric_daily_data.append(outgoing_interval_value)
-            outgoing_electric_daily_label.append((self.start_date + timedelta(days=n)).strftime('%m/%d'))
+            outgoing_electric_daily_label.append((self.start_date + timedelta(days=n)))
             n += 1
 
         return  incoming_electric_daily_data, incoming_electric_daily_label, outgoing_electric_daily_data, outgoing_electric_daily_label

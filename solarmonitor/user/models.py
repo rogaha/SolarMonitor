@@ -45,29 +45,49 @@ class EnergyAccount(db.Model):
 
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
         """Solar Edge production vs Combined PGE data"""
-        production, labels = self.solar_edge_production_graph(start_date, end_date)
-        net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
+        production = self.solar_edge_production_graph(start_date, end_date)
+        net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
 
-        return production, net_usage, labels
+        """Before we can output the data, we need to push the data with matching dates together.
+        The goal is to have the same data ranges available from both solar edge and PGE but sometimes
+        we will only have 10 days of data for pge and 15 days of data for solar edge. Data for the same date
+        ranges need to be displayed together, otherwise funky things happen with the chart."""
+        print [p[1] for p in production]
+        print [n[1] for n in net_usage]
+        print '\n'
+        #get all the dates for both lists and combine them into one list in date order, removing duplicates, convert to dict
+        date_dict = {key:None for key in set([p[1] for p in production] + [n[1] for n in net_usage])}
+
+        for value, date in net_usage:
+            date_dict[date] = (value,)
+
+        for value, date in production:
+            if not date_dict[date]:
+                date_dict[date] = (value, 0)
+            else:
+                date_dict[date] = (value,) + date_dict[date]
+
+        date_list = sorted(date_dict.items(), key=lambda x: x[0])
+
+        date_list = [(values[0], values[1], labels) if len(values) == 2 else (0, 0, labels) for labels, values in date_list]
+
+        # Returns a list of tuples e.g. [(production, net usage, label)]
+        return date_list
 
     def production_net_usage_percentage_graph(self, start_date=seven_days_ago, end_date=today):
         """Solar Edge Production vs Combined PGE data normalized to 100%"""
-        production, labels = self.solar_edge_production_graph(start_date, end_date)
-        net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
-        try:
-            production_percentage = [(x/(x + y)*100 )for x, y in zip(production, net_usage)]
-            production_percentage = [x if x <=100 else 100 for x in production_percentage]
+        p = self.production_net_usage_graph(start_date, end_date)
 
-            net_usage_percentage = [100-x for x in production_percentage]
+        labels = [labels for production, net_usage, labels in p]
+        production_percentage = [(x/(x + y)*100) if (x + y) != 0 else 0 for x, y, l in p]
+        production_percentage = [x if x <=100 else 100 for x in production_percentage]
 
-            net_input = [((x/(x + y)) - 1) for x, y in zip(production, net_usage)]
-            net_input = [x * 100 if x > 0 else 0 for x in net_input]
-        except ZeroDivisionError as e:
-            delta = end_date - start_date
-            print production, net_usage
-            production_percentage, net_input, net_usage_percentage, labels = [0] * delta.days, [0] * delta.days, [0] * delta.days, ['Div/0 Error'] * delta.days
+        net_usage_percentage = [100-x for x in production_percentage]
 
-        return production_percentage, net_input, net_usage_percentage, labels
+        net_input = [((x/(x + y)) - 1) if (x + y) != 0 else 0 for x, y, l in p]
+        net_input = [x * 100 if x > 0 else 0 for x in net_input]
+
+        return zip(production_percentage, net_input, net_usage_percentage, labels)
 
     def pge_incoming_outgoing_graph(self, start_date=seven_days_ago, end_date=today):
         from solarmonitor.pge.pge_helpers import PGEHelper
@@ -76,9 +96,11 @@ class EnergyAccount(db.Model):
         """Set the variables """
         incoming_data, incoming_labels, outgoing_data, outgoing_labels = pge_helper.get_daily_data_and_labels()
 
-        return incoming_data, outgoing_data, outgoing_labels
+        return zip(incoming_data, outgoing_data, outgoing_labels)
 
     def pge_incoming_outgoing_combined_graph(self, start_date=seven_days_ago, end_date=today):
+        """Uses the PGEHelper class to return a zipped list of kWh values and datetime objects as a list of tuples.
+        If no data is found for a particular day, a value of zero is returned as the kWh part of the tuple."""
         from solarmonitor.pge.pge_helpers import PGEHelper
         pge_helper = PGEHelper(start_date, end_date, self.id)
 
@@ -87,9 +109,10 @@ class EnergyAccount(db.Model):
 
         net_usage = [x - y for x, y in zip(incoming_data, outgoing_data)]
 
-        return net_usage, incoming_labels
+        return zip(net_usage, incoming_labels)
 
     def solar_edge_production_graph(self, start_date=seven_days_ago, end_date=today):
+        """Pulls all solar edge data (by day) and returns a zipped list of kWh values and datetime objects as a list of tuples."""
         solar_edge_data_pull = SolarEdgeUsagePoint.query.filter(
             (SolarEdgeUsagePoint.date>=start_date)&
             (SolarEdgeUsagePoint.energy_account_id==self.id)&
@@ -101,11 +124,11 @@ class EnergyAccount(db.Model):
 
         for each in solar_edge_data_pull:
             se_energy_data.append(each.value)
-            se_energy_labels.append(each.date.strftime('%m/%d'))
+            se_energy_labels.append(each.date)
 
         se_energy_data = [float(x)/1000 for x in se_energy_data]
 
-        return se_energy_data, se_energy_labels
+        return zip(se_energy_data, se_energy_labels)
 
     def serialize(self):
         return {
@@ -119,39 +142,46 @@ class EnergyAccount(db.Model):
             'solar_edge_site_id': self.solar_edge_site_id,
         }
 
-    def serialize_charts(self, start_date=seven_days_ago, end_date=today):
-        se_energy_data, se_energy_labels = self.solar_edge_production_graph(start_date, end_date)
-        net_usage, incoming_labels = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
-        incoming_data, outgoing_data, outgoing_labels = self.pge_incoming_outgoing_graph(start_date, end_date)
-        production_percentage, net_input, net_usage_percentage, labels = self.production_net_usage_percentage_graph(start_date, end_date)
-        production, net_usage_graph, graph_labels = self.production_net_usage_graph(start_date, end_date)
+    def serialize_charts(self, chart, start_date=seven_days_ago, end_date=today, date_format='%m/%d'):
+        if chart == 'solar_edge_production_graph':
+            solar_edge_production_graph = self.solar_edge_production_graph(start_date, end_date)
+            return {
+                'se_energy_data': [data for data, labels in solar_edge_production_graph],
+                'labels': [labels.strftime(date_format) for data, labels in solar_edge_production_graph]
+            }
 
-        return {
-            'solar_edge_production_graph': {
-                'se_energy_data': se_energy_data,
-                'labels': se_energy_labels
-                },
-            'pge_incoming_outgoing_combined_graph': {
-                'net_usage': net_usage,
-                'labels': incoming_labels
-                },
-            'pge_incoming_outgoing_graph': {
-                'incoming_data': incoming_data,
-                'outgoing_data': outgoing_data,
-                'labels': outgoing_labels
-                },
-            'production_net_usage_percentage_graph':{
-                'production_percentage': production_percentage,
-                'net_input': net_input,
-                'net_usage_percentage': net_usage_percentage,
-                'labels': labels
-                },
-            'production_net_usage_graph': {
-                'production': production,
-                'net_usage': net_usage_graph,
-                'labels': graph_labels
-                }
-        }
+        elif chart == 'pge_incoming_outgoing_combined_graph':
+            pge_incoming_outgoing_combined_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
+            return {
+                'net_usage': [data for data, labels in pge_incoming_outgoing_combined_graph],
+                'labels': [labels.strftime(date_format) for data, labels in pge_incoming_outgoing_combined_graph]
+            }
+
+        elif chart == 'pge_incoming_outgoing_graph':
+            pge_incoming_outgoing_graph = self.pge_incoming_outgoing_graph(start_date, end_date)
+            return {
+                'incoming_data': [inc_data for inc_data, out_data, labels in pge_incoming_outgoing_graph],
+                'outgoing_data': [out_data for inc_data, out_data, labels in pge_incoming_outgoing_graph],
+                'labels': [labels.strftime(date_format) for inc_data, out_data, labels in pge_incoming_outgoing_graph]
+            }
+
+        elif chart == 'production_net_usage_percentage_graph':
+            production_net_usage_percentage_graph = self.production_net_usage_percentage_graph(start_date, end_date)
+            return {
+                'production_percentage': [production_percentage for production_percentage, net_input, net_usage_percentage, labels in production_net_usage_percentage_graph],
+                'net_input': [net_input for production_percentage, net_input, net_usage_percentage, labels in production_net_usage_percentage_graph],
+                'net_usage_percentage': [net_usage_percentage for production_percentage, net_input, net_usage_percentage, labels in production_net_usage_percentage_graph],
+                'labels': [labels.strftime(date_format) for production_percentage, net_input, net_usage_percentage, labels in production_net_usage_percentage_graph]
+            }
+
+        elif chart == 'production_net_usage_graph':
+            production_net_usage_graph = self.production_net_usage_graph(start_date, end_date)
+            return {
+                'production': [production for production, net_usage, labels in production_net_usage_graph],
+                'net_usage': [net_usage for production, net_usage, labels in production_net_usage_graph],
+                'labels': [labels.strftime(date_format) for production, net_usage, labels in production_net_usage_graph]
+            }
+
 
     def __repr__(self):
         return '<EnergyAccount {}>' .format(self.id)

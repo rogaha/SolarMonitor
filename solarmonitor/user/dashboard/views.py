@@ -54,10 +54,13 @@ def home():
 def graph_update(account_id=None, start_date=None, end_date=None):
     energy_account = EnergyAccount.query.filter_by(id=account_id).first()
 
-    s_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
-    e_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+    s_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    e_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
 
-    result = energy_account.serialize_charts(s_date, e_date)
+    result = {
+        'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
+        'production_net_usage_graph': energy_account.serialize_charts('production_net_usage_graph', s_date, e_date)
+    }
 
     return jsonify(result)
 
@@ -196,7 +199,10 @@ def solar_edge(modify=None):
     else:
         end_date_se = datetime.datetime.now()
 
-    session['se_energy_data'], session['se_energy_labels'] = energy_account.solar_edge_production_graph(start_date_se, end_date_se)
+    solar_edge_production_graph = energy_account.serialize_charts('solar_edge_production_graph', start_date_se.date(), end_date_se.date())
+
+    session['se_energy_data'] = solar_edge_production_graph['se_energy_data']
+    session['se_energy_labels'] = solar_edge_production_graph['labels']
 
     """Load the form data into the session to save user selection"""
     if date_select_form.validate_on_submit():
