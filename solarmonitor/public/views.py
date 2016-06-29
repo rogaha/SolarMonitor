@@ -26,16 +26,6 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
 
-@blueprint.route('/get_graph/<int:energy_account_id>', methods=['GET', 'POST'])
-def get_graph(energy_account_id=None):
-    end_date = datetime.datetime.today().date()
-    start_date = end_date - timedelta(days=14)
-    energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
-    return render_template('email/img_generator.html',
-        energy_account=energy_account,
-        start_date=start_date,
-        end_date=end_date)
-
 @blueprint.route('/get_graph/<int:energy_account_id>_charts.png', methods=['GET', 'POST'])
 def selenium_img_generator(energy_account_id=None):
     energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
@@ -43,11 +33,21 @@ def selenium_img_generator(energy_account_id=None):
     if energy_account == None:
         return redirect(url_for('public.home'))
 
+    end_date = datetime.datetime.today().date()
+    start_date = end_date - timedelta(days=14)
+    energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
+    html = render_template('email/img_generator.html',
+        energy_account=energy_account,
+        start_date=start_date,
+        end_date=end_date)
+
+    selenium_html_string = """{}""".format(html)
+
     from selenium import webdriver
 
     driver = webdriver.PhantomJS()
     driver.set_window_size(560, 300)
-    driver.get('https://solarmonitor.epirtle.com/get_graph/{}'.format(energy_account.id))
+    driver.get(selenium_html_string)
     img = driver.get_screenshot_as_png()
 
     return send_file(io.BytesIO(img))
