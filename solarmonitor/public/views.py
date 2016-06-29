@@ -28,6 +28,7 @@ api = Api(config.SSL_CERTS)
 
 @blueprint.route('/get_graph/<int:energy_account_id>', methods=['GET', 'POST'])
 def get_graph(energy_account_id=None):
+    end_date = datetime.datetime.today().date()
     start_date = end_date - timedelta(days=14)
     energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
     return render_template('email/img_generator.html',
