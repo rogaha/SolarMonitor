@@ -52,7 +52,9 @@ class EnergyAccount(db.Model):
         The goal is to have the same data ranges available from both solar edge and PGE but sometimes
         we will only have 10 days of data for pge and 15 days of data for solar edge. Data for the same date
         ranges need to be displayed together, otherwise funky things happen with the chart."""
-
+        print [p[1] for p in production]
+        print [n[1] for n in net_usage]
+        print '\n'
         #get all the dates for both lists and combine them into one list in date order, removing duplicates, convert to dict
         date_dict = {key:None for key in set([p[1] for p in production] + [n[1] for n in net_usage])}
 
@@ -74,7 +76,6 @@ class EnergyAccount(db.Model):
 
     def production_net_usage_percentage_graph(self, start_date=seven_days_ago, end_date=today):
         """Solar Edge Production vs Combined PGE data normalized to 100%"""
-
         p = self.production_net_usage_graph(start_date, end_date)
 
         labels = [labels for production, net_usage, labels in p]
@@ -84,17 +85,6 @@ class EnergyAccount(db.Model):
         net_usage_percentage = [100-x for x in production_percentage]
 
         net_input = [((x/(x + y)) - 1) if (x + y) != 0 else 0 for x, y, l in p]
-
-        production, labels = self.solar_edge_production_graph(start_date, end_date)
-        net_usage = self.pge_incoming_outgoing_combined_graph(start_date, end_date)[0]
-
-        production_percentage = [(x/(x + y)*100) if (x + y) != 0 else 0 for x, y in zip(production, net_usage)]
-        production_percentage = [x if x <=100 else 100 for x in production_percentage]
-
-        net_usage_percentage = [100-x for x in production_percentage]
-
-        net_input = [((x/(x + y)) - 1) if (x + y) != 0 else 0 for x, y in zip(production, net_usage)]
-
         net_input = [x * 100 if x > 0 else 0 for x in net_input]
 
         return zip(production_percentage, net_input, net_usage_percentage, labels)
@@ -112,8 +102,6 @@ class EnergyAccount(db.Model):
         """Uses the PGEHelper class to return a zipped list of kWh values and datetime objects as a list of tuples.
         If no data is found for a particular day, a value of zero is returned as the kWh part of the tuple."""
         from solarmonitor.pge.pge_helpers import PGEHelper
-        """All the PGE data is listed in each row in the DB by hour. Since we are outputting all the data
-        in daily format, the PGE helper will group the data into daily format for us using the get_daily_data_and_labels method."""
         pge_helper = PGEHelper(start_date, end_date, self.id)
 
         """Set the variables """
@@ -138,7 +126,6 @@ class EnergyAccount(db.Model):
             se_energy_data.append(each.value)
             se_energy_labels.append(each.date)
 
-        """Convert to kWh"""
         se_energy_data = [float(x)/1000 for x in se_energy_data]
 
         return zip(se_energy_data, se_energy_labels)
