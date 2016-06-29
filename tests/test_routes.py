@@ -67,12 +67,6 @@ class TestPublicRoutes200:
         res = testapp.get(url_for('public.oauth_redirect'))
         assert res.status_code == 200
 
-    def test_get_graph(self, user, testapp):
-        """Solar Edge chart page for downloading and viewing data.
-        """
-        res = testapp.get(url_for('public.get_graph', energy_account_id=user.energy_accounts[0].id))
-        assert res.status_code == 200
-
     def test_selenium_img_generator(self, user, testapp):
         """Solar Edge chart page for downloading and viewing data.
         """
