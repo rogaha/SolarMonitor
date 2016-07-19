@@ -12,55 +12,48 @@ data:text/html,
   <script>
 
   var data = {
-  labels: {{ prod_net_usg_pct['labels']|safe }},
+  labels: {{ prod_net_usg['labels']|safe }},
   datasets: [
-    {
-        label: 'Production %',
-        backgroundColor: "rgba(43,83,207,0.2)",
-        borderColor: "rgba(25,60,168,1)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(43,83,207,0.4)",
-        hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ prod_net_usg_pct['production_percentage']|safe }},
-    },
-    {
-        label: 'Net Input %',
-        backgroundColor: "rgba(127,191,63,0.2)",
-        borderColor: "rgba(9,174,9,1)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(127,191,63,0.4)",
-        hoverBorderColor: "rgba(9,174,9,1)",
-        data: {{ prod_net_usg_pct['net_input']|safe }},
-    },
-    {
-        label: 'Net Usage %',
-        backgroundColor: "rgba(168,25,25,0.2)",
-        borderColor: "rgba(138,16,16,1)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(168,25,25,0.4)",
-        hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ prod_net_usg_pct['net_usage_percentage']|safe }},
-    },
+      {
+          type: 'line',
+          label: 'Production kWh',
+          backgroundColor: "rgba(43,83,207,0.2)",
+          borderColor: "rgba(25,60,168,1)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(43,83,207,0.4)",
+          hoverBorderColor: "rgba(25,60,168,1)",
+          data: {{ prod_net_usg['production']|safe }},
+      },
+      {
+          type: 'bar',
+          label: 'Net Usage',
+          backgroundColor: "rgba(168,25,25,0.2)",
+          borderColor: "rgba(138,16,16,1)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(168,25,25,0.4)",
+          hoverBorderColor: "rgba(138,16,16,1)",
+          data: {{ prod_net_usg['net_usage']|safe }},
+      }
   ]
   };
   var ctx = document.getElementById("myChart");
   var myChart = new Chart(ctx, {
-  type: 'bar',
-  data: data,
-  options: {
-      animation: false,
-      scales: {
-          yAxes: [{
-              stacked: true,
-              ticks: {
-                  beginAtZero:true
-              }
-          }],
-          xAxes: [{
-              stacked: true
-          }]
-      }
-  }
+    type: 'bar',
+    data: data,
+    options: {
+        animation: false,
+        scales: {
+            yAxes: [{
+                stacked: true,
+                ticks: {
+                    beginAtZero:true
+                }
+            }],
+            xAxes: [{
+                stacked: true
+            }]
+        }
+    }
   });
   </script>
 </body>

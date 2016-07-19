@@ -86,10 +86,16 @@ def email_users_graph_data():
     energy_accounts = EnergyAccount.query.all()
     print '\n \n \n \n RUNNING EMAIL NIGHTLY TASK \n \n \n \n \n '
 
+
+    end_date = datetime.datetime.today().date()
+    start_date = end_date - timedelta(days=14)
+
+    print start_date
+
     for account in energy_accounts:
         for user in account.users:
             print 'user: {}, energy_account: {}'.format(user.first_name, account.id)
-            html = render_template('email/nightly_update.html', energy_account=account, user=user)
+            html = render_template('email/nightly_update.html', energy_account=account, user=user, start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
             send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
 
 
