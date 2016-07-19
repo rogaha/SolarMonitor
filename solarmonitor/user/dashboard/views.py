@@ -37,23 +37,25 @@ def home():
     start_date = datetime.datetime.today().date() - timedelta(days=7)
     end_date = datetime.datetime.today().date()
 
+
+    """The data for each chart needs to be calculated here, otherwise the calculations
+    Are performed for each occurrence of a data set. This also makes the template
+    Code Neater"""
     #TODO assumes for now that we want only the first energy account.
-    energy_account = current_user.energy_accounts[0]
+    prod_net_usg_pct = current_user.energy_accounts[0].serialize_charts('production_net_usage_percentage_graph', start_date, end_date)
 
-
+    prod_net_usg = current_user.energy_accounts[0].serialize_charts('production_net_usage_graph', start_date, end_date)
 
     return render_template('users/dashboard/home.html',
-        energy_accounts=current_user.energy_accounts,
+        prod_net_usg_pct=prod_net_usg_pct,
+        prod_net_usg=prod_net_usg,
         breadcrumbs=breadcrumbs, heading=heading,
-        energy_account=energy_account,
-        start_date=start_date,
-        end_date=end_date
         )
 
 @blueprint.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-    breadcrumbs = [('Account', 'user', url_for('dashboard.account'))]
+    breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('Account', 'user', url_for('dashboard.account'))]
     heading = 'Dashboard'
     return render_template('users/dashboard/account.html',
         energy_accounts=current_user.energy_accounts,
@@ -101,8 +103,6 @@ def charts(modify=None):
     """PGE Electricity Usage Chart"""
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('PGE', 'bar-chart-o', url_for('dashboard.charts'))]
     heading = 'PGE Electricity'
-
-    energy_account = current_user.energy_accounts[0]
 
     date_select_form = DateSelectForm(prefix="date_select_form")
     download_data_form = DownloadDataForm(prefix="download_data_form")
@@ -159,12 +159,17 @@ def charts(modify=None):
 
         return redirect(url_for('dashboard.charts'))
 
+    pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph', start_date_pge, end_date_pge)
+
+    pge_inc_outg_grph_combnd = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date_pge, end_date_pge)
+
     return render_template('users/dashboard/data_chart.html',
         breadcrumbs=breadcrumbs,
         heading=heading,
         date_select_form=date_select_form,
         download_data_form=download_data_form,
-        energy_account=energy_account,
+        pge_inc_outg_grph=pge_inc_outg_grph,
+        pge_inc_outg_grph_combnd=pge_inc_outg_grph_combnd,
         start_date=start_date_pge,
         end_date=end_date_pge
     )

@@ -175,7 +175,7 @@ margin-top:50px
 
     <script>
     var data = {
-    labels: {{ energy_account.serialize_charts('pge_incoming_outgoing_graph', start_date, end_date)['labels']|safe }},
+    labels: {{ pge_inc_outg_grph['labels']|safe }},
     datasets: [
         {
             label: 'Outgoing Electric (Sold to Grid) kWh',
@@ -184,7 +184,7 @@ margin-top:50px
             borderWidth: 1,
             hoverBackgroundColor: "rgba(127,191,63,0.4)",
             hoverBorderColor: "rgba(9,174,9,1)",
-            data: {{ energy_account.serialize_charts('pge_incoming_outgoing_graph', start_date, end_date)['outgoing_data']|safe }},
+            data: {{ pge_inc_outg_grph['outgoing_data']|safe }},
         },
 
         {
@@ -194,7 +194,7 @@ margin-top:50px
             borderWidth: 1,
             hoverBackgroundColor: "rgba(255,99,132,0.4)",
             hoverBorderColor: "rgba(255,99,132,1)",
-            data: {{ energy_account.serialize_charts('pge_incoming_outgoing_graph', start_date, end_date)['incoming_data']|safe }},
+            data: {{ pge_inc_outg_grph['incoming_data']|safe }},
         }
     ]
 };
@@ -226,10 +226,10 @@ margin-top:50px
       var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {{ energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date)['labels']|safe }},
+            labels: {{ pge_inc_outg_grph_combnd['labels']|safe }},
             datasets: [{
                 label: 'Combined Electric (+/-) kWh',
-                data: {{ energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date)['net_usage']|safe }},
+                data: {{ pge_inc_outg_grph_combnd['net_usage']|safe }},
                 borderWidth: 1
             }]
         },

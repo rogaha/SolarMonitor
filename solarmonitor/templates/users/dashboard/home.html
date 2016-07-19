@@ -135,7 +135,7 @@ var today = moment().format("YYYY-MM-DD");
 <script>
 
 var data = {
-labels: {{ energy_account.serialize_charts('production_net_usage_percentage_graph', start_date, end_date)['labels']|safe }},
+labels: {{ prod_net_usg_pct['labels']|safe }},
 datasets: [
     {
         label: 'Production %',
@@ -144,7 +144,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(43,83,207,0.4)",
         hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ energy_account.serialize_charts('production_net_usage_percentage_graph', start_date, end_date)['production_percentage']|safe }},
+        data: {{ prod_net_usg_pct['production_percentage']|safe }},
     },
     {
         label: 'Net Input %',
@@ -153,7 +153,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(127,191,63,0.4)",
         hoverBorderColor: "rgba(9,174,9,1)",
-        data: {{ energy_account.serialize_charts('production_net_usage_percentage_graph', start_date, end_date)['net_input']|safe }},
+        data: {{ prod_net_usg_pct['net_input']|safe }},
     },
     {
         label: 'Net Usage %',
@@ -162,7 +162,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(168,25,25,0.4)",
         hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ energy_account.serialize_charts('production_net_usage_percentage_graph', start_date, end_date)['net_usage_percentage']|safe }},
+        data: {{ prod_net_usg_pct['net_usage_percentage']|safe }},
     },
 ]
 };
@@ -188,7 +188,7 @@ var myChart = new Chart(ctx, {
 
 <script>
 var data = {
-labels: {{ energy_account.serialize_charts('production_net_usage_graph', start_date, end_date)['labels']|safe }},
+labels: {{ prod_net_usg['labels']|safe }},
 datasets: [
     {
         label: 'Production kWh',
@@ -197,7 +197,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(43,83,207,0.4)",
         hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ energy_account.serialize_charts('production_net_usage_graph', start_date, end_date)['production']|safe }},
+        data: {{ prod_net_usg['production']|safe }},
     },
     {
         label: 'Net Usage',
@@ -206,7 +206,7 @@ datasets: [
         borderWidth: 1,
         hoverBackgroundColor: "rgba(168,25,25,0.4)",
         hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ energy_account.serialize_charts('production_net_usage_graph', start_date, end_date)['net_usage']|safe }},
+        data: {{ prod_net_usg['net_usage']|safe }},
     }
 ]
 };

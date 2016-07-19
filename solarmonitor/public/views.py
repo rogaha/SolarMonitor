@@ -35,9 +35,11 @@ def selenium_img_generator(energy_account_id=None):
 
     end_date = datetime.datetime.today().date()
     start_date = end_date - timedelta(days=14)
-    energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
+
+    prod_net_usg_pct = energy_account.serialize_charts('production_net_usage_percentage_graph', start_date, end_date)
+
     html = render_template('email/img_generator.html',
-        energy_account=energy_account,
+        prod_net_usg_pct=prod_net_usg_pct,
         start_date=start_date,
         end_date=end_date)
 
