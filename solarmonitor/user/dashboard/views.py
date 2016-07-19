@@ -50,7 +50,7 @@ def home():
         end_date=end_date
         )
 
-@blueprint.route('', methods=['GET', 'POST'])
+@blueprint.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     breadcrumbs = [('Account', 'user', url_for('dashboard.account'))]
