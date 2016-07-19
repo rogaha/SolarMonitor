@@ -49,6 +49,7 @@ def home():
     return render_template('users/dashboard/home.html',
         prod_net_usg_pct=prod_net_usg_pct,
         prod_net_usg=prod_net_usg,
+        account_id=current_user.energy_accounts[0].id,
         breadcrumbs=breadcrumbs, heading=heading,
         )
 

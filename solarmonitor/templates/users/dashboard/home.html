@@ -47,7 +47,7 @@
 var today = moment().format("YYYY-MM-DD");
 
   $('#30days').click(function () {
-  var account_id = $("#account_id").val();
+  var account_id = {{ account_id|safe }};
   var thirtyDaysAgo = moment().subtract(30, 'days').format("YYYY-MM-DD");
   var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
     $.ajax({
@@ -65,12 +65,17 @@ var today = moment().format("YYYY-MM-DD");
             myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
             myChart2.data.labels = data.production_net_usage_graph.labels;
             myChart2.update();
+
+            myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
+            myChart3.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart3.data.labels = data.production_net_usage_graph.labels;
+            myChart3.update();
         }
     });
   });
 
   $('#14days').click(function () {
-  var account_id = $("#account_id").val();
+  var account_id = {{ account_id|safe }};
   var thirtyDaysAgo = moment().subtract(14, 'days').format("YYYY-MM-DD");
   var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
     $.ajax({
@@ -88,12 +93,17 @@ var today = moment().format("YYYY-MM-DD");
             myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
             myChart2.data.labels = data.production_net_usage_graph.labels;
             myChart2.update();
+
+            myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
+            myChart3.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart3.data.labels = data.production_net_usage_graph.labels;
+            myChart3.update();
         }
     });
   });
 
   $('#7days').click(function () {
-  var account_id = $("#account_id").val();
+  var account_id = {{ account_id|safe }};
   var thirtyDaysAgo = moment().subtract(7, 'days').format("YYYY-MM-DD");
   var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
     $.ajax({
@@ -111,6 +121,11 @@ var today = moment().format("YYYY-MM-DD");
             myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
             myChart2.data.labels = data.production_net_usage_graph.labels;
             myChart2.update();
+
+            myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
+            myChart3.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart3.data.labels = data.production_net_usage_graph.labels;
+            myChart3.update();
         }
     });
   });
@@ -262,7 +277,7 @@ datasets: [
 ]
 };
 var ctx2 = document.getElementById("myChart3");
-var myChart = new Chart(ctx2, {
+var myChart3 = new Chart(ctx2, {
   type: 'bar',
   data: data2,
   options: {
