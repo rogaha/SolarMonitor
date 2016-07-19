@@ -85,20 +85,20 @@ def about():
 
 
 #TODO Need to move this route to the auth module. Need to clear with PGE first.
-@blueprint.route('/oauth', methods=['GET', 'POST'])
+@blueprint.route('/pge-oauth-scope', methods=['GET', 'POST'])
 def oauth():
     """	The OAuth URL you provide here will be used to direct customers to your customer login page to complete the authorization."""
     return render_template('public/oauth.html')
 
 #TODO Need to move this route to the auth module. Need to clear with PGE first.
-@blueprint.route('/oauth-redirect', methods=['GET', 'POST'])
+@blueprint.route('/pge-oauth-redirect', methods=['GET', 'POST'])
 def oauth_redirect():
     """	The redirect URI you provide here is where PG&E will send the Authorization Code once customer authorization is completed and you make a request for the authorization code.
     """
     return render_template('public/oauth.html', page_title='Redirect')
 
 #TODO Need to move this route to the user.dashboard module. Need to clear with PGE first.
-@blueprint.route('/notifications', methods=['GET', 'POST'])
+@blueprint.route('/pge-notification', methods=['GET', 'POST'])
 def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available  """
 
