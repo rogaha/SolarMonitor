@@ -29,13 +29,25 @@
 									</td>&#13;
 								</tr>&#13;
 								<tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">&#13;
-									<td class="content-block" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">&#13;
+									<td background="https://notrueup.solardatapros.com/static/img/loadingplaceholder.gif" bgcolor="#c7c7c7" width="560" height="300" valign="top" class="content-block" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" >&#13;
+									  <!--[if gte mso 9]>
+									  <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:560px;height:300px;">
+									    <v:fill type="tile" src="https://notrueup.solardatapros.com/static/img/loadingplaceholder.gif" color="#7bceeb" />
+									    <v:textbox inset="0,0,0,0">
+									  <![endif]-->
+									  <div>
+
 										See your usage graph below:&#13;<br>
                     <br>
-										<div class="ChartPlaceholder" style="background-image: url(https://notrueup.solardatapros.com/static/img/loadingplaceholder.gif);background-position: center;background-repeat: no-repeat;height: &lt;%= ChartHeight %&gt;px;width: &lt;%= ChartWidth %&gt;px;">
+
                       <img width='560' height="300" src="https://notrueup.solardatapros.com/get_graph/{{ energy_account.id }}_{{ start_date }}_{{ end_date }}_charts.png">
-										</div>
+							<br><br>
                   <!--<img src="http://myground.org:5000/selenium.png">-->
+								</div>
+									<!--[if gte mso 9]>
+									</v:textbox>
+									</v:rect>
+									<![endif]-->
 									</td>&#13;
 								</tr>&#13;
 								<tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">&#13;
