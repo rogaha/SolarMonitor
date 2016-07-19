@@ -88,7 +88,7 @@ def email_users_graph_data():
 
 
     end_date = datetime.datetime.today().date()
-    start_date = end_date - timedelta(days=23)
+    start_date = end_date - timedelta(days=24)
 
     for account in energy_accounts:
         for user in account.users:
