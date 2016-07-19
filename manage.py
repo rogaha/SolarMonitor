@@ -90,8 +90,6 @@ def email_users_graph_data():
     end_date = datetime.datetime.today().date()
     start_date = end_date - timedelta(days=14)
 
-    print start_date
-
     for account in energy_accounts:
         for user in account.users:
             print 'user: {}, energy_account: {}'.format(user.first_name, account.id)

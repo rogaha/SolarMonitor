@@ -9,6 +9,8 @@ from solarmonitor.extensions import db
 from solarmonitor.user.models import User, PGEUsagePoint, SolarEdgeUsagePoint
 
 import pytest
+import datetime
+from datetime import timedelta
 
 @pytest.mark.usefixtures('db')
 class TestPublicRoutes200:
@@ -70,11 +72,14 @@ class TestPublicRoutes200:
     def test_selenium_img_generator(self, user, testapp):
         """Solar Edge chart page for downloading and viewing data.
         """
-        res = testapp.get(url_for('public.selenium_img_generator', energy_account_id=user.energy_accounts[0].id))
+        end_date = datetime.datetime.today().date()
+        start_date = end_date - timedelta(days=14)
+
+        res = testapp.get(url_for('public.selenium_img_generator', energy_account_id=user.energy_accounts[0].id, start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d')))
         assert res.status_code == 200
 
         made_up_number = 5649875454
-        res = testapp.get(url_for('public.selenium_img_generator', energy_account_id=made_up_number))
+        res = testapp.get(url_for('public.selenium_img_generator', energy_account_id=made_up_number, start_date=start_date, end_date=end_date))
         assert res.status_code == 302
 
     def test_dashboard_home(self, user, testapp):

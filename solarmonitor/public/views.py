@@ -26,22 +26,24 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
 
-@blueprint.route('/get_graph/<int:energy_account_id>-<start_date>-<end_date>_charts.png', methods=['GET', 'POST'])
+@blueprint.route('/get_graph/<int:energy_account_id>_<start_date>_<end_date>_charts.png', methods=['GET', 'POST'])
 def selenium_img_generator(energy_account_id=None, start_date=None, end_date=None):
     energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
 
     if energy_account == None:
         return redirect(url_for('public.home'))
 
-    if start_date:
-        start_date = end_date - timedelta(days=14)
-    else:
-        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
-
     if end_date:
-        end_date = datetime.datetime.today().date()
-    else:
         end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+    else:
+        end_date = datetime.datetime.today().date()
+
+
+    if start_date:
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    else:
+        start_date = end_date - timedelta(days=14)
+
 
 
     prod_net_usg = energy_account.serialize_charts('production_net_usage_graph', start_date, end_date)
