@@ -32,7 +32,9 @@
 									<td class="content-block" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">&#13;
 										See your usage graph below:&#13;<br>
                     <br>
-                      <img src="https://notrueup.solardatapros.com/get_graph/{{ energy_account.id }}_{{ start_date }}_{{ end_date }}_charts.png">
+										<div class="ChartPlaceholder" style="background-image: url(https://notrueup.solardatapros.com/static/img/loadingplaceholder.gif);background-position: center;background-repeat: no-repeat;height: &lt;%= ChartHeight %&gt;px;width: &lt;%= ChartWidth %&gt;px;">
+                      <img width='560' height="300" src="https://notrueup.solardatapros.com/get_graph/{{ energy_account.id }}_{{ start_date }}_{{ end_date }}_charts.png">
+										</div>
                   <!--<img src="http://myground.org:5000/selenium.png">-->
 									</td>&#13;
 								</tr>&#13;
