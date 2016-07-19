@@ -91,6 +91,20 @@ class TestPublicRoutes200:
         res = testapp.get(url_for('dashboard.home'))
         assert res.status_code == 200
 
+    def test_dashboard_account(self, user, testapp):
+        """Solar Edge chart page for downloading and viewing data.
+        """
+        # Goes to homepage
+        res = testapp.get('/')
+        # Fills out login form in navbar
+        form = res.forms['loginForm']
+        form['email'] = user.email
+        form['password'] = 'myprecious'
+        # Submits
+        res = form.submit().follow()
+        res = testapp.get(url_for('dashboard.account'))
+        assert res.status_code == 200
+
     def test_solar_edge_charts(self, user, testapp):
         """Solar Edge chart page for downloading and viewing data.
         """

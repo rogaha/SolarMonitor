@@ -28,7 +28,6 @@ oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
 blueprint = Blueprint('dashboard', __name__, url_prefix='/users/dashboard', static_folder='../static')
 
-
 @blueprint.route('', methods=['GET', 'POST'])
 @login_required
 def home():
@@ -41,6 +40,8 @@ def home():
     #TODO assumes for now that we want only the first energy account.
     energy_account = current_user.energy_accounts[0]
 
+
+
     return render_template('users/dashboard/home.html',
         energy_accounts=current_user.energy_accounts,
         breadcrumbs=breadcrumbs, heading=heading,
@@ -48,6 +49,17 @@ def home():
         start_date=start_date,
         end_date=end_date
         )
+
+@blueprint.route('', methods=['GET', 'POST'])
+@login_required
+def account():
+    breadcrumbs = [('Account', 'user', url_for('dashboard.account'))]
+    heading = 'Dashboard'
+    return render_template('users/dashboard/account.html',
+        energy_accounts=current_user.energy_accounts,
+        breadcrumbs=breadcrumbs, heading=heading,
+        )
+
 
 @blueprint.route('/graph/update/<int:account_id>/<start_date>/<end_date>', methods=['GET', 'POST'])
 @login_required

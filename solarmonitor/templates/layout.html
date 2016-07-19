@@ -82,6 +82,9 @@
                     <li class="{% if request.url_rule.endpoint == 'dashboard.home' %} active {% endif %}">
                         <a href="{{ url_for('dashboard.home') }}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
+                    <li class="{% if request.url_rule.endpoint == 'dashboard.account' %} active {% endif %}">
+                        <a href="{{ url_for('dashboard.account') }}"><i class="fa fa-fw fa-user"></i> Account</a>
+                    </li>
                     <li class="{% if request.url_rule.endpoint == 'dashboard.charts' %} active {% endif %}">
                         <a href="{{ url_for('dashboard.charts') }}"><i class="fa fa-fw fa-bar-chart-o"></i> PGE Charts</a>
                     </li>
