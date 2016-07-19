@@ -52,7 +52,7 @@ class EnergyAccount(db.Model):
         The goal is to have the same data ranges available from both solar edge and PGE but sometimes
         we will only have 10 days of data for pge and 15 days of data for solar edge. Data for the same date
         ranges need to be displayed together, otherwise funky things happen with the chart."""
-        
+
         #get all the dates for both lists and combine them into one list in date order, removing duplicates, convert to dict
         date_dict = {key:None for key in set([p[1] for p in production] + [n[1] for n in net_usage])}
 
@@ -127,6 +127,7 @@ class EnergyAccount(db.Model):
         se_energy_data = [float(x)/1000 for x in se_energy_data]
 
         return zip(se_energy_data, se_energy_labels)
+
 
     def serialize(self):
         return {
