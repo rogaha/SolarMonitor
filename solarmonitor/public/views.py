@@ -110,7 +110,7 @@ def oauth_redirect():
     return render_template('public/oauth.html', page_title='Redirect')
 
 #TODO Need to move this route to the user.dashboard module. Need to clear with PGE first.
-@blueprint.route('/pge-notification', methods=['GET', 'POST'])
+@blueprint.route('/pge-notifications', methods=['GET', 'POST'])
 def notifications():
     """	The URI you provide here is where PG&E will send notifications that customer-authorized data is available  """
 
