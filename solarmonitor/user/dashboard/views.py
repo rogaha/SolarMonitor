@@ -155,7 +155,7 @@ def charts(modify=None):
         bulk_url += '?published-min={}&published-max={}' .format(start_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'), end_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'))
 
 
-        print bulk_url, start_date_pge, end_date_pge
+        print bulk_url
         print api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
 
         return redirect(url_for('dashboard.charts'))

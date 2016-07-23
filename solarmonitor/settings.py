@@ -18,8 +18,8 @@ class Config(object):
     ADMIN_EMAILS = ['dan@danwins.com', 'brad@epirtle.com']
     SSL_CERTS = {'crt': os.path.join(APP_DIR, 'ssl/client_cert.pem'), 'key': os.path.join(APP_DIR, 'ssl/client_key.pem')}
     #client_id and client_key are the same thing
-    PGE_CLIENT_CREDENTIALS = {'client_key': 'b5020eaae0f34c56a62726ff6f059b45', 'client_secret_key': '69f7ad97530447f49d9468373cf2fc4f'}
-    REG_ACCESS_TOKEN = '5fe3233d-c9f8-4ff9-9f63-3d02dc534c3c'
+    PGE_CLIENT_CREDENTIALS = {'client_key': '4f5e3635db834479a6a8ecc77da25407', 'client_secret_key': 'e21cf6a248bb4096baf82fce4640bbd8'}
+    REG_ACCESS_TOKEN = '5a01ad84-e582-43bb-9e8f-bffcb1d4129e'
     TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
     CELERY_BROKER_URL = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-163-252-131.compute-1.amazonaws.com:13639'
     CELERY_RESULT_BACKEND = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-163-252-131.compute-1.amazonaws.com:13639'

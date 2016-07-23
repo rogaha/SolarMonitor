@@ -25,6 +25,7 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
+oauth2 = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
 @blueprint.route('/get_graph/<int:energy_account_id>_<start_date>_<end_date>_charts.png', methods=['GET', 'POST'])
 def selenium_img_generator(energy_account_id=None, start_date=None, end_date=None):
@@ -98,15 +99,18 @@ def about():
 
 #TODO Need to move this route to the auth module. Need to clear with PGE first.
 @blueprint.route('/pge-oauth-scope', methods=['GET', 'POST'])
+@login_required
 def oauth():
     """	The OAuth URL you provide here will be used to direct customers to your customer login page to complete the authorization."""
-    return render_template('public/oauth.html')
+    return redirect("https://api.pge.com/datacustodian/test/oauth/v2/authorize", code=302)
 
 #TODO Need to move this route to the auth module. Need to clear with PGE first.
 @blueprint.route('/pge-oauth-redirect', methods=['GET', 'POST'])
 def oauth_redirect():
     """	The redirect URI you provide here is where PG&E will send the Authorization Code once customer authorization is completed and you make a request for the authorization code.
     """
+    code = request.args.get('authorization_code')
+    oauth2.get_access_token('https://api.pge.com/datacustodian/test/oauth/v2/token', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
     return render_template('public/oauth.html', page_title='Redirect')
 
 #TODO Need to move this route to the user.dashboard module. Need to clear with PGE first.
