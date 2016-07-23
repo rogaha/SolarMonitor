@@ -111,7 +111,7 @@ def oauth_redirect():
     """
     code = request.args.get('code')
     print code
-    token_info = oauth2.get_access_token('https://api.pge.com/datacustodian/test/oauth/v2/token', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
+    token_info = oauth2.get_access_token('https://api.pge.com/datacustodian/test/oauth/v2/authorize', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
     return render_template('public/oauth.html', page_title='Redirect', token_info=token_info)
 
 #TODO Need to move this route to the user.dashboard module. Need to clear with PGE first.
