@@ -102,14 +102,15 @@ def about():
 @login_required
 def oauth():
     """	The OAuth URL you provide here will be used to direct customers to your customer login page to complete the authorization."""
-    return redirect("https://api.pge.com/datacustodian/test/oauth/v2/authorize", code=302)
+    return redirect("https://api.pge.com/datacustodian/test/oauth/v2/authorize?client_id=4f5e3635db834479a6a8ecc77da25407&redirect_uri={redirect_uri}&scope=FB=1_3_4_5_8_13_14_15_18_19_31_32_35_37_38_39_40&response_type=code", code=302)
 
 #TODO Need to move this route to the auth module. Need to clear with PGE first.
 @blueprint.route('/pge-oauth-redirect', methods=['GET', 'POST'])
 def oauth_redirect():
     """	The redirect URI you provide here is where PG&E will send the Authorization Code once customer authorization is completed and you make a request for the authorization code.
     """
-    code = request.args.get('authorization_code')
+    code = request.args.get('code')
+    print code
     oauth2.get_access_token('https://api.pge.com/datacustodian/test/oauth/v2/token', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
     return render_template('public/oauth.html', page_title='Redirect')
 
