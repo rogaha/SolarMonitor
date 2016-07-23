@@ -10,7 +10,7 @@ from solarmonitor.auth.forms import RegistrationForm
 from solarmonitor.user.models import User, EnergyAccount
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
-from solarmonitor.pge.pge import Api, ClientCredentials
+from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from io import BytesIO
 import io
 import datetime
