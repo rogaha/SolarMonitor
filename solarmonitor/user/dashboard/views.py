@@ -63,6 +63,23 @@ def account():
         breadcrumbs=breadcrumbs, heading=heading,
         )
 
+@blueprint.route('/authorizations', methods=['GET', 'POST'])
+@blueprint.route('/authorizations/pge/<start_oauth>', methods=['GET', 'POST'])
+@login_required
+def authorizations(start_oauth=None):
+    breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')),
+                   ('Account', 'user', url_for('dashboard.account')),
+                   ('Authorizations', 'user', url_for('dashboard.authorizations'))]
+    heading = 'Authorizations'
+
+    if start_oauth:
+        return redirect("https://sharemydata.pge.com/myAuthorization/?clientId=50154&verified=true", code=302)
+
+    return render_template('users/dashboard/authorizations.html',
+        energy_accounts=current_user.energy_accounts,
+        breadcrumbs=breadcrumbs, heading=heading,
+        )
+
 
 @blueprint.route('/graph/update/<int:account_id>/<start_date>/<end_date>', methods=['GET', 'POST'])
 @login_required

@@ -91,6 +91,9 @@
                     <li class="{% if request.url_rule.endpoint == 'dashboard.solar_edge' %} active {% endif %}">
                         <a href="{{ url_for('dashboard.solar_edge') }}"><i class="fa fa-fw fa-bar-chart-o"></i>Solar Edge Charts</a>
                     </li>
+                    <li class="{% if request.url_rule.endpoint == 'dashboard.authorizations' %} active {% endif %}">
+                        <a href="{{ url_for('dashboard.authorizations') }}"><i class="fa fa-fw fa-unlock"></i>Authorizations</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
