@@ -112,9 +112,9 @@ def oauth_redirect():
     code = request.args.get('code')
 
     print code
-    token_info = oauth2.get_access_token('https://api.pge.com/datacustodian/test/oauth/v2/token', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
+    token_info = oauth2.get_access_token('https://api.pge.com/datacustodian/oauth/v2/token', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
 
-    current_user.pge_access_token = token_info.get('refresh_token', None)
+    current_user.energy_accounts[0].pge_access_token = token_info.get('refresh_token', None)
     db.session.commit()
 
     session['current_access_token'] = token_info.get('access_token', None)
