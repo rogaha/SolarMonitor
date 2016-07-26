@@ -118,6 +118,9 @@ def oauth_redirect():
     db.session.commit()
 
     session['current_access_token'] = token_info.get('access_token', None)
+
+    #test_data = api
+
     return render_template('public/oauth.html', page_title='Redirect', token_info=token_info)
 
 #TODO Need to move this route to the user.dashboard module. Need to clear with PGE first.
