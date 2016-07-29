@@ -22,9 +22,18 @@ class Api:
 		return response
 
 	#API sync request using Oauth2 access token
-	def sync_request(self, url,subscription_id, usage_point, published_min, published_max, access_token):
-		url = url + "/Subscription/" + subscription_id + "/UsagePoint/"+usage_point
-		url = url + "?published-max=" +published_max+ "&published-min="+published_min
+	def sync_request(self, url, subscription_id, usage_point, published_min, published_max, access_token):
+		url = url + "/Subscription/" + subscription_id + "/UsagePoint/" + usage_point
+		url = url + "?published-max=" + published_max + "&published-min=" + published_min
+		header_params = {'Authorization' : 'Bearer ' + access_token}
+		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
+		if str(request.status_code) == "200":
+			response = {"status": request.status_code, "data": request.text}
+			return response
+		response = {"status": request.status_code, "error": request.text}
+		return response
+
+	def sync_request_simple(self, url, access_token):
 		header_params = {'Authorization' : 'Bearer ' + access_token}
 		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":

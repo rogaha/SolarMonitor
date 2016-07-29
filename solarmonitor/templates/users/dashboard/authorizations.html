@@ -27,7 +27,7 @@
 
 <div class="row">
       <div class="col-sm-12">
-        <a href="{{ url_for('dashboard.authorizations', start_oauth='yes')}}" class="btn">Authorize PGE</a>
+      {% if current_user.energy_accounts[0].pge_refresh_token %}PGE Account is Authorized{% else%}  <a href="{{ url_for('dashboard.authorizations', start_oauth='yes')}}" class="btn">Authorize PGE</a>{% endif %}
       </div>
 </div>
 
@@ -54,6 +54,7 @@
                     <th>Address</th>
                     <th>PGE Bulk ID</th>
                     <th>PGE Access Token</th>
+                    <th>PGE Refresh Token</th>
                     <th>SolarEdge Site ID</th>
                 </tr>
               </thead>
@@ -72,6 +73,7 @@
                         <td id="account_address_one">{{ account.address_one }}</td>
                         <td id="account_pge_bulk_id">{{ account.pge_bulk_id }}</td>
                         <td id="account_pge_bulk_id">{{ account.pge_access_token }}</td>
+                        <td id="account_pge_bulk_id">{{ account.pge_refresh_token }}</td>
                         <td id="account_solar_edge_site_id">{{ account.solar_edge_site_id }}</td>
 
                       </tr>
@@ -224,6 +226,40 @@
 
     </div>
   </div>
+
+  DEBUG:
+
+<h2>  Batch Subscription</h2>:
+<em>Request (asynchronous) for complete usage point data feed for single subscription
+(authorization). </em>
+  <p>{{ batch_subscription }} RESPONSE Code of 202 indicates success. Data will be posted to our notification URL when ready. </p>
+  <hr>
+
+  <h2>  All Usage Points </h2>:
+  <em>Request all usage points (i.e. obfuscated service IDs) for given subscription
+(authorization). </em>
+    <p>{{ all_usgpnts }}</p>
+    <hr>
+
+    <h2>  Usage Point ID</h2>:
+    <em>Request given usage point entry only </em>
+      <p>{{ usage_point_id }}</p>
+      <hr>
+
+      <h2>  Usage Point Summary</h2>:
+      <em>Request given usage point's specific usage summary. Usage summary contains
+billing period usage total and if authorized by the customer, also "Billing
+Information".
+ </em>
+        <p>{{ usage_point_summary }}</p>
+        <hr>
+
+        <h2>  Batch Usage Point</h2>:
+        <em>Request (synchronous) for complete data feed for single usage point (obfuscated
+service id aka PG&E Service Agreement) belonging to single subscription
+(authorization).  </em>
+          <p>{{ batch_usgpnt }}</p>
+          <hr>
 </div>
 
 

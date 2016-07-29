@@ -75,9 +75,47 @@ def authorizations(start_oauth=None):
     if start_oauth:
         return redirect("https://sharemydata.pge.com/myAuthorization/?clientId=50154&verified=true", code=302)
 
+    refresh = oauth.get_refresh_token('https://api.pge.com/datacustodian/oauth/v2/token', current_user.energy_accounts[0].pge_refresh_token)
+
+    print refresh
+
+    current_user.energy_accounts[0].pge_refresh_token = refresh[u'refresh_token']
+    current_user.energy_accounts[0].pge_access_token = refresh[u'access_token']
+    db.session.commit()
+
+    batch_subscription = api.sync_request_simple(
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674',
+        current_user.energy_accounts[0].pge_access_token
+    )
+
+    all_usgpnts = api.sync_request_simple(
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint',
+        current_user.energy_accounts[0].pge_access_token
+    )
+
+    usage_point_id = api.sync_request_simple(
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint/0053420795?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
+        current_user.energy_accounts[0].pge_access_token
+    )
+
+    usage_point_summary = api.sync_request_simple(
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint/0053420795/UsageSummary?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
+        current_user.energy_accounts[0].pge_access_token
+    )
+
+    batch_usgpnt = api.sync_request_simple(
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674/UsagePoint/0053420795?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
+        current_user.energy_accounts[0].pge_access_token
+    )
+
     return render_template('users/dashboard/authorizations.html',
         energy_accounts=current_user.energy_accounts,
         breadcrumbs=breadcrumbs, heading=heading,
+        batch_subscription=batch_subscription,
+        all_usgpnts=all_usgpnts,
+        usage_point_id=usage_point_id,
+        usage_point_summary=usage_point_summary,
+        batch_usgpnt=batch_usgpnt
         )
 
 
