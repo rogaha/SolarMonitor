@@ -114,7 +114,7 @@ def oauth_redirect():
     print code
     token_info = oauth2.get_access_token('https://api.pge.com/datacustodian/oauth/v2/token', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
 
-    current_user.energy_accounts[0].pge_access_token = token_info.get('refresh_token', None)
+    current_user.energy_accounts[0].pge_refresh_token = token_info.get('refresh_token', None)
     db.session.commit()
 
     session['current_access_token'] = token_info.get('access_token', None)
@@ -151,6 +151,6 @@ def notifications():
         database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
         """
 
-        #task = process_xml.delay(bulk_data[0]['data']) TODO temporaily disabled
+        task = process_xml.delay(bulk_data[0]['data'])
 
     return render_template('public/oauth.html', page_title='Notification Bucket')
