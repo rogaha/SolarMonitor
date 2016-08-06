@@ -83,6 +83,7 @@ def authorizations(start_oauth=None):
     current_user.energy_accounts[0].pge_access_token = refresh[u'access_token']
     db.session.commit()
 
+    """
     batch_subscription = api.sync_request_simple(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674',
         current_user.energy_accounts[0].pge_access_token
@@ -97,24 +98,25 @@ def authorizations(start_oauth=None):
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint/0053420795?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
         current_user.energy_accounts[0].pge_access_token
     )
-
+    """
     usage_point_summary = api.sync_request_simple(
         'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint/0053420795/UsageSummary?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
         current_user.energy_accounts[0].pge_access_token
     )
 
+
     batch_usgpnt = api.sync_request_simple(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674/UsagePoint/0053420795?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
+        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674/UsagePoint/0053420795?published-min=2016-06-01T00:07:00Z&published-max=2016-06-02T00:07:00Z',
         current_user.energy_accounts[0].pge_access_token
     )
 
     return render_template('users/dashboard/authorizations.html',
         energy_accounts=current_user.energy_accounts,
         breadcrumbs=breadcrumbs, heading=heading,
-        batch_subscription=batch_subscription,
-        all_usgpnts=all_usgpnts,
-        usage_point_id=usage_point_id,
-        usage_point_summary=usage_point_summary,
+        #batch_subscription=batch_subscription,
+        #all_usgpnts=all_usgpnts,
+        #usage_point_id=usage_point_id,
+        #usage_point_summary=usage_point_summary,
         batch_usgpnt=batch_usgpnt
         )
 
@@ -307,9 +309,9 @@ def solar_edge(modify=None):
 
         if 'data_time_unit_se' in session:
             time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
-            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846', time_unit).text)
+            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), current_user.energy_accounts[0].solar_edge_site_id, time_unit).text) 
         else:
-            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), '237846').text)
+            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), current_user.energy_accounts[0].solar_edge_site_id).text)
 
         """Send the data returned by the API to celery for async processing."""
         task = process_se_data.delay(se_energy, energy_account.id)
