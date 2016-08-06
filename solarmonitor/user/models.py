@@ -97,7 +97,7 @@ class EnergyAccount(db.Model):
 
         return zip(incoming_data, outgoing_data, outgoing_labels)
 
-    def pge_incoming_outgoing_combined_graph(self, start_date=seven_days_ago, end_date=today):
+    def pge_incoming_outgoing_combined_graph(self, start_date=seven_days_ago, end_date=today, separate=None):
         """Uses the PGEHelper class to return a zipped list of kWh values and datetime objects as a list of tuples.
         If no data is found for a particular day, a value of zero is returned as the kWh part of the tuple."""
         from solarmonitor.pge.pge_helpers import PGEHelper
@@ -107,6 +107,12 @@ class EnergyAccount(db.Model):
         incoming_data, incoming_labels, outgoing_data, outgoing_labels = pge_helper.get_daily_data_and_labels()
 
         net_usage = [x - y for x, y in zip(incoming_data, outgoing_data)]
+
+        positive_usage = [x if x > 0 else 0 for x in net_usage]
+        negative_usage = [x if x < 0 else 0 for x in net_usage]
+
+        if separate:
+            return zip(positive_usage, negative_usage, incoming_labels)
 
         return zip(net_usage, incoming_labels)
 
@@ -142,7 +148,7 @@ class EnergyAccount(db.Model):
             'solar_edge_site_id': self.solar_edge_site_id,
         }
 
-    def serialize_charts(self, chart, start_date=seven_days_ago, end_date=today, date_format='%m/%d'):
+    def serialize_charts(self, chart, start_date=seven_days_ago, end_date=today, date_format='%m/%d', separate=False):
         if chart == 'solar_edge_production_graph':
             solar_edge_production_graph = self.solar_edge_production_graph(start_date, end_date)
             return {
@@ -151,6 +157,13 @@ class EnergyAccount(db.Model):
             }
 
         elif chart == 'pge_incoming_outgoing_combined_graph':
+            if separate:
+                pge_incoming_outgoing_combined_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date, separate)
+                return {
+                    'net_usage_positive': [pos_data for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph],
+                    'net_usage_negative': [neg_data for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph],
+                    'labels': [labels.strftime(date_format) for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph]
+                }
             pge_incoming_outgoing_combined_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
             return {
                 'net_usage': [data for data, labels in pge_incoming_outgoing_combined_graph],

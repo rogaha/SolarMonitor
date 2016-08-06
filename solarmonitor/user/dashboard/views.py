@@ -46,9 +46,12 @@ def home():
 
     prod_net_usg = current_user.energy_accounts[0].serialize_charts('production_net_usage_graph', start_date, end_date)
 
+    prod_comb = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, separate=True)
+
     return render_template('users/dashboard/home.html',
         prod_net_usg_pct=prod_net_usg_pct,
         prod_net_usg=prod_net_usg,
+        prod_comb=prod_comb,
         account_id=current_user.energy_accounts[0].id,
         breadcrumbs=breadcrumbs, heading=heading,
         )
