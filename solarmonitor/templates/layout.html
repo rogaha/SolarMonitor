@@ -69,9 +69,11 @@
               </a>
 
               {% if current_user and current_user.is_authenticated %}
-                <span class="navbar-brand">Logged in as {{ current_user.first_name }} <a href="{{ url_for('auth.logout') }}">Logout <i class="fa fa-sign-out"></i></a></span>
+                <span class="navbar-brand">
+                  Logged in as {{ current_user.first_name }} <a href="{{ url_for('auth.logout') }}">Logout <i class="fa fa-sign-out"></i></a>
+                </span>
 
-                <span class="navbar-brand"> <a href="{{ url_for('admin.home') }}">Admin <i class="fa fa-lock"></i></a></span>
+
 
               {% endif %}
             </div>
@@ -96,6 +98,11 @@
                     <li class="{% if request.url_rule.endpoint == 'dashboard.authorizations' %} active {% endif %}">
                         <a href="{{ url_for('dashboard.authorizations') }}"><i class="fa fa-fw fa-unlock"></i>Authorizations</a>
                     </li>
+                    <li class="{% if request.url_rule.endpoint == 'admin.home' %} active {% endif %}">
+                        <a href="{{ url_for('admin.home') }}"><i class="fa fa-lock"></i> Admin</a>
+                    </li>
+
+
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
