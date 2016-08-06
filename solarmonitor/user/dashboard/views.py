@@ -309,9 +309,9 @@ def solar_edge(modify=None):
 
         if 'data_time_unit_se' in session:
             time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
-            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), current_user.energy_accounts[0].solar_edge_site_id, time_unit).text) 
+            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), energy_account.solar_edge_site_id, time_unit).text)
         else:
-            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), current_user.energy_accounts[0].solar_edge_site_id).text)
+            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), energy_account.solar_edge_site_id).text)
 
         """Send the data returned by the API to celery for async processing."""
         task = process_se_data.delay(se_energy, energy_account.id)
