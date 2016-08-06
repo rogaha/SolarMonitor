@@ -150,6 +150,7 @@ def notifications():
         """This for-loop will work through the bulk_data list containing one or more XML trees. It will parse the tree, and insert the useful parts into the
         database. Before calling db.session.commit(), we also check to see if the data is already in the system, and ignores the data if true.
         """
+        print bulk_data
 
         task = process_xml.delay(bulk_data[0]['data'])
 
