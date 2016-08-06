@@ -250,6 +250,11 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
+    address_one = db.Column(db.String(64))
+    address_two = db.Column(db.String(64))
+    city = db.Column(db.String(64))
+    state = db.Column(db.String(64))
+    zip_code = db.Column(db.String(5))
     password_hash = db.Column(db.String(128))
     energy_accounts = relationship("EnergyAccount",
                     secondary=energy_accounts,
