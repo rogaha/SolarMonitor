@@ -67,7 +67,8 @@ var today = moment().format("YYYY-MM-DD");
             myChart2.update();
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
-            myChart3.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
+            myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
             myChart3.data.labels = data.production_net_usage_graph.labels;
             myChart3.update();
         }
@@ -95,7 +96,8 @@ var today = moment().format("YYYY-MM-DD");
             myChart2.update();
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
-            myChart3.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
+            myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
             myChart3.data.labels = data.production_net_usage_graph.labels;
             myChart3.update();
         }
@@ -123,7 +125,8 @@ var today = moment().format("YYYY-MM-DD");
             myChart2.update();
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
-            myChart3.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+            myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
+            myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
             myChart3.data.labels = data.production_net_usage_graph.labels;
             myChart3.update();
         }
