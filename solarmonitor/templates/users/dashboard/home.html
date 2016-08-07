@@ -44,11 +44,11 @@
 </div>
 <script type="text/javascript">
 
-var today = moment().format("YYYY-MM-DD");
+var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
 
   $('#30days').click(function () {
   var account_id = {{ account_id|safe }};
-  var thirtyDaysAgo = moment().subtract(30, 'days').format("YYYY-MM-DD");
+  var thirtyDaysAgo = moment().subtract(31, 'days').format("YYYY-MM-DD");
   var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
     $.ajax({
         type: 'GET',
@@ -77,7 +77,7 @@ var today = moment().format("YYYY-MM-DD");
 
   $('#14days').click(function () {
   var account_id = {{ account_id|safe }};
-  var thirtyDaysAgo = moment().subtract(14, 'days').format("YYYY-MM-DD");
+  var thirtyDaysAgo = moment().subtract(15, 'days').format("YYYY-MM-DD");
   var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
     $.ajax({
         type: 'GET',
@@ -106,7 +106,7 @@ var today = moment().format("YYYY-MM-DD");
 
   $('#7days').click(function () {
   var account_id = {{ account_id|safe }};
-  var thirtyDaysAgo = moment().subtract(7, 'days').format("YYYY-MM-DD");
+  var thirtyDaysAgo = moment().subtract(8, 'days').format("YYYY-MM-DD");
   var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
     $.ajax({
         type: 'GET',
