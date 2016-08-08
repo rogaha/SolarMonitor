@@ -39,18 +39,14 @@ def selenium_img_generator(energy_account_id=None, start_date=None, end_date=Non
     else:
         end_date = datetime.datetime.today().date()
 
-
     if start_date:
         start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
     else:
         start_date = end_date - timedelta(days=14)
 
-
-
     prod_net_usg = energy_account.serialize_charts('production_net_usage_graph', start_date, end_date)
 
     prod_comb = energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, separate=True)
-    print prod_comb
 
     html = render_template('email/img_generator.html',
         prod_net_usg=prod_net_usg,
@@ -68,7 +64,6 @@ def selenium_img_generator(energy_account_id=None, start_date=None, end_date=Non
     img = driver.get_screenshot_as_png()
 
     return send_file(io.BytesIO(img))
-
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def home():
