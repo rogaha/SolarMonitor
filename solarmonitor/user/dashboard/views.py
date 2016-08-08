@@ -95,7 +95,8 @@ def graph_update(account_id=None, start_date=None, end_date=None):
 
     result = {
         'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
-        'production_net_usage_graph': energy_account.serialize_charts('production_net_usage_graph', s_date, e_date)
+        'production_net_usage_graph': energy_account.serialize_charts('production_net_usage_graph', s_date, e_date),
+        'net_usage_separated': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, separate=True)
     }
 
     return jsonify(result)

@@ -87,8 +87,8 @@ def email_users_graph_data():
     print '\n \n \n \n RUNNING EMAIL NIGHTLY TASK \n \n \n \n \n '
 
 
-    end_date = datetime.datetime.today().date()
-    start_date = end_date - timedelta(days=14)
+    end_date = datetime.datetime.today().date() - timedelta(days=1)
+    start_date = end_date - timedelta(days=15)
 
     for account in energy_accounts:
         for user in account.users:
