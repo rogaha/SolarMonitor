@@ -79,6 +79,6 @@ def process_xml(self, xml):
                         db.session.add(usage_point)
                         db.session.commit()
 
-                    #self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
+                    self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
     return {'status': 'Task completed!'}
