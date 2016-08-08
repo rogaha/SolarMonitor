@@ -47,11 +47,15 @@ def selenium_img_generator(energy_account_id=None, start_date=None, end_date=Non
 
 
 
-    prod_net_usg = energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, separate=True)
+    prod_net_usg = energy_account.serialize_charts('production_net_usage_graph', start_date, end_date)
+
+    prod_comb = energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, separate=True)
+    print prod_comb
 
     html = render_template('email/img_generator.html',
         prod_net_usg=prod_net_usg,
         start_date=start_date,
+        prod_comb=prod_comb,
         end_date=end_date)
 
     selenium_html_string = """{}""".format(html)

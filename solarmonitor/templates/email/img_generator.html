@@ -32,7 +32,7 @@ data:text/html,
           borderWidth: 1,
           hoverBackgroundColor: "rgba(168,25,25,0.4)",
           hoverBorderColor: "rgba(138,16,16,1)",
-          data: {{ prod_net_usg['net_usage_positive']|safe }},
+          data: {{ prod_comb['net_usage_positive']|safe }},
       },
       {
           type: 'bar',
@@ -42,8 +42,8 @@ data:text/html,
           borderWidth: 1,
           hoverBackgroundColor: "rgba(127,191,63,0.4)",
           hoverBorderColor: "rgba(127,191,63,1)",
-          data: {{ prod_net_usg['net_usage_negative']|safe }},
-      }
+          data: {{ prod_comb['net_usage_negative']|safe }},
+      },
   ]
   };
   var ctx = document.getElementById("myChart");
