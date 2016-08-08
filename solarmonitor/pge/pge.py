@@ -1,6 +1,7 @@
 import requests
 import json
 from base64 import b64encode
+from solarmonitor.extensions import db
 
 class Api:
 	"""
@@ -22,23 +23,20 @@ class Api:
 		return response
 
 	#API sync request using Oauth2 access token
-	def sync_request(self, url, subscription_id, usage_point, published_min, published_max, access_token):
-		url = url + "/Subscription/" + subscription_id + "/UsagePoint/" + usage_point
-		url = url + "?published-max=" + published_max + "&published-min=" + published_min
-		header_params = {'Authorization' : 'Bearer ' + access_token}
+	def sync_request(self, energy_account, published_min, published_max):
+		"""Times need to be input as datetime objects"""
+		url = 'https://api.pge.com/GreenButtonConnect/espi/1_1/resource'
+		url = url + '/Batch/Subscription/{}/UsagePoint/{}?published-max={}&published-min={}'.format(
+			energy_account.pge_subscription_id,
+			energy_account.pge_usage_point,
+			published_max.strftime('%Y-%m-%dT%H:%m:%SZ'),
+			published_min.strftime('%Y-%m-%dT%H:%m:%SZ')
+		)
+		header_params = {'Authorization' : 'Bearer ' + energy_account.pge_access_token}
 		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
 			response = {"status": request.status_code, "data": request.text}
-			return response
-		response = {"status": request.status_code, "error": request.text}
-		return response
-
-	def sync_request_simple(self, url, access_token):
-		header_params = {'Authorization' : 'Bearer ' + access_token}
-		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
-		if str(request.status_code) == "200":
-			response = {"status": request.status_code, "data": request.text}
-			return response
+			return response['data']
 		response = {"status": request.status_code, "error": request.text}
 		return response
 
@@ -107,12 +105,16 @@ class OAuth2:
 
 
 	# Refresh token will collect back the new access token
-	def get_refresh_token(self, url, refresh_token):
-		request_params = {"grant_type":"refresh_token", "refresh_token": refresh_token}
+	def get_refresh_token(self, energy_account):
+		url = 'https://api.pge.com/datacustodian/oauth/v2/token'
+		request_params = {"grant_type":"refresh_token", "refresh_token": energy_account.pge_refresh_token}
 		header_params = {"Authorization":self.base64code}
 		request = requests.post(url, data = request_params,  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
 			res = request.json()
+			energy_account.pge_refresh_token = res[u'refresh_token']
+			energy_account.pge_access_token = res[u'access_token']
+			db.session.commit()
 			res.update({"status": request.status_code})
 			return res
 		response = {"status": request.status_code, "error": request.text}

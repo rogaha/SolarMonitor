@@ -19,7 +19,7 @@ import json
 from jxmlease import parse
 
 import datetime
-from datetime import timedelta, date
+from datetime import datetime, timedelta, date
 
 config = Config()
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
@@ -34,8 +34,8 @@ def home():
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home'))]
     heading = 'Dashboard'
 
-    start_date = datetime.datetime.today().date() - timedelta(days=7)
-    end_date = datetime.datetime.today().date()
+    start_date = datetime.today().date() - timedelta(days=7)
+    end_date = datetime.today().date()
 
 
     """The data for each chart needs to be calculated here, otherwise the calculations
@@ -75,52 +75,13 @@ def authorizations(start_oauth=None):
                    ('Authorizations', 'user', url_for('dashboard.authorizations'))]
     heading = 'Authorizations'
 
+
     if start_oauth:
         return redirect("https://sharemydata.pge.com/myAuthorization/?clientId=50154&verified=true", code=302)
-
-    refresh = oauth.get_refresh_token('https://api.pge.com/datacustodian/oauth/v2/token', current_user.energy_accounts[0].pge_refresh_token)
-
-    print refresh
-
-    current_user.energy_accounts[0].pge_refresh_token = refresh[u'refresh_token']
-    current_user.energy_accounts[0].pge_access_token = refresh[u'access_token']
-    db.session.commit()
-
-    """
-    batch_subscription = api.sync_request_simple(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674',
-        current_user.energy_accounts[0].pge_access_token
-    )
-
-    all_usgpnts = api.sync_request_simple(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint',
-        current_user.energy_accounts[0].pge_access_token
-    )
-
-    usage_point_id = api.sync_request_simple(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint/0053420795?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
-        current_user.energy_accounts[0].pge_access_token
-    )
-    """
-    usage_point_summary = api.sync_request_simple(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/202674/UsagePoint/0053420795/UsageSummary?published-min=2016-07-15T00:07:00Z&published-max=2016-07-17T00:07:00Z',
-        current_user.energy_accounts[0].pge_access_token
-    )
-
-
-    batch_usgpnt = api.sync_request_simple(
-        'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674/UsagePoint/0053420795?published-min=2016-06-01T00:07:00Z&published-max=2016-06-02T00:07:00Z',
-        current_user.energy_accounts[0].pge_access_token
-    )
 
     return render_template('users/dashboard/authorizations.html',
         energy_accounts=current_user.energy_accounts,
         breadcrumbs=breadcrumbs, heading=heading,
-        #batch_subscription=batch_subscription,
-        #all_usgpnts=all_usgpnts,
-        #usage_point_id=usage_point_id,
-        #usage_point_summary=usage_point_summary,
-        batch_usgpnt=batch_usgpnt
         )
 
 
@@ -129,8 +90,8 @@ def authorizations(start_oauth=None):
 def graph_update(account_id=None, start_date=None, end_date=None):
     energy_account = EnergyAccount.query.filter_by(id=account_id).first()
 
-    s_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
-    e_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+    s_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+    e_date = datetime.strptime(end_date, '%Y-%m-%d').date()
 
     result = {
         'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
@@ -175,49 +136,47 @@ def charts(modify=None):
         return redirect(url_for('dashboard.charts'))
 
     if modify == 'delete-data':
-        PGEUsagePoint.query.filter_by(energy_account_id=energy_account.id).delete()
+        PGEUsagePoint.query.filter_by(energy_account_id=current_user.energy_accounts[0].id).delete()
         db.session.commit()
         return redirect(url_for('dashboard.charts'))
 
     if 'start_date_pge' in session:
-        start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
+        start_date_pge = datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
     else:
-        start_date_pge = datetime.datetime.now() - timedelta(days=1)
+        start_date_pge = datetime.now() - timedelta(days=1)
 
     if 'end_date_pge' in session:
-        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
+        end_date_pge = datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
     else:
-        end_date_pge = datetime.datetime.now()
+        end_date_pge = datetime.now()
 
     if date_select_form.validate_on_submit():
         session['data_time_unit'] = date_select_form.data_time_unit.data
         session['start_date_pge'] = date_select_form.start_date.data
         session['end_date_pge'] = date_select_form.end_date.data
-        start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
-        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
+        start_date_pge = datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
+        end_date_pge = datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
         return redirect(url_for('dashboard.charts'))
 
     if download_data_form.validate_on_submit():
-        session['client_credentials'] = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
-        session['resource_authorization'] = api.simple_request(
-            'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization',
-            session['client_credentials'][u'client_access_token']
-            )
 
         session['start_date_pge'] = download_data_form.start_date.data
         session['end_date_pge'] = download_data_form.end_date.data
 
-        start_date_pge = datetime.datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
-        end_date_pge = datetime.datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
-
-        xml_dict = parse(session['resource_authorization']['data'])
-        bulk_url = xml_dict[u'ns1:feed'][u'ns1:entry'][1][u'ns1:content'][u'ns0:Authorization'][u'ns0:resourceURI']
-        bulk_url += '?published-min={}&published-max={}' .format(start_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'), end_date_pge.strftime('%Y-%m-%dT%H:%m:%SZ'))
+        start_date_pge = datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
+        end_date_pge = datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
 
 
-        print bulk_url
-        print api.simple_request(bulk_url, session['client_credentials'][u'client_access_token'])
+        print oauth.get_refresh_token(current_user.energy_accounts[0])
 
+        pge_data = api.sync_request(
+            current_user.energy_accounts[0],
+            start_date_pge,
+            end_date_pge,
+        )
+
+        process_xml.delay(pge_data)
+        flash('Data processing')
         return redirect(url_for('dashboard.charts'))
 
     pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph', start_date_pge, end_date_pge)
@@ -268,14 +227,14 @@ def solar_edge(modify=None):
 
     """Set some default dates if nothing has been entered in the form."""
     if 'start_date_se' in session:
-        start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
+        start_date_se = datetime.strptime(session['start_date_se'], '%Y-%m-%d')
     else:
-        start_date_se = datetime.datetime.now() - timedelta(days=1)
+        start_date_se = datetime.now() - timedelta(days=1)
 
     if 'end_date_se' in session:
-        end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
+        end_date_se = datetime.strptime(session['end_date_se'], '%Y-%m-%d')
     else:
-        end_date_se = datetime.datetime.now()
+        end_date_se = datetime.now()
 
     solar_edge_production_graph = energy_account.serialize_charts('solar_edge_production_graph', start_date_se.date(), end_date_se.date())
 
@@ -289,8 +248,8 @@ def solar_edge(modify=None):
         session['end_date_se'] = date_select_form.end_date.data
 
         try:
-            start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
-            end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
+            start_date_se = datetime.strptime(session['start_date_se'], '%Y-%m-%d')
+            end_date_se = datetime.strptime(session['end_date_se'], '%Y-%m-%d')
         except:
             flash('Date entered, not in correct format.')
             return redirect(url_for('dashboard.solar_edge'))
@@ -302,8 +261,8 @@ def solar_edge(modify=None):
         session['end_date_se'] = download_data_form.end_date.data
 
         try:
-            start_date_se = datetime.datetime.strptime(session['start_date_se'], '%Y-%m-%d')
-            end_date_se = datetime.datetime.strptime(session['end_date_se'], '%Y-%m-%d')
+            start_date_se = datetime.strptime(session['start_date_se'], '%Y-%m-%d')
+            end_date_se = datetime.strptime(session['end_date_se'], '%Y-%m-%d')
         except:
             flash('Date entered, not in correct format.')
             return redirect(url_for('dashboard.solar_edge'))

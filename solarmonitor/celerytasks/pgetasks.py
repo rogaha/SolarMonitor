@@ -19,11 +19,15 @@ def process_xml(self, xml):
     app = create_app(ProdConfig)
     with app.app_context():
 
-        bulk_id = data[u'ns1:feed'][u'ns1:link'].get_xml_attr("href").rsplit('/', 1)[-1]
+        identifier = data[u'ns1:feed'][u'ns1:link'].get_xml_attr("href").rsplit('/', 1)[-1]
 
-        print bulk_id
+        print identifier
 
-        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=bulk_id).first()
+        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=identifier).first()
+
+        if not energy_account:
+            energy_account = EnergyAccount.query.filter_by(pge_usage_point=identifier).first()
+
 
         celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
         db.session.add(celery_task)
@@ -75,6 +79,6 @@ def process_xml(self, xml):
                         db.session.add(usage_point)
                         db.session.commit()
 
-                    self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
+                    #self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
     return {'status': 'Task completed!'}

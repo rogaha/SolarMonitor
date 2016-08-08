@@ -254,70 +254,7 @@ margin-top:50px
       <p>Debug Data</p>
 
 
-<script type='text/javascript'>
 
-(function poll() {
-    setTimeout(function() {
-        $.ajax({
-            url: "status/task_check",
-            type: "GET",
-            success: function(data) {
-
-                console.log(data);
-                for (var key in data) {
-                    $("#progress_bar").removeAttr("style")
-                    var task_id = data[key];
-                    $.ajax({
-                      url: "status/" + data[key],
-                      type: "GET",
-                      success: function(data) {
-                        console.log(data['current'])
-                        console.log(data['total'])
-                        var percentage = ((data['current'] / data['total']) * 100).toFixed(1)
-                        console.log(percentage)
-                        console.log(data)
-                        $("#progress_bar").find('#percent_bar').css({"min-width":"2em", "width": percentage + '%'});
-                        $("#progress_bar").find('#percent_bar').text(percentage + '%');
-                        if (data['state'] === 'SUCCESS') {
-                          $("#progress_bar").find('#percent_bar').css({"min-width":"2em", "width": '100%'});
-                          $("#progress_bar").find('#percent_bar').text('100%');
-                          $("#progress_bar").css({'visibility': 'hidden'});
-                          $.ajax({
-                            url: "status/" + task_id + '/mark_complete',
-                            type: "GET",
-                            success: function(data) {
-                              $("#success_text").removeAttr("style");
-                              console.log( "<p>" + data['response'] + "</p>" );
-                            }
-                          })
-                        }
-                        if (data['state'] === 'FAILURE') {
-                          $("#progress_bar").find('#percent_bar').css({"min-width":"2em", "width": '100%'});
-                          $("#progress_bar").find('#percent_bar').text('Import Failed');
-                          $("#progress_bar").css({'visibility': 'hidden'});
-                          $.ajax({
-                            url: "status/" + task_id + '/mark_complete',
-                            type: "GET",
-                            success: function(data) {
-                              $("#success_text").removeAttr("style");
-                              $("#success_text").text('Import Failed');
-                              console.log( "<p>" + data['response'] + "</p>" );
-                            }
-                          })
-                        }
-                      }
-                    })
-
-                }
-            },
-            dataType: "json",
-            complete: poll,
-            timeout: 1000
-        })
-    }, 1000);
-})();
-
-</script>
 
 
 

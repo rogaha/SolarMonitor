@@ -37,6 +37,8 @@ class EnergyAccount(db.Model):
     state = db.Column(db.String(50))
     zip_code = db.Column(db.String(50))
     pge_bulk_id = db.Column(db.String(50))
+    pge_subscription_id = db.Column(db.String(50))
+    pge_usage_point = db.Column(db.String(50))
     pge_access_token = db.Column(db.String(255))
     pge_refresh_token = db.Column(db.String(255))
     solar_edge_site_id = db.Column(db.String(255))
