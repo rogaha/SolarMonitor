@@ -115,19 +115,15 @@ def oauth_redirect():
     """
     code = request.args.get('code')
 
+    """the `get_access_token` method will retrieve and save the access_token,
+    refresh_token, electric usage_point, and subscription_id
+    """
     token_info = oauth2.get_access_token(
         'https://api.pge.com/datacustodian/oauth/v2/token',
         code,
-        'https://notrueup.solardatapros.com/pge-oauth-redirect'
+        'https://notrueup.solardatapros.com/pge-oauth-redirect',
+        current_user.energy_accounts[0]
     )
-
-    #Save the access and refresh token to DB
-    current_user.energy_accounts[0].pge_refresh_token = token_info.get('refresh_token', None)
-    current_user.energy_accounts[0].pge_access_token = token_info.get('access_token', None)
-    db.session.commit()
-
-    #save the subscriber ID and the usagepoint ID for electric into the DB
-    oauth2.setup_new_oauth(current_user.energy_accounts[0], token_info)
 
     return render_template('public/oauth.html', page_title='Redirect', token_info=token_info)
 

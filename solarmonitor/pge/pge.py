@@ -103,33 +103,35 @@ class OAuth2:
 
 
 	#Get Acces Token
-	def get_access_token(self, url, code, redirect_uri):
+	def get_access_token(self, url, code, redirect_uri, energy_account):
 		request_params = {"grant_type":"authorization_code", "code": code , "redirect_uri":redirect_uri}
 		header_params = {'Authorization' : self.base64code}
 		request = requests.post(url, data = request_params,  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
 			res = request.json()
 			res.update({"status": request.status_code})
+
+			subscription_id = res[u'resourceURI'].rsplit('/', 1)[-1]
+
+			usage_point_xml = requests.post(
+				'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/{}/UsagePoint'.format(subscription_id)',
+				data=request_params,
+				headers=header_params,
+				cert=self.cert
+			)
+
+		    #Save the access and refresh token to DB
+		    energy_account.pge_refresh_token = res.get('refresh_token', None)
+		    energy_account.pge_access_token = res.get('access_token', None)
+			energy_account.pge_subscription_id = subscription_id
+			energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml)
+			db.session.commit()
+			
 			return res
+
 		response = {"status": request.status_code, "error": request.text}
 		return response
 
-	def setup_new_oauth(self, energy_account, oauth_response):
-		"""Needs to be called at the end of the Oauth Process to save all the customer data
-		in their energy account model. Purpose is to get subscriber_id, bulk_id, and usage_point_id. Sample oauth_response:
-		{'status': 200, u'resourceURI': u'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/219784', u'expires_in': 3600, u'access_token': u'22aed388-f3e9-4191-97e6-80ceff4d8e64', u'token_type': u'Bearer', u'refresh_token': u'6003b98e-5fa9-4f69-a940-2f341d90a589', u'scope': u'219784', u'authorizationURI': u'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization/219784'}
-		"""
-		subscription_id = oauth_response[u'resourceURI'].rsplit('/', 1)[-1]
-
-		usage_point_xml = self.sync_simple_request(
-			'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/{}/UsagePoint'.format(subscription_id),
-			energy_account
-		)
-		usage_point_id = get_usage_point_from_xml(usage_point_xml)
-
-		energy_account.pge_subscription_id = subscription_id
-		energy_account.pge_usage_point = usage_point_id
-		db.session.commit()
 
 
 
