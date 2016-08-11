@@ -118,14 +118,16 @@ def oauth_redirect():
     """the `get_access_token` method will retrieve and save the access_token,
     refresh_token, electric usage_point, and subscription_id
     """
-    token_info = oauth2.get_access_token(
+    oauth2.get_access_token(
         'https://api.pge.com/datacustodian/oauth/v2/token',
         code,
         'https://notrueup.solardatapros.com/pge-oauth-redirect',
         current_user.energy_accounts[0]
     )
 
-    return render_template('public/oauth.html', page_title='Redirect', token_info=token_info)
+    flash('PGE Connectivity Completed Successfully')
+
+    return render_template('public/oauth.html', page_title='PGE Oauth Connectivity',)
 
 #TODO Need to move this route to the user.dashboard module. Need to clear with PGE first.
 @blueprint.route('/pge-notifications', methods=['GET', 'POST'])

@@ -104,7 +104,7 @@ class OAuth2:
 
 	#Get Acces Token
 	def get_access_token(self, url, code, redirect_uri, energy_account):
-		request_params = {"grant_type":"authorization_code", "code": code , "redirect_uri":redirect_uri}
+		request_params = {"grant_type":"authorization_code", "code": code, "redirect_uri":redirect_uri}
 		header_params = {'Authorization' : self.base64code}
 		request = requests.post(url, data = request_params,  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
