@@ -114,7 +114,7 @@ class OAuth2:
 			subscription_id = res[u'resourceURI'].rsplit('/', 1)[-1]
 
 			usage_point_xml = requests.post(
-				'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/{}/UsagePoint'.format(subscription_id)',
+				'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/{}/UsagePoint'.format(subscription_id),
 				data=request_params,
 				headers=header_params,
 				cert=self.cert
@@ -126,7 +126,7 @@ class OAuth2:
 			energy_account.pge_subscription_id = subscription_id
 			energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml)
 			db.session.commit()
-			
+
 			return res
 
 		response = {"status": request.status_code, "error": request.text}
