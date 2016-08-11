@@ -113,7 +113,7 @@ class OAuth2:
 
 			subscription_id = res[u'resourceURI'].rsplit('/', 1)[-1]
 
-			usage_point_xml = requests.post(
+			usage_point_xml = requests.get(
 				'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/{}/UsagePoint'.format(subscription_id),
 				data=request_params,
 				headers={'Authorization' : 'Bearer {}'.format(res.get('access_token', None))},
@@ -125,7 +125,7 @@ class OAuth2:
 			energy_account.pge_refresh_token = res.get('refresh_token', None)
 			energy_account.pge_access_token = res.get('access_token', None)
 			energy_account.pge_subscription_id = subscription_id
-			#energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml.text)
+			energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml.text)
 			db.session.commit()
 
 			return res
