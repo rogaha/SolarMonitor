@@ -48,10 +48,13 @@ def home():
 
     prod_comb = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, separate=True)
 
+    financial = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, financial=True)
+
     return render_template('users/dashboard/home.html',
         prod_net_usg_pct=prod_net_usg_pct,
         prod_net_usg=prod_net_usg,
         prod_comb=prod_comb,
+        financial=financial,
         account_id=current_user.energy_accounts[0].id,
         breadcrumbs=breadcrumbs, heading=heading,
         )
@@ -75,9 +78,9 @@ def authorizations(start_oauth=None):
                    ('Authorizations', 'user', url_for('dashboard.authorizations'))]
     heading = 'Authorizations'
 
-
     if start_oauth:
-        return redirect("https://sharemydata.pge.com/myAuthorization/?clientId=50154&verified=true", code=302)
+        #See settings.py for more info on this.
+        return redirect(config.PGE_DATA_CUSTODIAN_URL, code=302)
 
     return render_template('users/dashboard/authorizations.html',
         energy_accounts=current_user.energy_accounts,
@@ -96,7 +99,8 @@ def graph_update(account_id=None, start_date=None, end_date=None):
     result = {
         'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
         'production_net_usage_graph': energy_account.serialize_charts('production_net_usage_graph', s_date, e_date),
-        'net_usage_separated': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, separate=True)
+        'net_usage_separated': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, separate=True),
+        'financial': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, financial=True)
     }
 
     return jsonify(result)

@@ -2,6 +2,16 @@ from solarmonitor.user.models import PGEUsagePoint
 from solarmonitor.extensions import db
 import datetime
 from datetime import timedelta, date
+from jxmlease import parse
+
+def get_usage_point_from_xml(xml):
+    data = parse(xml, xml_attribs=True)
+    for resource in data[u'ns1:feed'][u'ns1:entry']:
+        if resource[u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'1':
+            for link in resource[u'ns1:link']:
+                if link.get_xml_attr("rel") == u'self':
+                    return link.get_xml_attr("href").rsplit('/', 1)[-1]
+
 
 def generate_random_pge_data(number_of_data_rows=10, account_id=1, numbers_of_days_ago=4):
     import random

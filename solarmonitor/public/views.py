@@ -101,7 +101,12 @@ def about():
 @login_required
 def oauth():
     """	The OAuth URL you provide here will be used to direct customers to your customer login page to complete the authorization."""
-    return redirect("https://api.pge.com/datacustodian/oauth/v2/authorize?client_id=4f5e3635db834479a6a8ecc77da25407&redirect_uri=https://notrueup.solardatapros.com/pge-oauth-redirect&scope=1_3_4_5_8_13_14_15_18_19_31_32_35_37_38_39_40&response_type=code", code=302)
+    scope = request.args.get('scope')
+    return redirect("https://api.pge.com/datacustodian/oauth/v2/authorize?client_id={}&redirect_uri={}&scope={}&response_type=code".format(
+        config.PGE_CLIENT_CREDENTIALS['client_key'],
+        config.PGE_3rd_PARTY_REDIRECT_URI,
+        scope
+    ), code=302)
 
 #TODO Need to move this route to the auth module. Need to clear with PGE first.
 @blueprint.route('/pge-oauth-redirect', methods=['GET', 'POST'])
@@ -110,15 +115,19 @@ def oauth_redirect():
     """
     code = request.args.get('code')
 
-    print code
-    token_info = oauth2.get_access_token('https://api.pge.com/datacustodian/oauth/v2/token', code, 'https://notrueup.solardatapros.com/pge-oauth-redirect')
+    token_info = oauth2.get_access_token(
+        'https://api.pge.com/datacustodian/oauth/v2/token',
+        code,
+        'https://notrueup.solardatapros.com/pge-oauth-redirect'
+    )
 
+    #Save the access and refresh token to DB
     current_user.energy_accounts[0].pge_refresh_token = token_info.get('refresh_token', None)
+    current_user.energy_accounts[0].pge_access_token = token_info.get('access_token', None)
     db.session.commit()
 
-    session['current_access_token'] = token_info.get('access_token', None)
-
-    #test_data = api
+    #save the subscriber ID and the usagepoint ID for electric into the DB
+    oauth2.setup_new_oauth(current_user.energy_accounts[0], token_info)
 
     return render_template('public/oauth.html', page_title='Redirect', token_info=token_info)
 

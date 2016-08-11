@@ -2,6 +2,7 @@ import requests
 import json
 from base64 import b64encode
 from solarmonitor.extensions import db
+from solarmonitor.pge.pge_helpers import get_usage_point_from_xml
 
 class Api:
 	"""
@@ -32,6 +33,16 @@ class Api:
 			published_max.strftime('%Y-%m-%dT%H:%m:%SZ'),
 			published_min.strftime('%Y-%m-%dT%H:%m:%SZ')
 		)
+		header_params = {'Authorization' : 'Bearer ' + energy_account.pge_access_token}
+		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
+		if str(request.status_code) == "200":
+			response = {"status": request.status_code, "data": request.text}
+			return response['data']
+		response = {"status": request.status_code, "error": request.text}
+		return response
+
+	def sync_simple_request(self, url, energy_account):
+		"""Times need to be input as datetime objects"""
 		header_params = {'Authorization' : 'Bearer ' + energy_account.pge_access_token}
 		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
@@ -102,6 +113,24 @@ class OAuth2:
 			return res
 		response = {"status": request.status_code, "error": request.text}
 		return response
+
+	def setup_new_oauth(self, energy_account, oauth_response):
+		"""Needs to be called at the end of the Oauth Process to save all the customer data
+		in their energy account model. Purpose is to get subscriber_id, bulk_id, and usage_point_id. Sample oauth_response:
+		{'status': 200, u'resourceURI': u'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/219784', u'expires_in': 3600, u'access_token': u'22aed388-f3e9-4191-97e6-80ceff4d8e64', u'token_type': u'Bearer', u'refresh_token': u'6003b98e-5fa9-4f69-a940-2f341d90a589', u'scope': u'219784', u'authorizationURI': u'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization/219784'}
+		"""
+		subscription_id = oauth_response[u'resourceURI'].rsplit('/', 1)[-1]
+
+		usage_point_xml = self.sync_simple_request(
+			'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/{}/UsagePoint'.format(subscription_id),
+			energy_account
+		)
+		usage_point_id = get_usage_point_from_xml(usage_point_xml)
+
+		energy_account.pge_subscription_id = subscription_id
+		energy_account.pge_usage_point = usage_point_id
+		db.session.commit()
+
 
 
 	# Refresh token will collect back the new access token
