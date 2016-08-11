@@ -116,10 +116,10 @@ class OAuth2:
 			usage_point_xml = requests.post(
 				'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Subscription/{}/UsagePoint'.format(subscription_id),
 				data=request_params,
-				headers=header_params,
+				headers={'Authorization' : 'Bearer {}'.format(res.get('refresh_token', None))},
 				cert=self.cert
 			)
-			print usage_point_xml
+			print usage_point_xml.text
 
 			#Save the access and refresh token to DB
 			energy_account.pge_refresh_token = res.get('refresh_token', None)
