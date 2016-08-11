@@ -119,12 +119,13 @@ class OAuth2:
 				headers=header_params,
 				cert=self.cert
 			)
+			print usage_point_xml
 
 			#Save the access and refresh token to DB
 			energy_account.pge_refresh_token = res.get('refresh_token', None)
 			energy_account.pge_access_token = res.get('access_token', None)
 			energy_account.pge_subscription_id = subscription_id
-			energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml)
+			energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml.text)
 			db.session.commit()
 
 			return res
