@@ -24,5 +24,5 @@ def home(page=1):
         page=page,
         breadcrumbs=breadcrumbs,
         heading=heading,
-        users=users.paginate(page, 1, False)
+        users=users.paginate(page, 10, False)
     )
