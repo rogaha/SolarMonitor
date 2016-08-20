@@ -34,8 +34,8 @@ def home():
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home'))]
     heading = 'Dashboard'
 
-    start_date = datetime.today().date() - timedelta(days=9)
-    end_date = datetime.today().date() - timedelta(days=2)
+    start_date = datetime.today().date() - timedelta(days=8)
+    end_date = datetime.today().date() - timedelta(days=1)
 
 
     """The data for each chart needs to be calculated here, otherwise the calculations
