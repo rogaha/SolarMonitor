@@ -61,7 +61,7 @@
                         </td>
                         <td class="hidden-xs">{{ user.id }}</td>
                         <td id="account_nick_name">{{ user.first_name }} {{ user.last_name }}</td>
-                        <td id="account_address_one">{{ user.address_one }} {{ user.address_two }}, {{ user.city }}, {{ user.state }} {{ user.zip_code }}</td>
+                        <td id="account_address_one">{{ user.full_address }}</td>
                         <td id="account_pge_bulk_id">{{ user.email }}</td>
                         <td id="account_solar_edge_site_id">{{ user.energy_accounts | length }}</td>
 

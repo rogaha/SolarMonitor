@@ -290,6 +290,13 @@ class User(UserMixin, db.Model):
                     backref="users")
 
     @property
+    def full_address(self):
+        if self.address_one and self.city and self.state:
+            return '{} {} {}, {} {}'.format(self.address_one, self.address_two, self.city, self.state, self.zip_code)
+        else:
+            return 'No address to display'
+
+    @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
 
