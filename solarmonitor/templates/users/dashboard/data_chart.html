@@ -263,7 +263,7 @@ margin-top:50px
             type: "GET",
             success: function(data) {
 
-                console.log(data);
+                console.log(data)
                 for (var key in data) {
                     $("#progress_bar").removeAttr("style")
                     var task_id = data[key];
@@ -271,11 +271,9 @@ margin-top:50px
                       url: "status/" + data[key],
                       type: "GET",
                       success: function(data) {
-                        console.log(data['current'])
-                        console.log(data['total'])
+
                         var percentage = ((data['current'] / data['total']) * 100).toFixed(1)
-                        console.log(percentage)
-                        console.log(data)
+
                         $("#progress_bar").find('#percent_bar').css({"min-width":"2em", "width": percentage + '%'});
                         $("#progress_bar").find('#percent_bar').text(percentage + '%');
                         if (data['state'] === 'SUCCESS') {
@@ -287,7 +285,7 @@ margin-top:50px
                             type: "GET",
                             success: function(data) {
                               $("#success_text").removeAttr("style");
-                              console.log( "<p>" + data['response'] + "</p>" );
+
                             }
                           })
                         }
@@ -301,7 +299,7 @@ margin-top:50px
                             success: function(data) {
                               $("#success_text").removeAttr("style");
                               $("#success_text").text('Import Failed');
-                              console.log( "<p>" + data['response'] + "</p>" );
+
                             }
                           })
                         }
