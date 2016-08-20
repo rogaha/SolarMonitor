@@ -80,6 +80,6 @@ def process_xml(self, xml):
                         db.session.commit()
 
                     self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
-            celery_task.task_status = 1
-            db.session.commit()
+        celery_task.task_status = 1
+        db.session.commit()
     return {'status': 'Task completed!'}
