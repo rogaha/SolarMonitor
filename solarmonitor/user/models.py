@@ -293,8 +293,18 @@ class User(UserMixin, db.Model):
     def full_address(self):
         if self.address_one and self.city and self.state:
             return '{} {} {}, {} {}'.format(self.address_one, self.address_two, self.city, self.state, self.zip_code)
+        elif len(self.energy_accounts) > 0:
+            first_account = self.energy_accounts[0]
+            if first_account.address_one and first_account.city and first_account.state:
+                return '{} {} {}, {} {}'.format(
+                    first_account.address_one,
+                    first_account.address_two,
+                    first_account.city,
+                    first_account.state,
+                    first_account.zip_code
+                )
         else:
-            return 'No address to display'
+            return 'None'
 
     @property
     def password(self):
