@@ -35,7 +35,8 @@ def register():
         user.energy_accounts.append(energy_account)
         db.session.add(user)
         db.session.commit()
-        flash('Thank you for registering. You can now log in.', 'success')
+        login_user(user, True)
+        flash('Thank you for registering.', 'success')
         return redirect(url_for('public.home'))
     else:
         flash_errors(form)

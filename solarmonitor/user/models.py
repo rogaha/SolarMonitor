@@ -289,6 +289,17 @@ class User(UserMixin, db.Model):
                     secondary=role_associations,
                     backref="users")
 
+    def has_role(self, role):
+        user_roles = [x.role for x in self.roles]
+        return True if role in user_roles else False
+
+    def can(self, permission):
+        permissions = []
+        for role in self.roles:
+            for permission in role:
+                list(set(permissions.append(permission.permission)))
+        return True if permission in permissions else False
+
     @property
     def full_address(self):
         if self.address_one and self.city and self.state:
