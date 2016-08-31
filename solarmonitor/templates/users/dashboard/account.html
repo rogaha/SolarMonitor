@@ -62,7 +62,7 @@
                         <td class="hidden-xs">{{ account.id }}</td>
                         <td id="account_nick_name">{{ account.nick_name }}</td>
                         <td id="account_address_one">{{ account.address_one }}</td>
-                        <td id="account_pge_bulk_id">{{ account.pge_bulk_id }}</td>
+                        <td id="account_pge_bulk_id">{% if current_user.energy_accounts[0].pge_refresh_token %}PGE Account is Authorized{% else%}  <a href="{{ url_for('dashboard.authorizations', start_oauth='yes')}}" class="btn btn-primary">Authorize PGE</a>{% endif %}</td>
                         <td id="account_solar_edge_site_id">{{ account.solar_edge_site_id }}</td>
 
                       </tr>
