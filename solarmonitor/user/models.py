@@ -83,7 +83,7 @@ class EnergyAccount(db.Model):
         production_percentage = [(x/(x + y)*100) if (x + y) != 0 else 0 for x, y, l in p]
         production_percentage = [x if x <=100 else 100 for x in production_percentage]
 
-        net_usage_percentage = [100-x for x in production_percentage]
+        net_usage_percentage = [100-x if x != 0 else 0 for x in production_percentage ]
 
         net_input = [((x/(x + y)) - 1) if (x + y) != 0 else 0 for x, y, l in p]
         net_input = [x * 100 if x > 0 else 0 for x in net_input]
