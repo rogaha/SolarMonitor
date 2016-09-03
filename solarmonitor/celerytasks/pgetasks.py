@@ -114,7 +114,7 @@ def process_xml(self, xml):
                     self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
         #Mark the task as complete. Previously this was only done on the front-end but created
-        #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended. 
+        #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
         celery_task.task_status = 1
         db.session.commit()
     return {'status': 'Task completed!'}

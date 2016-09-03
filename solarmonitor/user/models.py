@@ -27,9 +27,28 @@ permission_associations = db.Table('permissions_roles',
     db.Column('role_id', db.Integer, db.ForeignKey('roles.id'))
 )
 
+
+class AppEvent(db.Model):
+    __tablename__ = 'app_events'
+    id = db.Column(db.Integer, primary_key=True)
+    date_time = db.Column(db.DateTime)
+    event_type = db.Column(db.Integer)
+    level = db.Column(db.Integer)
+    info = db.Column(db.String(355))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class EnergyEvent(db.Model):
+    __tablename__ = 'energy_events'
+    id = db.Column(db.Integer, primary_key=True)
+    energy_account_id = db.Column(db.Integer, db.ForeignKey('energy_accounts.id'))
+    date_time = db.Column(db.DateTime)
+    event_type = db.Column(db.Integer)
+    info = db.Column(db.String(355))
+
 class EnergyAccount(db.Model):
     __tablename__ = 'energy_accounts'
     id = db.Column(db.Integer, primary_key=True)
+    energy_events = db.relationship('EnergyEvent', backref="energy_account", lazy='dynamic')
     nick_name = db.Column(db.String(255))
     address_one = db.Column(db.String(255))
     address_two = db.Column(db.String(255))
@@ -282,6 +301,7 @@ class User(UserMixin, db.Model):
     state = db.Column(db.String(64))
     zip_code = db.Column(db.String(5))
     password_hash = db.Column(db.String(128))
+    app_events = db.relationship('AppEvent', backref="user", lazy='dynamic')
     energy_accounts = relationship("EnergyAccount",
                     secondary=energy_accounts,
                     backref="users")
@@ -316,6 +336,21 @@ class User(UserMixin, db.Model):
                 )
         else:
             return 'None'
+
+    def log_event(self, event_type=None, level=1, info=None):
+        event = AppEvent(
+            user_id=self.id,
+            date_time=datetime.datetime.utcnow(),
+            event_type=event_type,
+            level=level,
+            info=info
+        )
+        db.session.add(event)
+        db.session.commit()
+
+    @property
+    def full_name(self):
+        return '{} {}'.format(self.first_name, self.last_name)
 
     @property
     def password(self):

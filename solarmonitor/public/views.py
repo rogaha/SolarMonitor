@@ -7,7 +7,7 @@ from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.extensions import login_manager, db, login_user, logout_user
 from solarmonitor.public.forms import LoginForm
 from solarmonitor.auth.forms import RegistrationForm
-from solarmonitor.user.models import User, EnergyAccount
+from solarmonitor.user.models import User, EnergyAccount, AppEvent
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
@@ -83,7 +83,7 @@ def home():
                 next = request.args.get('next')
                 #if not next_is_valid('next'):
                 #    return abort(400)
-
+                current_user.log_event(info='{} just logged in.'.format(current_user.full_name))
                 return redirect(next or url_for('dashboard.home'))
             flash('Invalid email address or password')
         else:

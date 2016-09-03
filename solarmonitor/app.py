@@ -5,7 +5,7 @@ from flask import Flask, render_template
 from solarmonitor import public, user, auth, admin
 from solarmonitor.user import dashboard
 from solarmonitor.assets import assets
-from solarmonitor.extensions import bcrypt, db, login_manager
+from solarmonitor.extensions import bcrypt, db, login_manager, moment
 from solarmonitor.settings import ProdConfig
 from solarmonitor.public.forms import LoginForm
 
@@ -40,8 +40,9 @@ def register_extensions(app):
     bcrypt.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
+    moment.init_app(app)
 
-    return None 
+    return None
 
 
 def register_blueprints(app):
