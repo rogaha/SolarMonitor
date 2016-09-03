@@ -1,0 +1,120 @@
+{% extends "admin/home.html" %}
+{% block admin_content %}
+<br>
+<div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-default panel-table">
+
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col col-xs-6">
+                <h3 class="panel-title">App Events</h3>
+              </div>
+              <div class="col col-xs-6 text-right">
+                <button type="button" class="btn btn-sm btn-primary btn-create">Search</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <table class="table table-striped table-bordered table-list">
+              <thead>
+                <tr>
+                    <th><em class="fa fa-cog"></em></th>
+                    <th class="hidden-xs">ID</th>
+                    <th>Info</th>
+                    <th>Type</th>
+                    <th>Level</th>
+                    <th>User</th>
+                    <th>Date Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for app_event in app_events.items %}
+                      <tr>
+                        <td align="center">
+                          <!-- Button trigger modal -->
+                          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#">
+                            <em class="fa fa-pencil"></em>
+                          </button>
+
+                        </td>
+                        <td class="hidden-xs">{{ app_event.id }}</td>
+                        <td id="account_nick_name">{{ app_event.info }} </td>
+                        <td id="account_address_one">{{ app_event.event_type }}</td>
+                        <td id="account_pge_bulk_id">{{ app_event.level }}</td>
+                        <td id="account_solar_edge_site_id">{{ app_event.user.full_name }}</td>
+                        <td id="account_solar_edge_site_id">{{ moment(app_event.date_time).format('MMMM Do YYYY, h:mm:ss a') }}</td>
+
+                      </tr>
+                  {% endfor %}
+                    </tbody>
+            </table>
+
+          </div>
+
+
+
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col col-xs-4">{{ app_events.total }} total results
+              </div>
+              <div class="col col-xs-8 ">
+                <div class="pull-right">
+                <ul class="pagination">
+               {% if app_events.has_prev %}
+                 <li>
+                   <a href="{{ url_for('admin.events', page=app_events.prev_num) }}" aria-label="Previous">
+                     <span aria-hidden="true">&laquo;</span>
+                   </a>
+                 </li>
+                 {% else %}
+                 <li class="disabled">
+                   <a href="#" aria-label="Previous">
+                     <span aria-hidden="true">&laquo;</span>
+                   </a>
+                 </li>
+               {% endif %}
+
+            </ul>
+                 <ul class='pagination'>
+                   {%- for page in app_events.iter_pages() %}
+                     {% if page %}
+                       {% if page != app_events.page %}
+                        <li> <a href="{{ url_for('admin.events', page=page) }}">{{ page }}</a></li>
+                       {% else %}
+                         <li class="active"><a href="#">{{ page }}</a></li>
+                       {% endif %}
+                     {% else %}
+                       <li><span class=ellipsis>…</span></li>
+                     {% endif %}
+                   {%- endfor %}
+
+                 </ul>
+
+                 <ul class="pagination">
+                {% if app_events.has_next %}
+
+
+                  <li>
+                    <a href="{{ url_for('admin.events', page=app_events.next_num) }}" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+
+
+                  {% else %}
+                  <li class="disabled">
+                    <a href="#" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                {% endif %}
+                </ul>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endblock %}
