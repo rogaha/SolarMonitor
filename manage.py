@@ -13,7 +13,7 @@ from flask_script.commands import Clean, ShowUrls
 from solarmonitor.app import create_app
 from solarmonitor.mailgun.mailgun_api import send_html_email
 from solarmonitor.settings import DevConfig, ProdConfig, Config
-from solarmonitor.user.models import User, EnergyAccount
+from solarmonitor.user.models import User, EnergyAccount, EnergyEvent
 from solarmonitor.extensions import db
 from solarmonitor.pge.pge import Api, ClientCredentials
 from solarmonitor.solaredge.se_api import SolarEdgeApi
@@ -87,13 +87,17 @@ def email_users_graph_data():
     print '\n \n \n \n RUNNING EMAIL NIGHTLY TASK \n \n \n \n \n '
 
 
+
     end_date = datetime.datetime.today().date() - timedelta(days=1)
     start_date = end_date - timedelta(days=15)
 
+
+
     for account in energy_accounts:
         for user in account.users:
+            events = account.energy_events(start_date, end_date)
             print 'user: {}, energy_account: {}'.format(user.first_name, account.id)
-            html = render_template('email/nightly_update.html', energy_account=account, user=user, start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
+            html = render_template('email/nightly_update.html', events=events, energy_account=account, user=user, start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
             send_html_email('Solarmonitor Admin <admin@solarmonitor.com>', 'Your daily update', user.email, html)
 
 
