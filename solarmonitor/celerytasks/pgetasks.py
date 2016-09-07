@@ -117,4 +117,7 @@ def process_xml(self, xml):
         #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
         celery_task.task_status = 1
         db.session.commit()
+
+        for user in energy_account.users:
+            user.log_event(info="Incoming PGE Data finished processing. Energy Acount: {}".format(energy_account.id))
     return {'status': 'Task completed!'}

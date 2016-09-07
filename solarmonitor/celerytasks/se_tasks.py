@@ -1,6 +1,6 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
-from solarmonitor.user.models import SolarEdgeUsagePoint
+from solarmonitor.user.models import SolarEdgeUsagePoint, EnergyAccount
 import datetime
 from datetime import timedelta, date
 
@@ -33,3 +33,6 @@ def process_se_data(self, json_data, energy_account_id):
             else:
                 db.session.add(usage_point)
                 db.session.commit()
+        energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
+        for user in energy_account.users:
+            user.log_event(info="Incoming Solar Edge Data finished processing. Energy Acount: {}".format(energy_account.id))

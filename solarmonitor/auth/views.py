@@ -34,6 +34,7 @@ def register():
         )
         energy_account = EnergyAccount(nick_name='Default Account')
         user.energy_accounts.append(energy_account)
+        user.log_event(info="Default account created for new user.")
         db.session.add(user)
         db.session.commit()
         login_user(user, True)

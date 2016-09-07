@@ -126,8 +126,9 @@ def oauth_redirect():
     )
 
     flash('PGE Connectivity Completed Successfully')
+    current_user.log_event(info="PGE Account Successfully connected via oauth.")
 
-    return render_template('public/oauth.html', page_title='PGE Oauth Connectivity',)
+    return redirect(url_for('dashboard.home'))
 
 #TODO Need to move this route to the user.dashboard module. Need to clear with PGE first.
 @blueprint.route('/pge-notifications', methods=['GET', 'POST'])
