@@ -65,6 +65,15 @@ class EnergyAccount(db.Model):
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
 
+    def energy_events(self, start_date=seven_days_ago, end_date=today):
+        events = EnergyEvent.query.filter(
+            (EnergyEvent.date_time <= end_date)&
+            (EnergyEvent.date_time >= start_date)&
+            (EnergyEvent.energy_account_id == self.id)
+        ).all()
+        return events
+
+
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
         """Solar Edge production vs Combined PGE data"""
         production = self.solar_edge_production_graph(start_date, end_date)

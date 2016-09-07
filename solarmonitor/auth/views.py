@@ -39,7 +39,7 @@ def register():
         db.session.commit()
         login_user(user, True)
         flash('Thank you for registering.', 'success')
-        return redirect(url_for('public.home'))
+        return redirect(url_for('dashboard.home'))
     else:
         flash_errors(form)
     return render_template('public/register.html', form=form)

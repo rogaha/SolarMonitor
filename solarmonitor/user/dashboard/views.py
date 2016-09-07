@@ -10,9 +10,11 @@ from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.pge.pge_helpers import PGEHelper
 from solarmonitor.solaredge.se_api import SolarEdgeApi
 from solarmonitor.mailgun.mailgun_api import send_email
-from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint, EnergyAccount
+from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint, EnergyAccount, EnergyEvent
+from solarmonitor.user.dashboard.forms import EventAddForm
 from solarmonitor.public.forms import DateSelectForm, DownloadDataForm
 from solarmonitor.extensions import db
+from solarmonitor.utils import try_parsing_date
 import requests
 import json
 
@@ -29,8 +31,9 @@ oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 blueprint = Blueprint('dashboard', __name__, url_prefix='/users/dashboard', static_folder='../static')
 
 @blueprint.route('', methods=['GET', 'POST'])
+@blueprint.route('/<modify>/<int:id>', methods=['GET', 'POST'])
 @login_required
-def home():
+def home(modify=None, id=None):
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home'))]
     heading = 'Dashboard'
 
@@ -50,6 +53,30 @@ def home():
 
     financial = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, financial=True)
 
+    events = current_user.energy_accounts[0].energy_events(start_date, end_date)
+
+    form = EventAddForm()
+
+    if modify == 'del':
+        event = EnergyEvent.query.filter_by(id=id).first()
+        db.session.delete(event)
+        db.session.commit()
+        flash('Energy event deleted')
+        return redirect(url_for('dashboard.home'))
+
+    if form.validate_on_submit():
+        energy_event = EnergyEvent(
+            info=form.info.data,
+            date_time=try_parsing_date(form.date_time.data),
+            event_type=form.event_type.data,
+            energy_account_id=current_user.energy_accounts[0].id
+        )
+        db.session.add(energy_event)
+        db.session.commit()
+        flash('New energy event added!')
+        return redirect(url_for('dashboard.home'))
+
+
     return render_template('users/dashboard/home.html',
         prod_net_usg_pct=prod_net_usg_pct,
         prod_net_usg=prod_net_usg,
@@ -57,6 +84,8 @@ def home():
         financial=financial,
         account_id=current_user.energy_accounts[0].id,
         breadcrumbs=breadcrumbs, heading=heading,
+        events=events,
+        form=form
         )
 
 @blueprint.route('/account', methods=['GET', 'POST'])

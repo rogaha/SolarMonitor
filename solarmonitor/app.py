@@ -32,6 +32,15 @@ def create_app(config_object=ProdConfig):
         login_form = LoginForm()
         return dict(login_form=login_form)
 
+    @app.context_processor
+    def utility_processor():
+        def format_event_type(id):
+            if id == 1:
+                return 'Weather Related'
+            if id == 2:
+                return 'Panel Related'
+        return dict(format_event_type=format_event_type)
+
     return app
 
 def register_extensions(app):
