@@ -1,9 +1,9 @@
 {% extends "admin/home.html" %}
 {% block admin_content %}
 <br>
-<div class="row">
+<div id='row1' class="row">
     <div class="col-sm-12">
-      <div class="panel panel-default panel-table">
+      <div id="panel1" class="panel panel-default panel-table">
 
           <div class="panel-heading">
             <div class="row">
@@ -11,7 +11,7 @@
                 <h3 class="panel-title">App Events</h3>
               </div>
               <div class="col col-xs-6 text-right">
-                <form class="form-inline" action="{{ url_for('admin.events') }}" method="post">
+                <form id="form1" class="form-inline" action="{{ url_for('admin.events') }}" method="post">
                   {{ form.hidden_tag() }}
                   <div class="form-group">
                       <label class="sr-only" for="inputEmail">Start Date</label>
@@ -22,6 +22,7 @@
                       $(document).ready(function() {
                           $('#datepicker1').datepicker({
                             format: 'yyyy-mm-dd',
+                            container: '#panel1'
                           });
                       })
                       </script>
@@ -35,6 +36,7 @@
                       $(document).ready(function() {
                           $('#datepicker2').datepicker({
                             format: 'yyyy-mm-dd',
+                            container: '#panel1'
                           });
                       })
                       </script>
