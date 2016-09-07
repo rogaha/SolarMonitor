@@ -62,6 +62,7 @@ def home(modify=None, id=None):
         db.session.delete(event)
         db.session.commit()
         flash('Energy event deleted')
+        current_user.log_event(info="Energy event deleted")
         return redirect(url_for('dashboard.home'))
 
     if form.validate_on_submit():
@@ -74,6 +75,7 @@ def home(modify=None, id=None):
         db.session.add(energy_event)
         db.session.commit()
         flash('New energy event added!')
+        current_user.log_event(info="Energy event added")
         return redirect(url_for('dashboard.home'))
 
 
