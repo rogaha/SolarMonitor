@@ -78,7 +78,16 @@
               <div class="form-group">
                 <label class="col-md-4 control-label" for="textinput">Date</label>
                 <div class="col-md-4">
-                {{ form.date_time(class="form-control input-md") }}
+                {{ form.date_time(class="form-control input-md", id="datepicker1") }}
+
+                <script type="text/javascript">
+
+                $(document).ready(function() {
+                    $('#datepicker1').datepicker({
+                      format: 'yyyy-mm-dd',
+                    });
+                })
+                </script>
 
                 </div>
               </div>
