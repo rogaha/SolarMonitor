@@ -8,6 +8,8 @@ from flask import flash, g, request, redirect, url_for, abort
 from celery import Celery
 from solarmonitor.settings import ProdConfig
 
+from datetime import datetime
+
 
 celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfig.CELERY_RESULT_BACKEND)
 
@@ -17,6 +19,13 @@ def flash_errors(form, category='warning'):
         for error in errors:
             flash('{0} - {1}'.format(getattr(form, field).label.text, error), category)
 
+def try_parsing_date(text):
+    for fmt in ('%Y-%m-%d %H:%M', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%-m/%-d/%Y', '%m/%d/%Y'):
+        try:
+            return datetime.strptime(text, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
 
 
 def requires_roles(*roles):

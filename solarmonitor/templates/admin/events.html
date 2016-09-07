@@ -11,7 +11,37 @@
                 <h3 class="panel-title">App Events</h3>
               </div>
               <div class="col col-xs-6 text-right">
-                <button type="button" class="btn btn-sm btn-primary btn-create">Search</button>
+                <form class="form-inline" action="{{ url_for('admin.events') }}" method="post">
+                  {{ form.hidden_tag() }}
+                  <div class="form-group">
+                      <label class="sr-only" for="inputEmail">Start Date</label>
+                      {{ form.start_date(class="form-control input-md", id="datepicker1", autocomplete="off", placeholder="Start Date") }}
+
+                      <script type="text/javascript">
+
+                      $(document).ready(function() {
+                          $('#datepicker1').datepicker({
+                            format: 'yyyy-mm-dd',
+                          });
+                      })
+                      </script>
+                  </div>
+                  <div class="form-group">
+                      <label class="sr-only" for="inputPassword">End Date</label>
+                      {{ form.end_date(class="form-control input-md", id="datepicker2", autocomplete="off", placeholder="End Date") }}
+
+                      <script type="text/javascript">
+
+                      $(document).ready(function() {
+                          $('#datepicker2').datepicker({
+                            format: 'yyyy-mm-dd',
+                          });
+                      })
+                      </script>
+                  </div>
+
+                <button type="submit" class="btn btn-sm btn-primary btn-create">Search</button>
+                </form>
               </div>
             </div>
           </div>
