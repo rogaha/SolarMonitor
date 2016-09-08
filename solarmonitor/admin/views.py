@@ -49,7 +49,7 @@ def events(page=1):
         return redirect(url_for('admin.events'))
 
     app_events = AppEvent.query.filter(
-        (AppEvent.date_time <= try_parsing_date(session.get('event_end_date', datetime.utcnow().strftime('%Y-%m-%d'))))&
+        (AppEvent.date_time <= try_parsing_date(session.get('event_end_date', (datetime.utcnow() + timedelta(days=1)).strftime('%Y-%m-%d')))))&
         (AppEvent.date_time >= try_parsing_date(session.get('event_start_date', (datetime.utcnow() - timedelta(days=365)).strftime('%Y-%m-%d'))))
     ).order_by(AppEvent.date_time.desc())
 
