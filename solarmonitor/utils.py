@@ -20,6 +20,8 @@ def flash_errors(form, category='warning'):
             flash('{0} - {1}'.format(getattr(form, field).label.text, error), category)
 
 def try_parsing_date(text):
+    if not text:
+        return None
     for fmt in ('%Y-%m-%d %H:%M', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%-m/%-d/%Y', '%m/%d/%Y'):
         try:
             return datetime.strptime(text, fmt)
