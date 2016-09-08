@@ -44,8 +44,10 @@ def events(page=1):
     form = DownloadDataForm()
 
     if form.validate_on_submit():
-        session['event_start_date'] = form.start_date.data
-        session['event_end_date'] = form.end_date.data
+        if form.start_date.data:
+            session['event_start_date'] = form.start_date.data
+        if form.end_date.data:
+            session['event_end_date'] = form.end_date.data
         return redirect(url_for('admin.events'))
 
     app_events = AppEvent.query.filter(
