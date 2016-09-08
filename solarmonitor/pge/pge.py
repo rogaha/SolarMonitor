@@ -125,7 +125,12 @@ class OAuth2:
 			energy_account.pge_refresh_token = res.get('refresh_token', None)
 			energy_account.pge_access_token = res.get('access_token', None)
 			energy_account.pge_subscription_id = subscription_id
-			energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml.text)
+			try:
+				print usage_point_xml.text
+				energy_account.pge_usage_point = get_usage_point_from_xml(usage_point_xml.text)
+			except:
+				energy_account.pge_usage_point = 'Not found.'
+
 			db.session.commit()
 
 			return res
