@@ -45,16 +45,19 @@ def users(page=1, modify=None, user_id=None):
 
         db.session.commit()
         flash('User modified.')
+        current_user.log_event(info='user account: {} modified'.format(user.full_name))
         return redirect(url_for('admin.users'))
 
     if modify == 'del':
         user = User.query.filter_by(id=user_id).first()
+        name = user.full_name
         if current_user == user:
             flash('You can\'t delete yourself!')
             return redirect(url_for('admin.users'))
         db.session.delete(user)
         db.session.commit()
         flash('User deleted')
+        current_user.log_event(info='user account: {} deleted'.format(name))
         return redirect(url_for('admin.users'))
 
     if add_user_form.validate_on_submit():
@@ -66,7 +69,7 @@ def users(page=1, modify=None, user_id=None):
         )
         energy_account = EnergyAccount(nick_name='Default Account')
         user.energy_accounts.append(energy_account)
-        user.log_event(info="Default account created for new user.")
+        current_user.log_event(info="Default account created for \'{}\' by admin.".format(user.full_name))
         db.session.add(user)
         db.session.commit()
         flash('User created.', 'success')
