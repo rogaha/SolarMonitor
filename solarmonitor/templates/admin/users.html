@@ -1,6 +1,17 @@
 {% extends "admin/home.html" %}
 
 {% block admin_content %}
+{% if add_user_form.errors %}
+<div class="alert alert-error">
+    <ul class="errors">
+        {% for field_name, field_errors in add_user_form.errors|dictsort if field_errors %}
+            {% for error in field_errors %}
+                <li>{{ add_user_form[field_name].label }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    </div>
+{% endif %}
 <br>
 <div class="row">
     <div class="col-sm-12">
@@ -114,9 +125,108 @@
                       <tr>
                         <td align="center">
                           <!-- Button trigger modal -->
-                          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#">
-                            <em class="fa fa-pencil"></em>
+
+
+                          <button
+                            type="button"
+                            data-toggle="popover"
+                            class="btn btn-default"
+                            data-content-id="#content_{{ user.id }}"
+                            data-head-id="#head_{{ user.id }}"
+                            >
+
+                          <em  class="fa fa-pencil"></em>
+
                           </button>
+
+                          <div id="head_{{ user.id }}" class="hide">
+                            Edit User
+                          </div>
+                          <div id="content_{{ user.id }}" class="hide">
+                            <form class='form-inline' method='post' action='{{url_for("admin.users", modify="edit", user_id=user.id)}}'>
+                              {{ edit_user_form.hidden_tag() }}
+                              <fieldset>
+
+
+
+                            <!-- Text input-->
+                            <div class="form-group">
+                              <label class=" control-label" for="textinput">First Name</label>
+                              <div class="">
+                              <input class="form-control input-md" id="inputEmail" name="edit-first_name" placeholder="First Name" type="text" value="{{ user.first_name }}">
+
+                              </div>
+                            </div>
+
+                            <!-- Text input-->
+                            <div class="form-group">
+                              <label class=" control-label" for="textinput">Last Name</label>
+                              <div class="">
+                              <input class="form-control input-md" id="inputEmail" name="edit-last_name" placeholder="Last Name" type="text" value="{{ user.last_name }}">
+
+                              </div>
+                            </div>
+
+                            <!-- Text input-->
+                            <div class="form-group">
+                              <label class=" control-label" for="textinput">Email</label>
+                              <div class="">
+                              <input class="form-control input-md" id="inputEmail" name="edit-email" placeholder="johndoe@example.com" type="text" value="{{ user.email }}">
+
+                              </div>
+                            </div>
+
+                            <!-- Password input-->
+                            <div class="form-group">
+                              <label class=" control-label" for="passwordinput">Password</label>
+                              <div class="">
+                                <input class="form-control input-md" id="inputEmail" name="edit-password" placeholder="Password" type="password" value="">
+
+                              </div>
+                            </div>
+
+                            <!-- Password input-->
+                            <div class="form-group">
+                              <label class=" control-label" for="passwordinput">Repeat Password</label>
+                              <div class="">
+                                <input class="form-control input-md" id="inputEmail" name="edit-password2" placeholder="Repeat Password" type="password" value="">
+
+                              </div>
+                            </div>
+
+                            <div class="form-group">
+                              <label class=" control-label" for="passwordinput"></label>
+                              <div class="">
+                                <button type='submit' class='btn btn-primary'>Edit</button>
+
+                              </div>
+                            </div>
+
+                            </fieldset>
+
+
+
+                            </form>
+                          </div>
+
+                          <script>
+
+                          $(function () {
+                            $('[data-toggle="popover"]').popover({
+                              html : true,
+                              title: function() {
+                                return $($(this).attr('data-head-id')).html();
+                              },
+                              content: function() {
+                                return $($(this).attr('data-content-id')).html();
+                              }
+                            })
+                          });
+
+                          </script>
+
+
+
                           <a href="{{ url_for('admin.users', modify='del', user_id=user.id) }}" class="btn btn-danger"><em class="fa fa-trash"></em></a>
                         </td>
                         <td class="hidden-xs">{{ user.id }}</td>

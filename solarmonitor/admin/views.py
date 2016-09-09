@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, session
 from flask_login import login_required, login_user, logout_user, current_user
 from solarmonitor.auth.forms import RegistrationForm
-from solarmonitor.utils import flash_errors, requires_roles, try_parsing_date
+from solarmonitor.utils import flash_errors, requires_roles, try_parsing_date, flash_errors
 from solarmonitor.user.models import User, EnergyAccount, AppEvent
 from solarmonitor.extensions import db
 from solarmonitor.public.forms import DownloadDataForm
@@ -25,7 +25,27 @@ def users(page=1, modify=None, user_id=None):
 
     users = User.query
 
-    add_user_form = RegistrationForm()
+    add_user_form = RegistrationForm(prefix="add")
+    edit_user_form = RegistrationForm(prefix="edit")
+
+    if modify == 'edit':
+        user = User.query.filter_by(id=user_id).first()
+        user.first_name = edit_user_form.first_name.data
+        user.last_name = edit_user_form.last_name.data
+        if edit_user_form.email.data != user.email:
+            user_check = User.query.filter_by(email=edit_user_form.email.data).first()
+            if user_check:
+                flash('Email already in use.')
+                return redirect(url_for('admin.users'))
+            else:
+                user.email = edit_user_form.email.data
+
+        if edit_user_form.password.data:
+            user.password=edit_user_form.password.data
+
+        db.session.commit()
+        flash('User modified.')
+        return redirect(url_for('admin.users'))
 
     if modify == 'del':
         user = User.query.filter_by(id=user_id).first()
@@ -50,14 +70,17 @@ def users(page=1, modify=None, user_id=None):
         db.session.add(user)
         db.session.commit()
         flash('User created.', 'success')
+
         return redirect(url_for('admin.users'))
+
 
     return render_template('admin/users.html',
         page=page,
         breadcrumbs=breadcrumbs,
         heading=heading,
         users=users.paginate(page, 10, False),
-        add_user_form=add_user_form
+        add_user_form=add_user_form,
+        edit_user_form=edit_user_form
     )
 
 @blueprint.route('/events', methods=['GET', 'POST'])
