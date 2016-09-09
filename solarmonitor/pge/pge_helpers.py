@@ -6,13 +6,9 @@ from jxmlease import parse
 
 def get_usage_point_from_xml(xml):
     data = parse(xml, xml_attribs=True)
+    data.prettyprint()
     for resource in data[u'ns1:feed'][u'ns1:entry']:
-        if len(data[u'ns1:feed'][u'ns1:entry']) == 1:
-            for link in resource[u'ns1:link']:
-                if link.get_xml_attr("rel") == u'self':
-                    return link.get_xml_attr("href").rsplit('/', 1)[-1]
-
-        elif resource[u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
+        if resource[u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
             for link in resource[u'ns1:link']:
                 if link.get_xml_attr("rel") == u'self':
                     return link.get_xml_attr("href").rsplit('/', 1)[-1]
