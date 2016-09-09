@@ -11,8 +11,8 @@ def get_usage_point_from_xml(xml):
         If they have both gas and electric, this will fail with a key error, and in the
         except block, we'll loop through the entry feeds looking for the Electricity UsagePoint
         which is ns0:kind == 0"""
-        if resource[u'ns1:feed'][u'ns1:entry'][u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
-            for link in resource[u'ns1:link']:
+        if data[u'ns1:feed'][u'ns1:entry'][u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
+            for link in data[u'ns1:feed'][u'ns1:entry'][u'ns1:link']:
                 if link.get_xml_attr("rel") == u'self':
                     return link.get_xml_attr("href").rsplit('/', 1)[-1]
     except:
