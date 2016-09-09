@@ -97,10 +97,10 @@ def account(modify=None):
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('Account', 'user', url_for('dashboard.account'))]
     heading = 'Dashboard'
     if modify == 'del_pge':
-        current_user.pge_access_token = None
-        current_user.pge_refresh_token = None
-        current_user.pge_subscription_id = None
-        current_user.pge_usage_point = None
+        current_user.energy_accounts[0].pge_access_token = None
+        current_user.energy_accounts[0].pge_refresh_token = None
+        current_user.energy_accounts[0].pge_subscription_id = None
+        current_user.energy_accounts[0].pge_usage_point = None
         db.session.commit()
         flash('PGE connection deleted on SDP energy account. ')
         return redirect(url_for('dashboard.account'))
