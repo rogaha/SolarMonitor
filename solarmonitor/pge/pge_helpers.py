@@ -6,11 +6,21 @@ from jxmlease import parse
 
 def get_usage_point_from_xml(xml):
     data = parse(xml, xml_attribs=True)
-    for resource in data[u'ns1:feed'][u'ns1:entry']:
-        if resource[u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
+    try:
+        """If a user only has one type of energy usage, we can query the kind directly.
+        If they have both gas and electric, this will fail with a key error, and in the
+        except block, we'll loop through the entry feeds looking for the Electricity UsagePoint
+        which is ns0:kind == 0"""
+        if resource[u'ns1:feed'][u'ns1:entry'][u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
             for link in resource[u'ns1:link']:
                 if link.get_xml_attr("rel") == u'self':
                     return link.get_xml_attr("href").rsplit('/', 1)[-1]
+    except:
+        for resource in data[u'ns1:feed'][u'ns1:entry']:
+            if resource[u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
+                for link in resource[u'ns1:link']:
+                    if link.get_xml_attr("rel") == u'self':
+                        return link.get_xml_attr("href").rsplit('/', 1)[-1]
 
 
 def generate_random_pge_data(number_of_data_rows=10, account_id=1, numbers_of_days_ago=4):
