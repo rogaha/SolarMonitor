@@ -113,6 +113,7 @@
   </div>
 
 </div>
+{% if events|length > 0 %}
 <div class="row">
   <div class="col col-xs-6">
     <table class="table">
@@ -134,6 +135,7 @@
   </table>
   </div>
 </div>
+{% endif %}
 <script type="text/javascript">
 
 var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
