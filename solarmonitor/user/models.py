@@ -48,7 +48,7 @@ class EnergyEvent(db.Model):
 class EnergyAccount(db.Model):
     __tablename__ = 'energy_accounts'
     id = db.Column(db.Integer, primary_key=True)
-    energy_events = db.relationship('EnergyEvent', backref="energy_account", lazy='dynamic')
+    energy_events = db.relationship('EnergyEvent', backref="energy_account", lazy='dynamic', cascade="all, delete-orphan")
     nick_name = db.Column(db.String(255))
     address_one = db.Column(db.String(255))
     address_two = db.Column(db.String(255))
@@ -310,7 +310,7 @@ class User(UserMixin, db.Model):
     state = db.Column(db.String(64))
     zip_code = db.Column(db.String(5))
     password_hash = db.Column(db.String(128))
-    app_events = db.relationship('AppEvent', backref="user", lazy='dynamic')
+    app_events = db.relationship('AppEvent', backref="user", lazy='dynamic', cascade="all, delete-orphan")
     energy_accounts = relationship("EnergyAccount",
                     secondary=energy_accounts,
                     backref="users")
