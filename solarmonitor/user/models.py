@@ -67,8 +67,8 @@ class EnergyAccount(db.Model):
 
     def energy_events(self, start_date=seven_days_ago, end_date=today):
         events = EnergyEvent.query.filter(
-            (EnergyEvent.date_time <= end_date)&
-            (EnergyEvent.date_time >= start_date)&
+            (EnergyEvent.date <= end_date)&
+            (EnergyEvent.date >= start_date)&
             (EnergyEvent.energy_account_id == self.id)
         ).order_by(EnergyEvent.date_time.desc()).all()
         return events
