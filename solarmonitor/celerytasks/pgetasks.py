@@ -115,8 +115,6 @@ def process_xml(self, xml):
 
         #Mark the task as complete. Previously this was only done on the front-end but created
         #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
-        import time
-        time.sleep(5)
         celery_task.task_status = 1
         db.session.commit()
 

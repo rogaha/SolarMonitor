@@ -70,7 +70,7 @@ class EnergyAccount(db.Model):
             (EnergyEvent.date_time <= end_date)&
             (EnergyEvent.date_time >= start_date)&
             (EnergyEvent.energy_account_id == self.id)
-        ).all()
+        ).order_by(EnergyEvent.date_time.desc()).all()
         return events
 
 
