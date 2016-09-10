@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="body-content">
+<div class="body-content" ng-controller='eventController'>
 <div class="row">
   <div class="col col-xs-6">
     <div class="btn-group">
@@ -33,9 +33,9 @@
         <span class="sr-only">Toggle Dropdown</span>
       </button>
       <ul class="dropdown-menu">
-        <li><a id="30days" href="#">30 days</a></li>
-        <li><a id="14days" href="#">14 days</a></li>
-        <li><a id="7days" href="#">7 days</a></li>
+        <li><a id="30days" href="#" ng-click="getEvents(30)">30 days</a></li>
+        <li><a id="14days" href="#" ng-click="getEvents(14)">14 days</a></li>
+        <li><a id="7days" href="#" ng-click="getEvents(7)">7 days</a></li>
       </ul>
     </div>
 
@@ -113,29 +113,32 @@
   </div>
 
 </div>
-{% if events|length > 0 %}
-<div class="row">
-  <div class="col col-xs-6">
-    <table class="table">
-      <thead>
-        <th>Time</th>
-        <th>Type</th>
-        <th>Info</th>
-        <th></th>
-      </thead>
 
-    {% for event in events %}
-    <tr>
-      <td>{{ event.date.strftime('%m/%d/%Y') }}</td>
-      <td>{{ format_event_type(event.event_type) }}</td>
-      <td>{{ event.info }}</td>
-      <td><a href="{{url_for('dashboard.home', modify='del', id=event.id) }}"<i class="fa fa-close" style="color:red"></i></a></td>
-    </tr>
-    {% endfor %}
-  </table>
+
+  {% if events|length > 0 %}
+  <div class="row">
+    <div class="col col-xs-6">
+      <table class="table">
+        <thead>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Info</th>
+          <th></th>
+        </thead>
+
+
+      <tr ng-repeat="event in events">
+        <td>[[ event.date ]]</td>
+        <td>[[ event.event_type ]]</td>
+        <td>[[ event.info ]]</td>
+        <td><a href="/users/dashboard/del/[[event.id]]"<i class="fa fa-close" style="color:red"></i></a></td>
+      </tr>
+
+    </table>
+    </div>
   </div>
-</div>
-{% endif %}
+  {% endif %}
+
 <script type="text/javascript">
 
 var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
@@ -168,7 +171,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
 
             myChart4.data.datasets[0].data = data.financial.net_usage;
             myChart4.data.labels = data.financial.labels;
-            myChar4.update();
+            myChart4.update();
         }
     });
   });
@@ -201,7 +204,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
 
             myChart4.data.datasets[0].data = data.financial.net_usage;
             myChart4.data.labels = data.financial.labels;
-            myChar4.update();
+            myChart4.update();
         }
     });
   });
@@ -234,7 +237,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
 
             myChart4.data.datasets[0].data = data.financial.net_usage;
             myChart4.data.labels = data.financial.labels;
-            myChar4.update();
+            myChart4.update();
         }
     });
   });

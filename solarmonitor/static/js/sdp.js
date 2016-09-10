@@ -4,6 +4,23 @@ sdp.config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('[[').endSymbol(']]');
 });
 
+sdp.constant("moment", moment);
+
+sdp.controller('eventController', function($scope, $http) {
+
+    $scope.today = moment().subtract(1, 'days');
+    $scope.getEvents = function(daysAgo) {
+        console.log(daysAgo)
+        $scope.startDate = moment().subtract((1 + daysAgo), 'days').format("YYYY-MM-DD");
+        console.log($scope.startDate)
+        $http.get('/users/dashboard/status/events/' + $scope.startDate + '/' + $scope.today.format("YYYY-MM-DD"))
+            .then(function(response) {
+                $scope.events = response.data
+            });
+    }
+    $scope.events = $scope.getEvents(7)
+});
+
 sdp.controller('progressBar', function($scope, $http, $timeout) {
     $scope.taskSuccess = null
     $scope.taskProgress = null

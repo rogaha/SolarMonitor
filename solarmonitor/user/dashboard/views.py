@@ -337,14 +337,22 @@ def solar_edge(modify=None):
         )
 
 @blueprint.route('/status/<task_id>', methods=['GET', 'POST'])
+@blueprint.route('/status/<task_id>/<start_date>/<end_date>', methods=['GET', 'POST'])
 @blueprint.route('/status/<task_id>/<change_status>', methods=['GET', 'POST'])
-def taskstatus(task_id=None, change_status=None):
+def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None):
     if change_status == "mark_complete":
         celery_task = CeleryTask.query.filter_by(task_id=task_id).first()
         celery_task.task_status = 1
         db.session.commit()
         response = {'response': 'task {} completed'.format(task_id)}
         return jsonify(response)
+
+    if task_id == 'events':
+        return current_user.energy_accounts[0].energy_events(
+            start_date=try_parsing_date(start_date),
+            end_date=try_parsing_date(end_date),
+            serialize=True
+        )
 
     if task_id == "task_check":
         unfinished_tasks = CeleryTask.query.filter(

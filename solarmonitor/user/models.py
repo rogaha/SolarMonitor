@@ -2,6 +2,7 @@
 """User models."""
 import datetime as dt
 
+import json
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
 
@@ -65,12 +66,24 @@ class EnergyAccount(db.Model):
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
 
-    def energy_events(self, start_date=seven_days_ago, end_date=today):
+    def energy_events(self, start_date=seven_days_ago, end_date=today, serialize=False):
         events = EnergyEvent.query.filter(
             (EnergyEvent.date <= end_date)&
             (EnergyEvent.date >= start_date)&
             (EnergyEvent.energy_account_id == self.id)
         ).order_by(EnergyEvent.date.desc()).all()
+
+        if serialize:
+            serialized_events = []
+            for event in events:
+                event_dict = {}
+                event_dict['date'] = event.date.strftime('%m/%d/%Y')
+                event_dict['event_type'] = 'Weather Related' if event.event_type == 1 else 'Panel Related'
+                event_dict['info'] = event.info
+                event_dict['id'] = event.id
+                serialized_events.append(event_dict)
+            return json.dumps(serialized_events)
+
         return events
 
 
