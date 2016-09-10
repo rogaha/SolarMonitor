@@ -41,7 +41,7 @@ class EnergyEvent(db.Model):
     __tablename__ = 'energy_events'
     id = db.Column(db.Integer, primary_key=True)
     energy_account_id = db.Column(db.Integer, db.ForeignKey('energy_accounts.id'))
-    date_time = db.Column(db.DateTime)
+    date = db.Column(db.Date)
     event_type = db.Column(db.Integer)
     info = db.Column(db.String(355))
 

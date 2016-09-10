@@ -68,7 +68,7 @@ def home(modify=None, id=None):
     if form.validate_on_submit():
         energy_event = EnergyEvent(
             info=form.info.data,
-            date_time=try_parsing_date(form.date_time.data),
+            date=try_parsing_date(form.date.data),
             event_type=form.event_type.data,
             energy_account_id=current_user.energy_accounts[0].id
         )
