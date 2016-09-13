@@ -51,7 +51,7 @@ class Api:
 		current_user.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
 			current_user.full_name,
 			response['status'],
-			response['data'][:65],
+			response.get('data', None),
 			published_min,
 			published_max
 			)
