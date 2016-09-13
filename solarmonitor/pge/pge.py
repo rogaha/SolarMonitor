@@ -3,6 +3,7 @@ import json
 from base64 import b64encode
 from solarmonitor.extensions import db
 from solarmonitor.pge.pge_helpers import get_usage_point_from_xml
+from flask_login import current_user
 
 class Api:
 	"""
@@ -37,8 +38,24 @@ class Api:
 		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
 			response = {"status": request.status_code, "data": request.text}
+			current_user.log_event(info='SUCCESS - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
+				current_user.full_name,
+				response['status'],
+				response['data'][:65],
+				published_min,
+				published_max
+				)
+			)
 			return response['data']
 		response = {"status": request.status_code, "error": request.text}
+		current_user.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
+			current_user.full_name,
+			response['status'],
+			response['data'][:65],
+			published_min,
+			published_max
+			)
+		)
 		return response
 
 	def sync_simple_request(self, url, energy_account):
