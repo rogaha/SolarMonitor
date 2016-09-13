@@ -48,10 +48,10 @@ class Api:
 			)
 			return response['data']
 		response = {"status": request.status_code, "error": request.text}
-		current_user.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
+		current_user.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Error Message: {} Dates:{}-{}'.format(
 			current_user.full_name,
 			response['status'],
-			response.get('data', None),
+			response.get('error', None),
 			published_min,
 			published_max
 			)
