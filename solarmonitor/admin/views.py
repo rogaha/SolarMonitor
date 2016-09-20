@@ -17,8 +17,9 @@ blueprint = Blueprint('admin', __name__, url_prefix='/admin', static_folder='../
 @requires_roles('Admin')
 def test_user_account(page=1, modify=None, user_id=None):
     if modify == 'login_as':
-        logout_user()
         test_user = User.query.filter_by(id=user_id).first()
+        current_user.log_event(info='{} logged in as {}'.format(current_user.full_name, test_user.full_name))
+        logout_user()
         login_user(test_user, True)
         return redirect(url_for('dashboard.home'))
 
