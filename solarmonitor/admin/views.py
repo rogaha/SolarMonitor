@@ -12,6 +12,15 @@ from datetime import timedelta, datetime
 
 blueprint = Blueprint('admin', __name__, url_prefix='/admin', static_folder='../static')
 
+@blueprint.route('/test/<modify>/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@requires_roles('Admin')
+def test_user_account(page=1, modify=None, user_id=None):
+    if modify == 'login_as':
+        logout_user()
+        test_user = User.query.filter_by(id=user_id).first()
+        login_user(test_user, True)
+        return redirect(url_for('dashboard.home'))
 
 @blueprint.route('/users', methods=['GET', 'POST'])
 @blueprint.route('/users/page/<int:page>', methods=['GET', 'POST'])

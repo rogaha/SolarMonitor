@@ -118,6 +118,7 @@
                     <th>Address</th>
                     <th>Email</th>
                     <th>Energy Accounts</th>
+                    <th>Test Account</th>
                 </tr>
               </thead>
               <tbody>
@@ -245,7 +246,7 @@
                         <td id="account_address_one">{{ user.full_address }}</td>
                         <td id="account_pge_bulk_id">{{ user.email }}</td>
                         <td id="account_solar_edge_site_id">{{ user.energy_accounts | length }}</td>
-
+                        <td><a href='{{ url_for("admin.test_user_account", modify="login_as", user_id=user.id)}}' class='btn btn-primary'>Login as User</a></td>
                       </tr>
                   {% endfor %}
                     </tbody>
