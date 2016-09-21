@@ -15,9 +15,10 @@ from solarmonitor.mailgun.mailgun_api import send_html_email
 from solarmonitor.settings import DevConfig, ProdConfig, Config
 from solarmonitor.user.models import User, EnergyAccount, EnergyEvent
 from solarmonitor.extensions import db
-from solarmonitor.pge.pge import Api, ClientCredentials
+from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.solaredge.se_api import SolarEdgeApi
 from solarmonitor.celerytasks.se_tasks import process_se_data
+from solarmonitor.celerytasks.pgetasks import process_xml
 import json
 
 import datetime
@@ -33,6 +34,7 @@ manager = Manager(app)
 
 cc = ClientCredentials(CONFIG.PGE_CLIENT_CREDENTIALS, CONFIG.SSL_CERTS)
 api = Api(CONFIG.SSL_CERTS)
+oauth = OAuth2(CONFIG.PGE_CLIENT_CREDENTIALS, CONFIG.SSL_CERTS)
 
 
 def _make_context():
@@ -113,18 +115,20 @@ def bulk_download_pge_data(number_of_days_history=7):
         start_date = x_days_ago
         end_date = today
 
-        bulk_id = account.pge_bulk_id
-        bulk_url =  'https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/{}'.format(bulk_id)
-        bulk_url += '?published-min={}&published-max={}' .format(
-            start_date.strftime('%Y-%m-%dT%H:%m:%SZ'),
-            end_date.strftime('%Y-%m-%dT%H:%m:%SZ')
-        )
-        """Logging"""
-        print api.simple_request(bulk_url, client_credentials[u'client_access_token']), 'BULK ID: {} \n Start: {} End: {} \n\n'.format(
-            bulk_id,
-            start_date,
-            end_date
-        )
+        if account.pge_refresh_token:
+
+            print oauth.get_refresh_token(account)
+
+            pge_data = api.sync_request(
+                account,
+                start_date,
+                end_date,
+            )
+
+            process_xml.delay(pge_data)
+
+        else:
+            print 'No refresh token available for account {}'.format(account.id)
 
 @manager.command
 def bulk_download_solar_edge_data(number_of_days_history=7):

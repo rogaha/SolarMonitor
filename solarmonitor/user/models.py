@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 from solarmonitor.extensions import bcrypt, db
 import datetime
 from datetime import timedelta
+from flask.ext.login import AnonymousUserMixin
 
 today = datetime.datetime.today().date()
 seven_days_ago = datetime.datetime.today().date() - timedelta(days=7)
@@ -27,6 +28,22 @@ permission_associations = db.Table('permissions_roles',
     db.Column('permission_id', db.Integer, db.ForeignKey('permissions.id')),
     db.Column('role_id', db.Integer, db.ForeignKey('roles.id'))
 )
+
+
+class Anonymous(AnonymousUserMixin):
+    def __init__(self):
+        self.full_name = 'Anonymous'
+
+    def log_event(self, event_type=None, level=1, info=None):
+        event = AppEvent(
+            user_id=1,
+            date_time=datetime.datetime.utcnow(),
+            event_type=event_type,
+            level=level,
+            info=info
+        )
+        db.session.add(event)
+        db.session.commit()
 
 
 class AppEvent(db.Model):

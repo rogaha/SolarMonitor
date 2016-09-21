@@ -8,6 +8,7 @@ from solarmonitor.assets import assets
 from solarmonitor.extensions import bcrypt, db, login_manager, moment
 from solarmonitor.settings import ProdConfig
 from solarmonitor.public.forms import LoginForm
+from solarmonitor.user.models import Anonymous
 
 from celery import Celery
 celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfig.CELERY_RESULT_BACKEND)
@@ -26,6 +27,7 @@ def create_app(config_object=ProdConfig):
     register_logger(app)
 
     celery.conf.update(app.config)
+    login_manager.anonymous_user = Anonymous
 
     @app.context_processor
     def inject_login_form():
