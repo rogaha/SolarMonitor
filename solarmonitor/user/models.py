@@ -78,6 +78,7 @@ class EnergyAccount(db.Model):
     pge_usage_point = db.Column(db.String(50))
     pge_access_token = db.Column(db.String(255))
     pge_refresh_token = db.Column(db.String(255))
+    pge_last_date = db.Column(db.Date)
     solar_edge_site_id = db.Column(db.String(255))
     pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')

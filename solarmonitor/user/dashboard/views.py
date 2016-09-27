@@ -22,6 +22,7 @@ from jxmlease import parse
 
 import datetime
 from datetime import datetime, timedelta, date
+from calendar import monthrange
 
 config = Config()
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
@@ -89,6 +90,34 @@ def home(modify=None, id=None):
         events=events,
         form=form
         )
+
+@blueprint.route('/pull-ytd', methods=['GET', 'POST'])
+@login_required
+def pull_ytd():
+    for energy_account in current_user.energy_accounts:
+        print oauth.get_refresh_token(energy_account)
+
+        """First find the whole date range to pull data."""
+        end_date = datetime.now() if energy_account.pge_last_date == None else energy_account.pge_last_date
+        start_date = datetime(year=datetime.now().year, month=1, day=1)
+
+        for month in range(7, (end_date.month+1)):
+            """For the given date range, break into month chunks and pull PGE Data"""
+            week_day, last_day = monthrange(start_date.year, month)
+
+            print datetime(year=start_date.year, month=month, day=1)
+            print datetime(year=start_date.year, month=month, day=last_day)
+
+            pge_data = api.sync_request(
+                energy_account,
+                datetime(year=start_date.year, month=month, day=1),
+                datetime(year=start_date.year, month=month, day=last_day),
+            )
+
+            process_xml.delay(pge_data)
+
+
+    return redirect(url_for('dashboard.charts'))
 
 @blueprint.route('/account', methods=['GET', 'POST'])
 @blueprint.route('/account/<modify>', methods=['GET', 'POST'])
