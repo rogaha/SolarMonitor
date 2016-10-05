@@ -133,5 +133,5 @@ def process_xml(self, energy_account, start_date, end_date):
 				start_date,
 				end_date
 				)
-			))
+			)
     return {'status': 'Task completed!'}
