@@ -58,7 +58,7 @@
 
 							    {% for event in events %}
 							    <tr>
-							      <td>{{ event.date_time.strftime('%m/%d/%Y') }}&nbsp;&nbsp;&nbsp;</td>
+							      <td>{{ event.date.strftime('%m/%d/%Y') }}&nbsp;&nbsp;&nbsp;</td>
 							      <td>{{ format_event_type(event.event_type) }}&nbsp;&nbsp;&nbsp;</td>
 							      <td>{{ event.info }}</td>
 							      <td><a href="{{url_for('dashboard.home', modify='del', id=event.id) }}"<i class="fa fa-close" style="color:red"></i></a></td>
