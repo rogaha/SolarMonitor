@@ -4,6 +4,7 @@ from base64 import b64encode
 from solarmonitor.extensions import db
 from solarmonitor.pge.pge_helpers import get_usage_point_from_xml
 from flask_login import current_user
+from solarmonitor.user.models import User
 
 class Api:
 	"""
@@ -27,6 +28,8 @@ class Api:
 	#API sync request using Oauth2 access token
 	def sync_request(self, energy_account, published_min, published_max):
 		"""Times need to be input as datetime objects"""
+		if not current_user:
+			current_user = User.query.filter_by(id=1).first()
 		url = 'https://api.pge.com/GreenButtonConnect/espi/1_1/resource'
 		url = url + '/Batch/Subscription/{}/UsagePoint/{}?published-max={}&published-min={}'.format(
 			energy_account.pge_subscription_id,
