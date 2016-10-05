@@ -40,8 +40,7 @@ class Api:
 		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
 			response = {"status": request.status_code, "data": request.text}
-			Anonymous.log_event(info='SUCCESS - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
-				current_user.full_name,
+			Anonymous.log_event(info='SUCCESS - PGE Data Pull. Response Code: {} Response Message: {} Dates:{}-{}'.format(
 				response['status'],
 				response['data'][:65],
 				published_min,
@@ -50,8 +49,7 @@ class Api:
 			)
 			return response['data']
 		response = {"status": request.status_code, "error": request.text}
-		Anonymous.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Error Message: {} Dates:{}-{}'.format(
-			current_user.full_name,
+		Anonymous.log_event(info='FAILURE - PGE Data Pull. Response Code: {} Error Message: {} Dates:{}-{}'.format(
 			response['status'],
 			response.get('error', None),
 			published_min,
