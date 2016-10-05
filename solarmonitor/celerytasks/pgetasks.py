@@ -35,27 +35,6 @@ def process_xml(self, energy_account, start_date, end_date):
     app = create_app(ProdConfig)
     with app.app_context():
 
-        """In this first section, we try to find the identifier. This is something that will link
-        the XML to a user's energy_account in the database.
-        """
-
-        """Get the identifier from the href attribute of the of the link element. This looks like
-        https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Subscription/202674/UsagePoint/0053420795
-        and the value at the end is the identifier. When we were using bulk uploads, this was the
-        bulk_id of the user, however now that we are on synchronous data it is the usage point."""
-
-        identifier = data[u'ns1:feed'][u'ns1:link'].get_xml_attr("href").rsplit('/', 1)[-1]
-
-        #Logging purposes
-        print identifier
-
-        #Try to get an energy account using the identifier as a bulk_id
-        energy_account = EnergyAccount.query.filter_by(pge_bulk_id=identifier).first()
-
-        #If no energy account can be found, then try again but use identifier as a UsagePointID
-        if not energy_account:
-            energy_account = EnergyAccount.query.filter_by(pge_usage_point=identifier).first()
-
         #Create a new celery task in the database
         celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
         db.session.add(celery_task)
