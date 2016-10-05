@@ -32,7 +32,16 @@ def process_xml(self, energy_account, start_date, end_date):
         #This will add the XML to the heroku logs.
         print pge_data
 
-        if pge_data['status'] != 200:
+        if 'error' in pge_data:
+            for user in energy_account.users:
+                user.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Error Message: {} Dates:{}-{}'.format(
+        			user.full_name,
+    				pge_data['status'],
+    				pge_data['error'],
+    				start_date,
+    				end_date
+        			)
+        		)
             print 'PGE request failed'
             return
 
@@ -43,7 +52,6 @@ def process_xml(self, energy_account, start_date, end_date):
         celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
         db.session.add(celery_task)
         db.session.commit()
-
 
         for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
             """Here we loop through all the entry blocks in the XML, not all of these blocks
@@ -118,5 +126,12 @@ def process_xml(self, energy_account, start_date, end_date):
         db.session.commit()
 
         for user in energy_account.users:
-            user.log_event(info="Incoming PGE Data finished processing. Energy Acount: {}".format(energy_account.id))
+            user.log_event(info='SUCCESS - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
+				user.full_name,
+				200,
+				pge_data[:65],
+				start_date,
+				end_date
+				)
+			))
     return {'status': 'Task completed!'}
