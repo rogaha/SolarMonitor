@@ -32,6 +32,10 @@ def process_xml(self, energy_account, start_date, end_date):
         #This will add the XML to the heroku logs.
         print pge_data
 
+        if pge_data['status'] != 200:
+            print 'PGE request failed'
+            return
+
         reading_type = {}
         data = parse(pge_data)
 
