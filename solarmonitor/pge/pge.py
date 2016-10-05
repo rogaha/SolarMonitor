@@ -4,7 +4,7 @@ from base64 import b64encode
 from solarmonitor.extensions import db
 from solarmonitor.pge.pge_helpers import get_usage_point_from_xml
 from flask_login import current_user
-from solarmonitor.user.models import User
+from solarmonitor.user.models import Anonymous
 
 class Api:
 	"""
@@ -28,6 +28,7 @@ class Api:
 	#API sync request using Oauth2 access token
 	def sync_request(self, energy_account, published_min, published_max):
 		"""Times need to be input as datetime objects"""
+
 		url = 'https://api.pge.com/GreenButtonConnect/espi/1_1/resource'
 		url = url + '/Batch/Subscription/{}/UsagePoint/{}?published-max={}&published-min={}'.format(
 			energy_account.pge_subscription_id,
@@ -39,7 +40,7 @@ class Api:
 		request = requests.get(url, data = {},  headers = header_params, cert = self.cert)
 		if str(request.status_code) == "200":
 			response = {"status": request.status_code, "data": request.text}
-			energy_account.users[0].log_event(info='SUCCESS - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
+			Anonymous.log_event(info='SUCCESS - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
 				current_user.full_name,
 				response['status'],
 				response['data'][:65],
@@ -49,7 +50,7 @@ class Api:
 			)
 			return response['data']
 		response = {"status": request.status_code, "error": request.text}
-		energy_account.users[0].log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Error Message: {} Dates:{}-{}'.format(
+		Anonymous.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Error Message: {} Dates:{}-{}'.format(
 			current_user.full_name,
 			response['status'],
 			response.get('error', None),
