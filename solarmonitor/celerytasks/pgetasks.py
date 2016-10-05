@@ -1,19 +1,35 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
 from solarmonitor.user.models import PGEUsagePoint, CeleryTask, EnergyAccount
+from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 import datetime
 from datetime import timedelta
 
 from solarmonitor.utils import celery
 from jxmlease import parse
 
-@celery.task(bind=True)
-def process_xml(self, xml):
+config = ProdConfig()
+cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
+api = Api(config.SSL_CERTS)
+oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
-    print xml
+@celery.task(bind=True)
+def process_xml(self, energy_account, start_date, end_date):
+    #Refresh the OAuth token. This token is good for 1 hour.
+    oauth.get_refresh_token(energy_account)
+
+    #pge_data is an XML document
+    pge_data = api.sync_request(
+        energy_account,
+        start_date,
+        end_date,
+    )
+
+    #This will add the XML to the heroku logs.
+    print pge_data
 
     reading_type = {}
-    data = parse(xml)
+    data = parse(pge_data)
 
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)

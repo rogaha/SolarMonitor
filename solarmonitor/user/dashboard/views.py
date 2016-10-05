@@ -101,7 +101,7 @@ def pull_ytd():
         end_date = datetime.now() if energy_account.pge_last_date == None else energy_account.pge_last_date
         start_date = datetime(year=datetime.now().year, month=1, day=1)
 
-        for month in range(7, (end_date.month+1)):
+        for month in range(start_date.month, (end_date.month+1)):
             """For the given date range, break into month chunks and pull PGE Data"""
             week_day, last_day = monthrange(start_date.year, month)
 
@@ -241,16 +241,7 @@ def charts(modify=None):
         start_date_pge = datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
         end_date_pge = datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
 
-
-        print oauth.get_refresh_token(current_user.energy_accounts[0])
-
-        pge_data = api.sync_request(
-            current_user.energy_accounts[0],
-            start_date_pge,
-            end_date_pge,
-        )
-
-        process_xml.delay(pge_data)
+        process_xml.delay(current_user.energy_accounts[0], start_date_pge, end_date_pge)
         flash('Data processing')
         return redirect(url_for('dashboard.charts'))
 

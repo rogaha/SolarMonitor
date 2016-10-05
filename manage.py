@@ -86,14 +86,10 @@ def run_server():
 @manager.command
 def email_users_graph_data():
     energy_accounts = EnergyAccount.query.all()
-    print '\n \n \n \n RUNNING EMAIL NIGHTLY TASK \n \n \n \n \n '
-
-
+    print '\n \n RUNNING EMAIL NIGHTLY TASK \n \n'
 
     end_date = datetime.datetime.today().date() - timedelta(days=1)
     start_date = end_date - timedelta(days=15)
-
-
 
     for account in energy_accounts:
         for user in account.users:
@@ -105,7 +101,6 @@ def email_users_graph_data():
 
 @manager.command
 def bulk_download_pge_data(number_of_days_history=7):
-    client_credentials = cc.get_client_access_token('https://api.pge.com/datacustodian/oauth/v2/token')
 
     today = datetime.datetime.today().date() + timedelta(days=1)
     x_days_ago = datetime.datetime.today().date() - timedelta(days=number_of_days_history)
@@ -116,16 +111,7 @@ def bulk_download_pge_data(number_of_days_history=7):
         end_date = today
 
         if account.pge_refresh_token:
-
-            print oauth.get_refresh_token(account)
-
-            pge_data = api.sync_request(
-                account,
-                start_date,
-                end_date,
-            )
-
-            process_xml.delay(pge_data)
+            process_xml.delay(account, start_date, end_date)
 
         else:
             print 'No refresh token available for account {}'.format(account.id)
