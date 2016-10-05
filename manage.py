@@ -137,7 +137,7 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
                 ).text
             )
 
-        task = process_se_data.delay(se_energy, account.id)
+            task = process_se_data.delay(se_energy, account.id)
 
         """Logging"""
         print 'Account ID: {} \n Start: {} End: {} \n\n'.format(
