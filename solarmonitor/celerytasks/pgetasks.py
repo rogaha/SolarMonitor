@@ -33,15 +33,6 @@ def process_xml(self, energy_account, start_date, end_date):
         print pge_data
 
         if 'error' in pge_data:
-            for user in energy_account.users:
-                user.log_event(info='FAILURE - PGE Data Pull by {}. Response Code: {} Error Message: {} Dates:{}-{}'.format(
-        			user.full_name,
-    				pge_data['status'],
-    				pge_data['error'],
-    				start_date,
-    				end_date
-        			)
-        		)
             print 'PGE request failed'
             return
 
@@ -126,12 +117,5 @@ def process_xml(self, energy_account, start_date, end_date):
         db.session.commit()
 
         for user in energy_account.users:
-            user.log_event(info='SUCCESS - PGE Data Pull by {}. Response Code: {} Response Message: {} Dates:{}-{}'.format(
-				user.full_name,
-				200,
-				pge_data[:65],
-				start_date,
-				end_date
-				)
-			)
+            user.log_event(info="Incoming PGE Data finished processing. Energy Acount: {}".format(energy_account.id))
     return {'status': 'Task completed!'}
