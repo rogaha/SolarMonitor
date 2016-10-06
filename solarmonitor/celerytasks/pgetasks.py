@@ -20,7 +20,7 @@ def process_xml(self, energy_account, start_date, end_date):
     with app.app_context():
 
         #Refresh the OAuth token. This token is good for 1 hour.
-        oauth.get_refresh_token(energy_account)
+        print oauth.get_refresh_token(energy_account)
 
         #pge_data is an XML document
         pge_data = api.sync_request(
