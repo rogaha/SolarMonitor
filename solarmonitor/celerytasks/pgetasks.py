@@ -20,7 +20,9 @@ def process_xml(self, energy_account, start_date, end_date):
     with app.app_context():
 
         #Refresh the OAuth token. This token is good for 1 hour.
-        print oauth.get_refresh_token(energy_account)
+        refresh_info = oauth.get_refresh_token(energy_account)
+        energy_account.pge_refresh_token = refresh_info.get(u'refresh_token', None)
+        energy_account.pge_access_token = refresh_info.get(u'access_token', None)
 
         #pge_data is an XML document
         pge_data = api.sync_request(
@@ -115,5 +117,5 @@ def process_xml(self, energy_account, start_date, end_date):
         #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
         celery_task.task_status = 1
         db.session.commit()
-        
+
     return {'status': 'Task completed!'}
