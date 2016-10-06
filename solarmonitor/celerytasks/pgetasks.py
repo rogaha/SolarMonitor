@@ -138,8 +138,13 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
 
         #Mark the task as complete. Previously this was only done on the front-end but created
         #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
+        
+        if energy_account.pge_last_date < end_date:
+            energy_account.pge_last_date = end_date
+        if energy_account.pge_first_date > start_date:
+            energy_account.pge_first_date = start_date
+
         celery_task.task_status = 1
-        db.session.commit()
         event = AppEvent(
             user_id=user_id,
             date_time=datetime.datetime.utcnow(),
