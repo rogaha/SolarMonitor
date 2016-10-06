@@ -24,6 +24,7 @@ def process_xml(self, energy_account, start_date, end_date):
         print refresh_info
         energy_account.pge_refresh_token = refresh_info.get(u'refresh_token', None)
         energy_account.pge_access_token = refresh_info.get(u'access_token', None)
+        db.session.commit()
 
         #pge_data is an XML document
         pge_data = api.sync_request(
