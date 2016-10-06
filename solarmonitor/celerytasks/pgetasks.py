@@ -24,7 +24,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             date_time=datetime.datetime.utcnow(),
             event_type=None,
             level=1,
-            info='PGE Data pull started. Date range: {}-{}'.format(start_date, end_date)
+            info='PGE Data pull started. Date range: {} to {} | celery_task_id:{}'.format(start_date, end_date, self.request.id)
         )
         db.session.add(event)
         db.session.commit()
@@ -54,7 +54,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 date_time=datetime.datetime.utcnow(),
                 event_type=None,
                 level=1,
-                info='FAILURE - PGE Data pull. Error: {}'.format(pge_data['error'])
+                info='FAILURE - PGE Data pull. Error: {} | celery_task_id:{}'.format(pge_data['error'], self.request.id)
             )
             db.session.add(event)
             db.session.commit()
@@ -145,7 +145,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             date_time=datetime.datetime.utcnow(),
             event_type=None,
             level=1,
-            info='SUCCESS - PGE Data pull. data: {}'.format(pge_data[:65])
+            info='SUCCESS - PGE Data pull. data: {} | celery_task_id:{}'.format(pge_data[:65], self.request.id)
         )
         db.session.add(event)
         db.session.commit()
