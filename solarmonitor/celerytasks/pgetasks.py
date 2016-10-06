@@ -19,6 +19,8 @@ def process_xml(self, energy_account, start_date, end_date):
     app = create_app(ProdConfig)
     with app.app_context():
 
+        energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
+
         #Refresh the OAuth token. This token is good for 1 hour.
         refresh_info = oauth.get_refresh_token(energy_account)
         print refresh_info
