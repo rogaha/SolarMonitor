@@ -14,13 +14,13 @@ api = Api(config.SSL_CERTS)
 oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
 @celery.task(bind=True)
-def process_xml(self, energy_account, start_date, end_date):
+def process_xml(self, energy_account, start_date, end_date, user_id=1):
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
 
         event = AppEvent(
-            user_id=1,
+            user_id=user_id,
             date_time=datetime.datetime.utcnow(),
             event_type=None,
             level=1,
@@ -50,7 +50,7 @@ def process_xml(self, energy_account, start_date, end_date):
 
         if 'error' in pge_data:
             event = AppEvent(
-                user_id=1,
+                user_id=user_id,
                 date_time=datetime.datetime.utcnow(),
                 event_type=None,
                 level=1,
@@ -141,7 +141,7 @@ def process_xml(self, energy_account, start_date, end_date):
         celery_task.task_status = 1
         db.session.commit()
         event = AppEvent(
-            user_id=1,
+            user_id=user_id,
             date_time=datetime.datetime.utcnow(),
             event_type=None,
             level=1,
