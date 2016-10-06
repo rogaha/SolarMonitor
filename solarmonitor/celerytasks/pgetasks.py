@@ -21,13 +21,6 @@ def process_xml(self, energy_account, start_date, end_date):
 
         energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
 
-        #Refresh the OAuth token. This token is good for 1 hour.
-        refresh_info = oauth.get_refresh_token(energy_account)
-        print refresh_info
-        energy_account.pge_refresh_token = refresh_info.get(u'refresh_token', None)
-        energy_account.pge_access_token = refresh_info.get(u'access_token', None)
-        db.session.commit()
-
         #pge_data is an XML document
         pge_data = api.sync_request(
             energy_account,
@@ -39,8 +32,13 @@ def process_xml(self, energy_account, start_date, end_date):
         print pge_data
 
         if 'error' in pge_data:
-            print 'PGE request failed'
-            return
+            print pge_data['error']
+            #Refresh the OAuth token. This token is good for 1 hour.
+            refresh_info = oauth.get_refresh_token(energy_account)
+            print refresh_info
+            energy_account.pge_refresh_token = refresh_info.get(u'refresh_token', None)
+            energy_account.pge_access_token = refresh_info.get(u'access_token', None)
+            db.session.commit()
 
         reading_type = {}
         data = parse(pge_data)
