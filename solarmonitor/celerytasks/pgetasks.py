@@ -1,6 +1,6 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
-from solarmonitor.user.models import PGEUsagePoint, CeleryTask, EnergyAccount
+from solarmonitor.user.models import PGEUsagePoint, CeleryTask, EnergyAccount, AppEvent
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 import datetime
 from datetime import timedelta
@@ -18,6 +18,16 @@ def process_xml(self, energy_account, start_date, end_date):
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
+
+        event = AppEvent(
+            user_id=1,
+            date_time=datetime.datetime.utcnow(),
+            event_type=None,
+            level=1,
+            info='PGE Data pull started. Date range: {}-{}'.format(start_date, end_date)
+        )
+        db.session.add(event)
+        db.session.commit()
 
         energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
 
@@ -39,6 +49,15 @@ def process_xml(self, energy_account, start_date, end_date):
         print pge_data
 
         if 'error' in pge_data:
+            event = AppEvent(
+                user_id=1,
+                date_time=datetime.datetime.utcnow(),
+                event_type=None,
+                level=1,
+                info='FAILURE - PGE Data pull. Error: {}'.format(pge_data['error'])
+            )
+            db.session.add(event)
+            db.session.commit()
             print pge_data['error']
             return
 
@@ -120,6 +139,15 @@ def process_xml(self, energy_account, start_date, end_date):
         #Mark the task as complete. Previously this was only done on the front-end but created
         #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
         celery_task.task_status = 1
+        db.session.commit()
+        event = AppEvent(
+            user_id=1,
+            date_time=datetime.datetime.utcnow(),
+            event_type=None,
+            level=1,
+            info='SUCCESS - PGE Data pull. data: {}'.format(pge_data[:65])
+        )
+        db.session.add(event)
         db.session.commit()
 
     return {'status': 'Task completed!'}
