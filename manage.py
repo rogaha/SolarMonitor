@@ -100,15 +100,15 @@ def email_users_graph_data():
 
 
 @manager.command
-def bulk_download_pge_data(number_of_days_history=7):
-
-    today = datetime.datetime.today().date() + timedelta(days=1)
-    x_days_ago = datetime.datetime.today().date() - timedelta(days=number_of_days_history)
-
+def bulk_download_pge_data():
     energy_accounts = EnergyAccount.query.all()
     for account in energy_accounts:
-        start_date = x_days_ago
-        end_date = today
+        if account.pge_last_date:
+            start_date = account.pge_last_date - timedelta(days=1)
+        else:
+            start_date = datetime.datetime.today().date() - timedelta(days=7)
+
+        end_date = datetime.datetime.today().date() + timedelta(days=1) #today + 1
 
         if account.pge_refresh_token:
             process_xml.delay(account, start_date, end_date)
