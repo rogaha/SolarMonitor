@@ -10,6 +10,7 @@ from solarmonitor.extensions import bcrypt, db
 import datetime
 from datetime import timedelta
 from flask.ext.login import AnonymousUserMixin
+from sqlalchemy import func
 
 today = datetime.datetime.today().date()
 seven_days_ago = datetime.datetime.today().date() - timedelta(days=7)
@@ -80,6 +81,7 @@ class EnergyAccount(db.Model):
     pge_refresh_token = db.Column(db.String(255))
     pge_last_date = db.Column(db.DateTime)
     pge_first_date = db.Column(db.DateTime)
+    solar_install_date = db.Column(db.DateTime)
     solar_edge_site_id = db.Column(db.String(255))
     pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
@@ -104,6 +106,57 @@ class EnergyAccount(db.Model):
             return json.dumps(serialized_events)
 
         return events
+
+    def cumulative_usage_graph(self, start_date=seven_days_ago, end_date=today):
+        """Graph that shows net usage.
+        Ex.
+        3) Graph the daily cumulative usage from a date (1/1), on any graph. So if I am graphing 9/1 - 9/19, we do this:
+
+        a) Pull the usage from 1/1 to 8/31 and sum it (either with sum SQL or just adding up the data)
+
+        b) Starting the graph range, start and the cumulative and show each days change.
+        This is a line graph similar to the SE production.
+
+        c) Later we can move to a "caching" style db that saves us processing a year of data, but for now, lets just pull the usage data live and see how bad it is in terms of timing.
+        for flow_direction 1 means delivered electric and 19 means reversed and sold back to grid. """
+        today = datetime.datetime.now()
+        first_of_year = datetime.datetime(year=today.year, month=1, day=1)
+
+        if self.solar_install_date and (self.solar_install_date > first_of_year):
+            historical_start = self.solar_install_date
+        else:
+            historical_start = first_of_year
+
+
+        #sold back to grid
+        negative_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
+            (PGEUsagePoint.flow_direction==19)&
+            (PGEUsagePoint.interval_start < start_date)&
+            (PGEUsagePoint.interval_start >= historical_start)
+        ).scalar()
+
+        #used electric
+        positive_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
+            (PGEUsagePoint.flow_direction==1)&
+            (PGEUsagePoint.interval_start < start_date)&
+            (PGEUsagePoint.interval_start >= historical_start)
+        ).scalar()
+
+        print positive_usage, negative_usage
+
+        starting_point = positive_usage - negative_usage
+
+        print starting_point
+
+        starting_point = starting_point / (1000*1000)
+
+        original_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
+
+        new_graph = [((x + starting_point), y) for x, y in original_graph]
+
+        return new_graph
+
+
 
 
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
@@ -249,6 +302,13 @@ class EnergyAccount(db.Model):
                 'incoming_data': [inc_data for inc_data, out_data, labels in pge_incoming_outgoing_graph],
                 'outgoing_data': [out_data for inc_data, out_data, labels in pge_incoming_outgoing_graph],
                 'labels': [labels.strftime(date_format) for inc_data, out_data, labels in pge_incoming_outgoing_graph]
+            }
+
+        elif chart == 'cumulative_usage_graph':
+            cumulative_usage_graph = self.cumulative_usage_graph(start_date, end_date)
+            return {
+                'net_usage': [data for data, labels in cumulative_usage_graph],
+                'labels': [labels.strftime(date_format) for data, labels in cumulative_usage_graph]
             }
 
         elif chart == 'production_net_usage_percentage_graph':

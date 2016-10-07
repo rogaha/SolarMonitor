@@ -54,6 +54,8 @@ def home(modify=None, id=None):
 
     financial = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, financial=True)
 
+    cumulative = current_user.energy_accounts[0].serialize_charts('cumulative_usage_graph', start_date, end_date)
+
     events = current_user.energy_accounts[0].energy_events(start_date, end_date)
 
     form = EventAddForm()
@@ -85,6 +87,7 @@ def home(modify=None, id=None):
         prod_net_usg=prod_net_usg,
         prod_comb=prod_comb,
         financial=financial,
+        cumulative=cumulative,
         account_id=current_user.energy_accounts[0].id,
         breadcrumbs=breadcrumbs, heading=heading,
         events=events,

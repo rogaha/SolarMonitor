@@ -425,17 +425,17 @@ var myChart3 = new Chart(ctx2, {
 
 
 var data4 = {
-labels: {{ financial['labels']|safe }},
+labels: {{ cumulative['labels']|safe }},
 datasets: [
     {
         type: 'bar',
-        label: 'Financial Test',
-        backgroundColor: "rgba(168,25,25,0.2)",
-        borderColor: "rgba(138,16,16,1)",
+        label: 'Cumulative Usage',
+        backgroundColor: "rgba(207,249,117,0.2)",
+        borderColor: "rgba(137,156,255,1)",
         borderWidth: 1,
-        hoverBackgroundColor: "rgba(168,25,25,0.4)",
-        hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ financial['net_usage']|safe }},
+        hoverBackgroundColor: "rgba(207,249,117,0.4)",
+        hoverBorderColor: "rgba(207,249,117,1)",
+        data: {{ cumulative['net_usage']|safe }},
     }
 ]
 };
@@ -459,8 +459,7 @@ var myChart4 = new Chart(ctx4, {
 });
 </script>
 
-
-
+{{ cumulative }}
 
     </div>
 </div>
