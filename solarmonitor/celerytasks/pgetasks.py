@@ -24,14 +24,6 @@ def backoff(attempts):
 
 @celery.task(bind=True, max_retries=16, soft_time_limit=86400)
 def process_xml(self, energy_account, start_date, end_date, user_id=1):
-    try:
-        start_date = start_date.date()
-    except:
-        pass
-    try:
-        end_date = end_date.date()
-    except:
-        pass
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
