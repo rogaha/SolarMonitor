@@ -433,7 +433,7 @@ labels: {{ cumulative['labels']|safe }},
 datasets: [
     {
         type: 'line',
-        label: 'Cumulative Usage',
+        label: 'Cumulative Usage since {{ solar_install_date | safe }}',
         backgroundColor: "rgba(207,249,117,0.05)",
         borderColor: "rgba(137,156,255,1)",
         borderWidth: 1,

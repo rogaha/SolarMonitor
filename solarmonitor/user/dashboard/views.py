@@ -89,6 +89,7 @@ def home(modify=None, id=None):
         financial=financial,
         cumulative=cumulative,
         account_id=current_user.energy_accounts[0].id,
+        solar_install_date=current_user.energy_accounts[0].solar_install_date.strftime('%m/%d/%Y'),
         breadcrumbs=breadcrumbs, heading=heading,
         events=events,
         form=form
