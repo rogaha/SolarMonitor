@@ -24,6 +24,12 @@ def backoff(attempts):
 
 @celery.task(bind=True, max_retries=16, soft_time_limit=86400)
 def process_xml(self, energy_account, start_date, end_date, user_id=1):
+    if not isinstance(start_date, datetime.date):
+        start_date = start_date.date()
+
+    if not isinstance(end_date, datetime.date):
+        end_date = end_date.date()
+
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
@@ -138,13 +144,13 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             #Mark the task as complete. Previously this was only done on the front-end but created
             #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
             if energy_account.pge_last_date:
-                if energy_account.pge_last_date < end_date.date():
+                if energy_account.pge_last_date < end_date:
                     energy_account.pge_last_date = end_date
             else:
                 energy_account.pge_last_date = end_date
 
             if energy_account.pge_first_date:
-                if energy_account.pge_first_date > start_date.date():
+                if energy_account.pge_first_date > start_date:
                     energy_account.pge_first_date = start_date
             else:
                 energy_account.pge_first_date = start_date
