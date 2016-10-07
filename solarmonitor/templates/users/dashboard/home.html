@@ -152,7 +152,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
         url: url,
         success: function (data) {
             console.log(data);
-            myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
+            /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
             myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
             myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
             myChart.data.labels = data.production_net_usage_percentage_graph.labels;
@@ -162,6 +162,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
             myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
             myChart2.data.labels = data.production_net_usage_graph.labels;
             myChart2.update();
+            */
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -185,7 +186,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
         url: url,
         success: function (data) {
             console.log(data);
-            myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
+            /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
             myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
             myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
             myChart.data.labels = data.production_net_usage_percentage_graph.labels;
@@ -195,6 +196,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
             myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
             myChart2.data.labels = data.production_net_usage_graph.labels;
             myChart2.update();
+            */
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -218,6 +220,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
         url: url,
         success: function (data) {
             console.log(data);
+            /*
             myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
             myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
             myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
@@ -227,7 +230,7 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
             myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
             myChart2.data.labels = data.production_net_usage_graph.labels;
-            myChart2.update();
+            myChart2.update();*/
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
