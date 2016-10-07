@@ -106,9 +106,9 @@ def bulk_download_pge_data():
         if account.pge_last_date:
             start_date = account.pge_last_date - timedelta(days=1)
         else:
-            start_date = datetime.datetime.today() - timedelta(days=7)
+            start_date = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=7)
 
-        end_date = datetime.datetime.today() + timedelta(days=1) #today + 1
+        end_date = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) #today + 1
 
         if account.pge_refresh_token:
             process_xml.delay(account, start_date, end_date)
