@@ -104,7 +104,7 @@ def bulk_download_pge_data():
     energy_accounts = EnergyAccount.query.all()
     for account in energy_accounts:
         if account.pge_last_date:
-            start_date = account.pge_last_date - timedelta(days=1)
+            start_date = account.pge_last_date - timedelta(days=3)
         else:
             start_date = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=7)
 
