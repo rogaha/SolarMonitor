@@ -167,7 +167,7 @@ def graph_update(account_id=None, start_date=None, end_date=None):
         'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
         'production_net_usage_graph': energy_account.serialize_charts('production_net_usage_graph', s_date, e_date),
         'net_usage_separated': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, separate=True),
-        'financial': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, financial=True)
+        'cumulative': energy_account.serialize_charts('cumulative_usage_graph', s_date, e_date)
     }
 
     return jsonify(result)
@@ -184,6 +184,10 @@ def modify_energy_account(account_id=None):
     energy_account.zip_code = request.form['zip_code']
     energy_account.pge_bulk_id = request.form['pge_bulk_id']
     energy_account.solar_edge_site_id = request.form['solar_edge_site_id']
+    try:
+        energy_account.solar_install_date = try_parsing_date(request.form['solar_install_date'])
+    except:
+        flash('Date not a recognized format')
     db.session.commit()
 
     result = energy_account.serialize()

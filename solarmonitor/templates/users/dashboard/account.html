@@ -67,9 +67,9 @@
                         <td id="account_address_one">{{ account.address_one }}</td>
                         <td id="account_pge_bulk_id">{% if current_user.energy_accounts[0].pge_refresh_token %}PGE Account is Authorized <a href="{{ url_for('dashboard.account', modify='del_pge') }}"><i class="fa fa-close" style="color:red"></i></a>{% else%}  <a href="{{ url_for('dashboard.authorizations', start_oauth='yes')}}" class="btn btn-primary">Authorize PGE</a>{% endif %}</td>
                         <td id="account_solar_edge_site_id">{{ account.solar_edge_site_id }}</td>
-                        <td id="account_solar_edge_site_id">{{ account.pge_first_date }}</td>
-                        <td id="account_solar_edge_site_id">{{ account.pge_last_date }}</td>
-                        <td id="account_solar_edge_site_id">{{ account.solar_install_date }}</td>
+                        <td id="account_solar_edge_site_id">{{ account.pge_first_date.strftime('%m/%d/%Y') }}</td>
+                        <td id="account_solar_edge_site_id">{{ account.pge_last_date.strftime('%m/%d/%Y') }}</td>
+                        <td id="account_solar_install_date">{{ account.solar_install_date.strftime('%m/%d/%Y') }}</td>
 
                       </tr>
                   {% endfor %}
@@ -180,6 +180,15 @@
                       </div>
                     </div>
 
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">Solar Install Date</label>
+                      <div class="col-md-4">
+                      <input id="solar_install_date" name="solar_install_date" type="text" placeholder="mm/dd/yyyy" class="form-control input-md" value="{% if account.solar_install_date %}{{ account.solar_install_date.strftime('%m/%d/%Y') }}{% endif %}">
+
+                      </div>
+                    </div>
+
                     <input id="account_id" type="hidden" name="account_id" value="{{ account.id }}">
 
                     </fieldset>
@@ -205,6 +214,7 @@
                             $('#account_pge_bulk_id').text(data.pge_bulk_id);
                             $('#account_address_one').text(data.address_one);
                             $('#account_solar_edge_site_id').text(data.solar_edge_site_id);
+                            $('#account_solar_install_date').text(data.solar_install_date);
                         }
                     });
 

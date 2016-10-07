@@ -266,6 +266,7 @@ class EnergyAccount(db.Model):
             'zip_code': self.zip_code,
             'pge_bulk_id': self.pge_bulk_id,
             'solar_edge_site_id': self.solar_edge_site_id,
+            'solar_install_date': self.solar_install_date
         }
 
     def serialize_charts(self, chart, start_date=seven_days_ago, end_date=today, date_format='%m/%d', separate=False, financial=False):

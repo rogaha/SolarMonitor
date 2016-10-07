@@ -169,8 +169,8 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
             myChart3.data.labels = data.production_net_usage_graph.labels;
             myChart3.update();
 
-            myChart4.data.datasets[0].data = data.financial.net_usage;
-            myChart4.data.labels = data.financial.labels;
+            myChart4.data.datasets[0].data = data.cumulative.net_usage;
+            myChart4.data.labels = data.cumulative.labels;
             myChart4.update();
         }
     });
@@ -202,8 +202,8 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
             myChart3.data.labels = data.production_net_usage_graph.labels;
             myChart3.update();
 
-            myChart4.data.datasets[0].data = data.financial.net_usage;
-            myChart4.data.labels = data.financial.labels;
+            myChart4.data.datasets[0].data = data.cumulative.net_usage;
+            myChart4.data.labels = data.cumulative.labels;
             myChart4.update();
         }
     });
@@ -235,8 +235,8 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
             myChart3.data.labels = data.production_net_usage_graph.labels;
             myChart3.update();
 
-            myChart4.data.datasets[0].data = data.financial.net_usage;
-            myChart4.data.labels = data.financial.labels;
+            myChart4.data.datasets[0].data = data.cumulative.net_usage;
+            myChart4.data.labels = data.cumulative.labels;
             myChart4.update();
         }
     });
@@ -307,7 +307,7 @@ datasets: [
 ]
 };
 var ctx = document.getElementById("myChart");
-var myChart = new Chart(ctx, {
+/*var myChart = new Chart(ctx, {
   type: 'bar',
   data: data,
   options: {
@@ -324,6 +324,7 @@ var myChart = new Chart(ctx, {
       }
   }
 });
+*/
 </script>
 
 <script>
@@ -351,7 +352,7 @@ datasets: [
 ]
 };
 var ctx = document.getElementById("myChart2");
-var myChart2 = new Chart(ctx, {
+/*var myChart2 = new Chart(ctx, {
   type: 'bar',
   data: data,
   options: {
@@ -367,7 +368,7 @@ var myChart2 = new Chart(ctx, {
           }]
       }
   }
-});
+});*/
 
 var data2 = {
 labels: {{ prod_net_usg['labels']|safe }},
@@ -428,9 +429,9 @@ var data4 = {
 labels: {{ cumulative['labels']|safe }},
 datasets: [
     {
-        type: 'bar',
+        type: 'line',
         label: 'Cumulative Usage',
-        backgroundColor: "rgba(207,249,117,0.2)",
+        backgroundColor: "rgba(207,249,117,0.05)",
         borderColor: "rgba(137,156,255,1)",
         borderWidth: 1,
         hoverBackgroundColor: "rgba(207,249,117,0.4)",
@@ -458,8 +459,6 @@ var myChart4 = new Chart(ctx4, {
   }
 });
 </script>
-
-{{ cumulative }}
 
     </div>
 </div>
