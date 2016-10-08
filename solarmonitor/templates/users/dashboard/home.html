@@ -33,6 +33,7 @@
         <span class="sr-only">Toggle Dropdown</span>
       </button>
       <ul class="dropdown-menu">
+        <li><a id="100days" href="#" ng-click="getEvents(100)">100 days</a></li>
         <li><a id="30days" href="#" ng-click="getEvents(30)">30 days</a></li>
         <li><a id="14days" href="#" ng-click="getEvents(14)">14 days</a></li>
         <li><a id="7days" href="#" ng-click="getEvents(7)">7 days</a></li>
@@ -142,6 +143,39 @@
 <script type="text/javascript">
 
 var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
+$('#100days').click(function () {
+var account_id = {{ account_id|safe }};
+var thirtyDaysAgo = moment().subtract(100, 'days').format("YYYY-MM-DD");
+var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
+  $.ajax({
+      type: 'GET',
+      url: url,
+      success: function (data) {
+          console.log(data);
+          /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
+          myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
+          myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
+          myChart.data.labels = data.production_net_usage_percentage_graph.labels;
+          myChart.update();
+
+          myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
+          myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
+          myChart2.data.labels = data.production_net_usage_graph.labels;
+          myChart2.update();
+          */
+
+          myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
+          myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
+          myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
+          myChart3.data.labels = data.production_net_usage_graph.labels;
+          myChart3.update();
+
+          myChart4.data.datasets[0].data = data.cumulative.net_usage;
+          myChart4.data.labels = data.cumulative.labels;
+          myChart4.update();
+      }
+  });
+});
 
   $('#30days').click(function () {
   var account_id = {{ account_id|safe }};
@@ -452,11 +486,14 @@ var myChart4 = new Chart(ctx4, {
           yAxes: [{
               stacked: true,
               ticks: {
-                  beginAtZero:true
+                  beginAtZero:false
               }
           }],
           xAxes: [{
-              stacked: true
+              stacked: true,
+              ticks: {
+                  beginAtZero:false
+              }
           }]
       }
   }

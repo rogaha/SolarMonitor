@@ -128,17 +128,20 @@ class EnergyAccount(db.Model):
         else:
             historical_start = first_of_year
 
+        print historical_start
+        print self.solar_install_date
+        print start_date
 
         #sold back to grid
         negative_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
-            (PGEUsagePoint.flow_direction==19)&
+            (PGEUsagePoint.flow_direction == 19)&
             (PGEUsagePoint.interval_start < start_date)&
             (PGEUsagePoint.interval_start >= historical_start)
         ).scalar()
 
         #used electric
         positive_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
-            (PGEUsagePoint.flow_direction==1)&
+            (PGEUsagePoint.flow_direction == 1)&
             (PGEUsagePoint.interval_start < start_date)&
             (PGEUsagePoint.interval_start >= historical_start)
         ).scalar()
@@ -149,11 +152,20 @@ class EnergyAccount(db.Model):
 
         print starting_point
 
-        starting_point = starting_point / (1000*1000)
+        starting_point = starting_point * (10**-6)
+
+        print starting_point
 
         original_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
 
-        new_graph = [(float("{0:.2f}".format((x + starting_point))), y) for x, y in original_graph]
+        new_data = []
+        for data, label in original_graph:
+            starting_point = float("{0:.2f}".format((data + starting_point)))
+            new_data.append(starting_point)
+
+        labels = [y for x, y in original_graph]
+
+        new_graph = zip(new_data, labels)
 
         return new_graph
 
