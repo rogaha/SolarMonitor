@@ -103,6 +103,10 @@ def pull_ytd():
         end_date = datetime.now() if energy_account.pge_last_date == None else energy_account.pge_last_date
         start_date = datetime(year=datetime.now().year, month=1, day=1)
 
+        #Refresh the OAuth token. This token is good for 1 hour.
+        refresh_info = oauth.get_refresh_token(energy_account)
+        print refresh_info
+
         for month in range(start_date.month, (end_date.month+1)):
             """For the given date range, break into month chunks and pull PGE Data"""
             week_day, last_day = monthrange(start_date.year, month)
