@@ -247,6 +247,9 @@ def charts(modify=None):
         start_date_pge = datetime.strptime(session['start_date_pge'], '%Y-%m-%d')
         end_date_pge = datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
 
+        refresh_info = oauth.get_refresh_token(current_user.energy_accounts[0])
+        print refresh_info
+
         process_xml.delay(current_user.energy_accounts[0], start_date_pge, end_date_pge, user_id=current_user.id)
         flash('Data processing')
         return redirect(url_for('dashboard.charts'))
