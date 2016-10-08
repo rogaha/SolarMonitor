@@ -152,12 +152,9 @@ class EnergyAccount(db.Model):
 
         original_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
 
-        new_graph = [((x + starting_point), y) for x, y in original_graph]
+        new_graph = [(float("{0:.2f}".format((x + starting_point))), y) for x, y in original_graph]
 
         return new_graph
-
-
-
 
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
         """Solar Edge production vs Combined PGE data"""
