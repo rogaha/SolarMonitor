@@ -22,7 +22,7 @@ def backoff(attempts):
     """
     return 2 ** attempts
 
-@celery.task(bind=True, max_retries=16, soft_time_limit=86400)
+@celery.task(bind=True, max_retries=3, soft_time_limit=6000)
 def process_xml(self, energy_account, start_date, end_date, user_id=1):
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
