@@ -33,7 +33,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 date_time=datetime.datetime.utcnow(),
                 event_type=None,
                 level=1,
-                info='PGE Data pull started. Date range: {} to {} | celery_task_id:{}'.format(start_date, end_date, self.request.id)
+                info='PGE Data pull started. Date range: {} to {} | celery_task_id:{}'.format(start_date.strftime('%m/%d/%Y'), end_date.strftime('%m/%d/%Y'), self.request.id)
             )
             db.session.add(event)
             db.session.commit()

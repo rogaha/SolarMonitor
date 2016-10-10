@@ -58,6 +58,11 @@ def home(modify=None, id=None):
 
     events = current_user.energy_accounts[0].energy_events(start_date, end_date)
 
+    if current_user.energy_accounts[0].solar_install_date:
+        solar_install_date = current_user.energy_accounts[0].solar_install_date.strftime('%m/%d/%Y')
+    else:
+        solar_install_date = None
+
     form = EventAddForm()
 
     if modify == 'del':
@@ -89,7 +94,7 @@ def home(modify=None, id=None):
         financial=financial,
         cumulative=cumulative,
         account_id=current_user.energy_accounts[0].id,
-        solar_install_date=current_user.energy_accounts[0].solar_install_date.strftime('%m/%d/%Y'),
+        solar_install_date=solar_install_date,
         breadcrumbs=breadcrumbs, heading=heading,
         events=events,
         form=form
