@@ -44,7 +44,7 @@ class Anonymous(AnonymousUserMixin):
             info=info
         )
         db.session.add(event)
-        db.session.commit()
+        db.session.commit() 
 
 
 class AppEvent(db.Model):
