@@ -43,7 +43,7 @@ class ProdConfig(Config):
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
 
 class DevConfig(Config):
-    """Development configuration."""
+    """Development configuration.""" 
 
     ENV = 'dev'
     DEBUG = True
