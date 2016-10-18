@@ -53,7 +53,7 @@ class AppEvent(db.Model):
     date_time = db.Column(db.DateTime)
     event_type = db.Column(db.Integer)
     level = db.Column(db.Integer)
-    info = db.Column(db.String(355))
+    info = db.Column(db.String(1300))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 class EnergyEvent(db.Model):
