@@ -39,7 +39,7 @@ class ProdConfig(Config):
 
     ENV = 'prod'
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgres://zqdbbnsrdcldwf:hN8yok1PcmPR6elNtOXUyqOCQg@ec2-54-235-207-226.compute-1.amazonaws.com:5432/de83poa0e5nd3o'
+    SQLALCHEMY_DATABASE_URI = 'postgres://u78omb7f92dods:paf3b0f2ocpbh0c2bofami4ld5l@ec2-52-72-25-94.compute-1.amazonaws.com:5432/de83nvhb4d5ql0'
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
 
 class DevConfig(Config):
@@ -50,7 +50,7 @@ class DevConfig(Config):
     DB_NAME = 'dev.db'
     # Put the db file in project root
     DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
-    SQLALCHEMY_DATABASE_URI = 'postgres://zqdbbnsrdcldwf:hN8yok1PcmPR6elNtOXUyqOCQg@ec2-54-235-207-226.compute-1.amazonaws.com:5432/de83poa0e5nd3o'
+    SQLALCHEMY_DATABASE_URI = 'postgres://u78omb7f92dods:paf3b0f2ocpbh0c2bofami4ld5l@ec2-52-72-25-94.compute-1.amazonaws.com:5432/de83nvhb4d5ql0'
     DEBUG_TB_ENABLED = True
     ASSETS_DEBUG = True  # Don't bundle/minify static assets
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
