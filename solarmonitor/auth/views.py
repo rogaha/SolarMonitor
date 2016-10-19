@@ -34,10 +34,11 @@ def register():
         )
         energy_account = EnergyAccount(nick_name='Default Account')
         user.energy_accounts.append(energy_account)
-        user.log_event(info="Default energy account created for new user \'{}\'.".format(user.full_name))
-        current_user.log_event(info="New user account created for \'{}\'.".format(user.full_name))
+
         db.session.add(user)
         db.session.commit()
+        user.log_event(info="Default energy account created for new user \'{}\'.".format(user.full_name))
+        current_user.log_event(info="New user account created for \'{}\'.".format(user.full_name))
         login_user(user, True)
         flash('Thank you for registering.', 'success')
         return redirect(url_for('dashboard.home'))
