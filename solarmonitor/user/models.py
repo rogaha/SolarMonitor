@@ -44,7 +44,7 @@ class Anonymous(AnonymousUserMixin):
             info=info
         )
         db.session.add(event)
-        db.session.commit() 
+        db.session.commit()
 
 
 class AppEvent(db.Model):
@@ -145,6 +145,9 @@ class EnergyAccount(db.Model):
             (PGEUsagePoint.interval_start < start_date)&
             (PGEUsagePoint.interval_start >= historical_start)
         ).scalar()
+
+        if (negative_usage == None) and (positive_usage == None):
+            return None
 
         print positive_usage, negative_usage
 
@@ -317,6 +320,8 @@ class EnergyAccount(db.Model):
 
         elif chart == 'cumulative_usage_graph':
             cumulative_usage_graph = self.cumulative_usage_graph(start_date, end_date)
+            if cumulative_usage_graph == None:
+                return None
             return {
                 'net_usage': [data for data, labels in cumulative_usage_graph],
                 'labels': [labels.strftime(date_format) for data, labels in cumulative_usage_graph]
