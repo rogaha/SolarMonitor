@@ -170,6 +170,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             db.session.add(event)
             db.session.commit()
         except Exception as exc:
+            print exc
             db.session.rollback()
             event = AppEvent(
                 user_id=user_id,
