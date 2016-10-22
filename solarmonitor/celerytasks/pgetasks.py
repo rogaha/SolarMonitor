@@ -27,6 +27,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
+
         try:
             event = AppEvent(
                 user_id=user_id,
@@ -39,6 +40,11 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             db.session.commit()
 
             energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
+            
+            #Create a new celery task in the database
+            celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
+            db.session.add(celery_task)
+            db.session.commit()
 
             if energy_account.pge_refresh_token_expiration:
                 """If there is an expiration date in the system check if it's expired.
@@ -72,11 +78,6 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
 
             reading_type = {}
             data = parse(pge_data)
-
-            #Create a new celery task in the database
-            celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
-            db.session.add(celery_task)
-            db.session.commit()
 
             for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
                 """Here we loop through all the entry blocks in the XML, not all of these blocks
