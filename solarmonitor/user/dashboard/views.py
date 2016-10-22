@@ -190,11 +190,12 @@ def modify_energy_account(account_id=None):
     energy_account.zip_code = request.form['zip_code']
     energy_account.pge_bulk_id = request.form['pge_bulk_id']
     energy_account.solar_edge_site_id = request.form['solar_edge_site_id']
+    energy_account.solar_edge_api_key = request.form['solar_edge_api_key']
     try:
         energy_account.solar_install_date = try_parsing_date(request.form['solar_install_date'])
     except:
         flash('Date not a recognized format')
-    db.session.commit()
+    db.ssion.commit()
 
     result = energy_account.serialize()
 
@@ -340,7 +341,7 @@ def solar_edge(modify=None):
             flash('Date entered, not in correct format.')
             return redirect(url_for('dashboard.solar_edge'))
 
-        se = SolarEdgeApi()
+        se = SolarEdgeApi(energy_account)
 
         if 'data_time_unit_se' in session:
             time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'

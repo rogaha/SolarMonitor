@@ -128,6 +128,17 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                             accumulation_behavior=reading_type['accumulation_behavior']
                             )
 
+                        """This function begins with a start_date and and end_date that is provided by the user
+                        (or system). However the start and end values for `pge_first_date` and `pge_last_date`
+                        should not be set by user input. Instead we will check for what data actuall comes back and
+                        set the first and last dates according to that data. On the first loop, we will set the first_date equal
+                        to the first date that comes in from PGE every subsequent loop will increment the end_date which
+                        will get updated and saved to the DB during the cleanup phase of this task."""
+                        if index == 0:
+                            start_date = usage_point.interval_start
+
+                        end_date = usage_point.interval_start
+
                         #Before executing the SQL, check to see if the data is already there
                         #Data is considered a dupe if it's the same energy account, interval value, flow direction, and start time
                         duplicate_check = PGEUsagePoint.query.filter_by(

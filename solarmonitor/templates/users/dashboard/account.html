@@ -47,6 +47,7 @@
                     <th>Address</th>
                     <th>PGE Bulk ID</th>
                     <th>SolarEdge Site ID</th>
+                    <th>SolarEdge API Key</th>
                     <th>PGE First Date</th>
                     <th>PGE Last Date</th>
                     <th>Solar Install Date</th>
@@ -67,6 +68,7 @@
                         <td id="account_address_one">{{ account.address_one }}</td>
                         <td id="account_pge_bulk_id">{% if current_user.energy_accounts[0].pge_refresh_token %}PGE Account is Authorized <a href="{{ url_for('dashboard.account', modify='del_pge') }}"><i class="fa fa-close" style="color:red"></i></a>{% else%}  <a href="{{ url_for('dashboard.authorizations', start_oauth='yes')}}" class="btn btn-primary">Authorize PGE</a>{% endif %}</td>
                         <td id="account_solar_edge_site_id">{{ account.solar_edge_site_id }}</td>
+                        <td id="account_solar_edge_site_id">{{ account.solar_edge_api_key }}</td>
                         <td id="account_solar_edge_site_id">{% if account.pge_first_date %}{{ account.pge_first_date.strftime('%m/%d/%Y') }}{% endif %}</td>
                         <td id="account_solar_edge_site_id">{% if account.pge_last_date %}{{ account.pge_last_date.strftime('%m/%d/%Y') }}{% endif %}</td>
                         <td id="account_solar_install_date">{% if account.solar_install_date %}{{ account.solar_install_date.strftime('%m/%d/%Y') }}{% endif %}</td>
@@ -176,6 +178,15 @@
                       <label class="col-md-4 control-label" for="textinput">Solar Edge Site Id</label>
                       <div class="col-md-4">
                       <input id="solar_edge_site_id" name="solar_edge_site_id" type="text" placeholder="12345" class="form-control input-md" value="{% if account.solar_edge_site_id %}{{ account.solar_edge_site_id }}{% endif %}">
+
+                      </div>
+                    </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label class="col-md-4 control-label" for="textinput">Solar Edge API Key</label>
+                      <div class="col-md-4">
+                      <input id="solar_edge_site_id" name="solar_edge_site_id" type="text" placeholder="12345" class="form-control input-md" value="{% if account.solar_edge_api_key %}{{ account.solar_edge_api_key }}{% endif %}">
 
                       </div>
                     </div>

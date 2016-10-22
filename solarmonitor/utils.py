@@ -19,6 +19,9 @@ def flash_errors(form, category='warning'):
         for error in errors:
             flash('{0} - {1}'.format(getattr(form, field).label.text, error), category)
 
+def convert_to_kWh(microwatts):
+    return round((microwatts * (10**-6)), 2)
+
 def try_parsing_date(text):
     if not text:
         return None

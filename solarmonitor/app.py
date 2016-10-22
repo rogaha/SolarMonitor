@@ -43,6 +43,13 @@ def create_app(config_object=ProdConfig):
                 return 'Panel Related'
         return dict(format_event_type=format_event_type)
 
+    @app.context_processor
+    def utility_processor():
+        def convert_to_kWh(data_list):
+            data_list = [(x * (10**-6)) for x in data_list]
+            return data_list
+        return dict(convert_to_kWh=convert_to_kWh)
+
     return app
 
 def register_extensions(app):

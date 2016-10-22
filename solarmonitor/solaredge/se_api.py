@@ -16,8 +16,8 @@ Temperature values are always in Celsius degrees.
 
 class SolarEdgeApi:
 
-    def __init__(self):
-        self.api_key = config.SOLAREDGE_API_KEY
+    def __init__(self, energy_account):
+        self.api_key = energy_account.solar_edge_api_key
         self.base_url = 'https://monitoringapi.solaredge.com'
 
     def __repr__(self):

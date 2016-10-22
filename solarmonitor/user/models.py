@@ -5,6 +5,7 @@ import datetime as dt
 import json
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
+from solarmonitor.utils import convert_to_kWh
 
 from solarmonitor.extensions import bcrypt, db
 import datetime
@@ -84,6 +85,7 @@ class EnergyAccount(db.Model):
     pge_first_date = db.Column(db.DateTime)
     solar_install_date = db.Column(db.DateTime)
     solar_edge_site_id = db.Column(db.String(255))
+    solar_edge_api_key = db.Column(db.String(255))
     pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
@@ -155,15 +157,11 @@ class EnergyAccount(db.Model):
 
         print starting_point
 
-        starting_point = starting_point * (10**-6)
-
-        print starting_point
-
         original_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
 
         new_data = []
         for data, label in original_graph:
-            starting_point = float("{0:.2f}".format((data + starting_point)))
+            starting_point = data + starting_point
             new_data.append(starting_point)
 
         labels = [y for x, y in original_graph]
@@ -264,7 +262,7 @@ class EnergyAccount(db.Model):
             se_energy_data.append(each.value)
             se_energy_labels.append(each.date)
 
-        se_energy_data = [float(x)/1000 for x in se_energy_data]
+        se_energy_data = [float(x) * 1000 for x in se_energy_data]
 
         return zip(se_energy_data, se_energy_labels)
 
@@ -279,6 +277,7 @@ class EnergyAccount(db.Model):
             'zip_code': self.zip_code,
             'pge_bulk_id': self.pge_bulk_id,
             'solar_edge_site_id': self.solar_edge_site_id,
+            'solar_edge_api_key': self.solar_edge_api_key,
             'solar_install_date': self.solar_install_date.strftime('%m/%d/%Y')
         }
 
@@ -286,7 +285,7 @@ class EnergyAccount(db.Model):
         if chart == 'solar_edge_production_graph':
             solar_edge_production_graph = self.solar_edge_production_graph(start_date, end_date)
             return {
-                'se_energy_data': [data for data, labels in solar_edge_production_graph],
+                'se_energy_data': [convert_to_kWh(data) for data, labels in solar_edge_production_graph],
                 'labels': [labels.strftime(date_format) for data, labels in solar_edge_production_graph]
             }
 
@@ -294,27 +293,27 @@ class EnergyAccount(db.Model):
             if separate:
                 pge_incoming_outgoing_combined_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date, separate)
                 return {
-                    'net_usage_positive': [pos_data for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph],
-                    'net_usage_negative': [neg_data for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph],
+                    'net_usage_positive': [convert_to_kWh(pos_data) for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph],
+                    'net_usage_negative': [convert_to_kWh(neg_data) for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph],
                     'labels': [labels.strftime(date_format) for pos_data, neg_data, labels in pge_incoming_outgoing_combined_graph]
                 }
             if financial:
                 pge_incoming_outgoing_combined_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date, financial=financial)
                 return {
-                    'net_usage': [data for data, labels in pge_incoming_outgoing_combined_graph],
+                    'net_usage': [convert_to_kWh(data) for data, labels in pge_incoming_outgoing_combined_graph],
                     'labels': [labels.strftime(date_format) for data, labels in pge_incoming_outgoing_combined_graph]
                 }
             pge_incoming_outgoing_combined_graph = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
             return {
-                'net_usage': [data for data, labels in pge_incoming_outgoing_combined_graph],
+                'net_usage': [convert_to_kWh(data) for data, labels in pge_incoming_outgoing_combined_graph],
                 'labels': [labels.strftime(date_format) for data, labels in pge_incoming_outgoing_combined_graph]
             }
 
         elif chart == 'pge_incoming_outgoing_graph':
             pge_incoming_outgoing_graph = self.pge_incoming_outgoing_graph(start_date, end_date)
             return {
-                'incoming_data': [inc_data for inc_data, out_data, labels in pge_incoming_outgoing_graph],
-                'outgoing_data': [out_data for inc_data, out_data, labels in pge_incoming_outgoing_graph],
+                'incoming_data': [convert_to_kWh(inc_data) for inc_data, out_data, labels in pge_incoming_outgoing_graph],
+                'outgoing_data': [convert_to_kWh(out_data) for inc_data, out_data, labels in pge_incoming_outgoing_graph],
                 'labels': [labels.strftime(date_format) for inc_data, out_data, labels in pge_incoming_outgoing_graph]
             }
 
@@ -323,7 +322,7 @@ class EnergyAccount(db.Model):
             if cumulative_usage_graph == None:
                 return None
             return {
-                'net_usage': [data for data, labels in cumulative_usage_graph],
+                'net_usage': [convert_to_kWh(data) for data, labels in cumulative_usage_graph],
                 'labels': [labels.strftime(date_format) for data, labels in cumulative_usage_graph]
             }
 
@@ -339,8 +338,8 @@ class EnergyAccount(db.Model):
         elif chart == 'production_net_usage_graph':
             production_net_usage_graph = self.production_net_usage_graph(start_date, end_date)
             return {
-                'production': [production for production, net_usage, labels in production_net_usage_graph],
-                'net_usage': [net_usage for production, net_usage, labels in production_net_usage_graph],
+                'production': [convert_to_kWh(production) for production, net_usage, labels in production_net_usage_graph],
+                'net_usage': [convert_to_kWh(net_usage) for production, net_usage, labels in production_net_usage_graph],
                 'labels': [labels.strftime(date_format) for production, net_usage, labels in production_net_usage_graph]
             }
 
