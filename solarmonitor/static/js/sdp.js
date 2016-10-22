@@ -27,6 +27,7 @@ sdp.controller('progressBar', function($scope, $http, $timeout) {
     $scope.value = 0;
 
     $scope.watchedTasks = []
+    $scope.pendingTasks = []
 
     var poll = function() {
         $timeout(function() {
@@ -36,9 +37,7 @@ sdp.controller('progressBar', function($scope, $http, $timeout) {
                     console.log(response.data)
                     console.log(response.data.length)
                     console.log($scope.watchedTasks)
-                    if (angular.equals(response.data, {})) {
-                        $scope.watchedTasks.push(response.data)
-                    }
+                    $scope.watchedTasks = response.data
                 });
 
             poll();
@@ -46,23 +45,31 @@ sdp.controller('progressBar', function($scope, $http, $timeout) {
     };
 
 
-    var check_status = function() {
+    var check_status = function(task) {
         $timeout(function() {
+            task_id = task[Object.keys(obj)[0]]
+            $http.get('/users/dashboard/status/' + task_id)
+                .then(function(response) {
+                    console.log(response.data)
+                    task.status = response.data
+                });
 
-            //$http.get('/users/dashboard/status/task_check')
-            //    .then(function(response) {
-            //        console.log(response.data)
-            //        if (response.data.length > 0) {
-            //            $scope.watchedTasks.push(response.data)
-            //        }
-            //    });
-
-            //check_status();
+            check_status(task);
         }, 1000);
     };
 
-
-    //check_status();
+    $scope.watchedTasks.forEach(check_status);
     poll();
 
 });
+
+function containsObject(obj, list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if (angular.equals(list[i], obj)) {
+            return true;
+        }
+    }
+
+    return false;
+}

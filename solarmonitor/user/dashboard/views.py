@@ -391,11 +391,20 @@ def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None)
             (CeleryTask.energy_account_id==current_user.energy_accounts[0].id)
             ).all()
 
-        unfinished_tasks_dict = {}
+        pending_tasks = []
         for task in unfinished_tasks:
-            unfinished_tasks_dict[task.id] = task.task_id
-
-        return jsonify(unfinished_tasks_dict)
+            celery_info = process_xml.AsyncResult(task.task_id)
+            print celery_info, celery_info.info
+            task_dict = {}
+            task_dict[task.id] = task.task_id
+            task_dict['status'] = {
+                'state': celery_info.state,
+                'current': celery_info.info.get('current', 0),
+                'total': celery_info.info.get('total', 1),
+                'message': str(celery_info.info,)
+            }
+            pending_tasks.append(task_dict)
+        return jsonify(pending_tasks)
 
 
     task = process_xml.AsyncResult(task_id)
@@ -403,8 +412,8 @@ def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None)
 
         response = {
             'state': task.state,
-            'current': 0,
-            'total': 1,
+            'current': task.info.get('current', 0),
+            'total': task.info.get('total', 1),
             'status': 'Pending...'
         }
     elif task.state != 'FAILURE':
