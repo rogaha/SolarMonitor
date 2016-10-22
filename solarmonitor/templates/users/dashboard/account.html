@@ -195,13 +195,14 @@
                     <div class="form-group">
                       <label class="col-md-4 control-label" for="textinput">Solar Install Date</label>
                       <div class="col-md-4">
-                      <input id="solar_install_date" name="solar_install_date" type="text" placeholder="mm/dd/yyyy" class="form-control input-md" value="{% if account.solar_install_date %}{{ account.solar_install_date.strftime('%m/%d/%Y') }}{% endif %}">
+                      <input id="solar_install_date" data-date-container='#energy_account_modify_{{ account.id }}' name="solar_install_date" type="text" placeholder="mm/dd/yyyy" class="form-control input-md" value="{% if account.solar_install_date %}{{ account.solar_install_date.strftime('%m/%d/%Y') }}{% endif %}">
 
                       <script type="text/javascript">
 
                       $(document).ready(function() {
                           $('#solar_install_date').datepicker({
                             format: 'mm/dd/yyyy',
+
                           });
                       })
                       </script>
