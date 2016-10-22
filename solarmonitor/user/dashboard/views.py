@@ -195,7 +195,7 @@ def modify_energy_account(account_id=None):
         energy_account.solar_install_date = try_parsing_date(request.form['solar_install_date'])
     except:
         flash('Date not a recognized format')
-    db.ssion.commit()
+    db.session.commit()
 
     result = energy_account.serialize()
 
