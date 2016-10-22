@@ -42,7 +42,9 @@
     $(document).ready(function() {
         $('#datepicker1').datepicker({
           format: 'yyyy-mm-dd',
-        });
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
+        });;
     })
     </script>
 
@@ -60,6 +62,8 @@
     $(document).ready(function() {
         $('#datepicker2').datepicker({
           format: 'yyyy-mm-dd',
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
         });
     })
     </script>
@@ -124,6 +128,8 @@
     $(document).ready(function() {
         $('#datepicker3').datepicker({
           format: 'yyyy-mm-dd',
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
         });
     })
     </script>
@@ -142,6 +148,8 @@
     $(document).ready(function() {
         $('#datepicker4').datepicker({
           format: 'yyyy-mm-dd',
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
         });
     })
     </script>
