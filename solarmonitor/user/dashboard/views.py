@@ -61,7 +61,7 @@ def home(modify=None, id=None):
     if current_user.energy_accounts[0].solar_install_date:
         solar_install_date = current_user.energy_accounts[0].solar_install_date.strftime('%m/%d/%Y')
     else:
-        solar_install_date = None
+        solar_install_date = datetime(year=datetime.now().year, month=1, day=1).strftime('%m/%d/%Y')
 
     form = EventAddForm()
 
@@ -348,9 +348,28 @@ def solar_edge(modify=None):
 
         if 'data_time_unit_se' in session:
             time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
-            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), energy_account.solar_edge_site_id, time_unit).text)
+            se_data = se.site_energy_measurements(
+                start_date_se.strftime('%Y-%m-%d'),
+                end_date_se.strftime('%Y-%m-%d'),
+                energy_account.solar_edge_site_id,
+                time_unit
+            ).text
+            try:
+                se_energy = json.loads(se_data)
+            except:
+                flash('an error occurred')
+                print se_data
         else:
-            se_energy = json.loads(se.site_energy_measurements(start_date_se.strftime('%Y-%m-%d'), end_date_se.strftime('%Y-%m-%d'), energy_account.solar_edge_site_id).text)
+            se_data = se.site_energy_measurements(
+                start_date_se.strftime('%Y-%m-%d'),
+                end_date_se.strftime('%Y-%m-%d'),
+                energy_account.solar_edge_site_id
+            ).text
+            try:
+                se_energy = json.loads(se_data)
+            except:
+                flash('an error occurred')
+                print se_data
 
         """Send the data returned by the API to celery for async processing."""
         task = process_se_data.delay(se_energy, energy_account.id)
@@ -394,15 +413,16 @@ def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None)
         pending_tasks = []
         for task in unfinished_tasks:
             celery_info = process_xml.AsyncResult(task.task_id)
-            print celery_info, celery_info.info
+            print celery_info, celery_info.info, celery_info.state
             task_dict = {}
             task_dict[task.id] = task.task_id
-            task_dict['status'] = {
+            task_dict[task.id]['status'] = {
                 'state': celery_info.state,
                 'current': celery_info.info.get('current', 0),
                 'total': celery_info.info.get('total', 1),
-                'message': str(celery_info.info,)
             }
+            if 'result' in celery_info.info:
+                response['result'] = task.info['result']
             pending_tasks.append(task_dict)
         return jsonify(pending_tasks)
 

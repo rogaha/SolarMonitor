@@ -138,6 +138,7 @@ class EnergyAccount(db.Model):
         negative_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
             (PGEUsagePoint.flow_direction == 19)&
             (PGEUsagePoint.interval_start < start_date)&
+            (PGEUsagePoint.energy_account_id == self.id)&
             (PGEUsagePoint.interval_start >= historical_start)
         ).scalar()
 
@@ -145,6 +146,7 @@ class EnergyAccount(db.Model):
         positive_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
             (PGEUsagePoint.flow_direction == 1)&
             (PGEUsagePoint.interval_start < start_date)&
+            (PGEUsagePoint.energy_account_id == self.id)&
             (PGEUsagePoint.interval_start >= historical_start)
         ).scalar()
 
