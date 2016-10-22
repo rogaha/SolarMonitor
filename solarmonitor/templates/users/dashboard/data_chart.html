@@ -99,7 +99,7 @@
             [[ Math.round(100*task.info.current/task.info.total) ]]%
 
           </div>
-            <span>[[ task.state ]]</span>
+            <span ng-show="task.state === 'FAILURE'">[[ task.state ]]</span>
         </div>
 
 
