@@ -356,6 +356,8 @@ def solar_edge(modify=None):
             ).text
             try:
                 se_energy = json.loads(se_data)
+                """Send the data returned by the API to celery for async processing."""
+                task = process_se_data.delay(se_energy, energy_account.id)
             except:
                 flash('an error occurred')
                 print se_data
@@ -367,12 +369,13 @@ def solar_edge(modify=None):
             ).text
             try:
                 se_energy = json.loads(se_data)
+                """Send the data returned by the API to celery for async processing."""
+                task = process_se_data.delay(se_energy, energy_account.id)
             except:
                 flash('an error occurred')
                 print se_data
 
-        """Send the data returned by the API to celery for async processing."""
-        task = process_se_data.delay(se_energy, energy_account.id)
+
 
         return redirect(url_for('dashboard.solar_edge'))
 
