@@ -40,9 +40,11 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             db.session.commit()
 
             energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
-            
+
             #Create a new celery task in the database
-            celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
+            celery_task = CeleryTask.query.filter_by(id=self.request.id).first()
+            if celery_task == None:
+                celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
             db.session.add(celery_task)
             db.session.commit()
 

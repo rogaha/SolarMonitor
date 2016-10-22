@@ -34,7 +34,9 @@ sdp.controller('progressBar', function($scope, $http, $timeout) {
             $http.get('/users/dashboard/status/task_check')
                 .then(function(response) {
                     console.log(response.data)
-                    if (response.data.length > 0) {
+                    console.log(response.data.length)
+                    console.log($scope.watchedTasks)
+                    if (angular.equals(response.data, {})) {
                         $scope.watchedTasks.push(response.data)
                     }
                 });
@@ -60,7 +62,7 @@ sdp.controller('progressBar', function($scope, $http, $timeout) {
     };
 
 
-    check_status();
+    //check_status();
     poll();
 
 });
