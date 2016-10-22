@@ -77,7 +77,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             print pge_data
 
             if 'error' in pge_data:
-                raise ValueError('PGE Api call resulted in the following error: {}'.format(pge_data['error']))
+                raise ValueError('PGE Api call resulted in the following error- {}'.format(pge_data['error']))
 
             reading_type = {}
             data = parse(pge_data)
@@ -192,7 +192,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 date_time=datetime.datetime.utcnow(),
                 event_type=None,
                 level=1,
-                info='RETRY - PGE Data pull. Error: {} | celery_task_id:{} retrying in {} seconds'.format(
+                info='RETRY - PGE Data pull. Error- {} | celery_task_id:{} retrying in {} seconds'.format(
                     exc,
                     self.request.id,
                     backoff(self.request.retries)
