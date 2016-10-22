@@ -28,6 +28,7 @@ sdp.controller('progressBar', function($scope, $http, $timeout) {
 
     $scope.watchedTasks = []
     $scope.pendingTasks = []
+    $scope.Math = window.Math;
 
     var poll = function() {
         $timeout(function() {

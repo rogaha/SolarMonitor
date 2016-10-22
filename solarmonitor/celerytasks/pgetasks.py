@@ -199,6 +199,10 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 )
             )
             db.session.add(event)
+
+            if self.request.retries == 3:
+                celery_task.task_status = 2
+
             db.session.commit()
             self.retry(countdown=backoff(self.request.retries), exc=exc)
 

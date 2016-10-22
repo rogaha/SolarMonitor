@@ -415,19 +415,20 @@ def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None)
 
         pending_tasks = []
         for task in unfinished_tasks:
-            celery_info = process_xml.AsyncResult(task.task_id)
-            print celery_info, celery_info.info, celery_info.state
-            task_dict = {}
-            task_dict[task.id] = task.task_id
-            task_dict[task.id]['status'] = {
-                'state': celery_info.state,
-                'current': celery_info.info.get('current', 0),
-                'total': celery_info.info.get('total', 1),
+            celery_task = process_xml.AsyncResult(task.task_id)
+            print celery_task, str(celery_task.info), celery_task.state
+            if celery_task.state == 'FAILURE':
+                info = str(celery_task.info)
+            else:
+                info = celery_task.info
+            task_dict = {
+                'id': task.task_id,
+                'info': info,
+                'state': celery_task.state
             }
-            if 'result' in celery_info.info:
-                response['result'] = task.info['result']
             pending_tasks.append(task_dict)
-        return jsonify(pending_tasks)
+        print pending_tasks
+        return jsonify(pending_tasks=pending_tasks)
 
 
     task = process_xml.AsyncResult(task_id)
