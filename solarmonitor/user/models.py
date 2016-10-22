@@ -268,6 +268,10 @@ class EnergyAccount(db.Model):
 
 
     def serialize(self):
+        if not self.solar_install_date:
+            install_date = None
+        else:
+            install_date = self.solar_install_date.strftime('%m/%d/%Y')
         return {
             'nick_name': self.nick_name,
             'address_one': self.address_one,
@@ -278,7 +282,7 @@ class EnergyAccount(db.Model):
             'pge_bulk_id': self.pge_bulk_id,
             'solar_edge_site_id': self.solar_edge_site_id,
             'solar_edge_api_key': self.solar_edge_api_key,
-            'solar_install_date': self.solar_install_date.strftime('%m/%d/%Y')
+            'solar_install_date': install_date
         }
 
     def serialize_charts(self, chart, start_date=seven_days_ago, end_date=today, date_format='%m/%d', separate=False, financial=False):
