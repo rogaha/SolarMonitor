@@ -86,21 +86,22 @@
     <label class="col-md-4 control-label" for="singlebutton"></label>
     <div class="col-md-6">
 
-      <div ng-controller="progressBar" ng-cloak>
+      <div ng-controller="progressBar" ng-cloak ng-show="watchedTasks.pending_tasks">
       <!--[[ watchedTasks ]]-->
 
         <div id="success_text" ng-show="taskSuccess">
-        <input class="btn btn-success" value="Get New Data" onClick="location.href='{{url_for('dashboard.charts')}}';">
+          <input class="btn btn-success" value="Get New Data" onClick="location.href='{{url_for('dashboard.charts')}}';">
         </div>
-
-        <div ng-repeat="task in watchedTasks.pending_tasks" class="progress" ng-show="watchedTasks.pending_tasks" id="progress_bar">
-
-          <div  id="percent_bar" class="progress-bar progress-bar-success progress-bar-striped active" style="min-width: 2em;" role="progressbar" aria-valuenow="[[ Math.round(100*task.info.current/task.info.total) ]]" aria-valuemin="0" aria-valuemax="100">
-            [[ Math.round(100*task.info.current/task.info.total) ]]%
-
+        <span ng-repeat="task in watchedTasks.pending_tasks">
+          <span style="margin-top:-15px">[[ task.state ]], [[ task.id ]]</span>
+          <div  class="progress" id="progress_bar">
+              <div  id="percent_bar" class="progress-bar progress-bar-success progress-bar-striped active" style="width:[[ Math.round(100*task.info.current/task.info.total) ]]%; min-width: 2em;" role="progressbar" aria-valuenow="[[ Math.round(100*task.info.current/task.info.total) ]]" aria-valuemin="0" aria-valuemax="100">
+                [[ Math.round(100*task.info.current/task.info.total) ]]%
+              </div>
           </div>
-            <span ng-show="task.state === 'FAILURE'">[[ task.state ]]</span>
-        </div>
+        </span>
+
+
 
 
       </div>

@@ -359,7 +359,7 @@ def solar_edge(modify=None):
                 """Send the data returned by the API to celery for async processing."""
                 task = process_se_data.delay(se_energy, energy_account.id)
             except:
-                flash('an error occurred')
+                flash('API access is not enabled for your account')
                 print se_data
         else:
             se_data = se.site_energy_measurements(
@@ -417,7 +417,7 @@ def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None)
         for task in unfinished_tasks:
             celery_task = process_xml.AsyncResult(task.task_id)
             print celery_task, str(celery_task.info), celery_task.state
-            if celery_task.state == 'FAILURE':
+            if (celery_task.state == 'FAILURE') or (celery_task.state == 'RETRY'):
                 info = str(celery_task.info)
             else:
                 info = celery_task.info
