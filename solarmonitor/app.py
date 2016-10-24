@@ -58,6 +58,7 @@ def register_extensions(app):
     bcrypt.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
+    login_manager.login_view = 'public.home'
     moment.init_app(app)
 
     return None
