@@ -19,6 +19,10 @@ sdp.controller('eventController', function($scope, $http) {
             });
     }
     $scope.events = $scope.getEvents(7)
+    if ($scope.events == null) {
+        $scope.events = false;
+    };
+    console.log($scope.events)
 });
 
 sdp.controller('progressBar', function($scope, $http, $timeout) {
