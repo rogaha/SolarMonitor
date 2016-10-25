@@ -85,7 +85,7 @@ def home():
                 #    return abort(400)
                 current_user.log_event(info='{} just logged in.'.format(current_user.full_name))
                 return redirect(next or url_for('dashboard.home'))
-            flash('Invalid email address or password')
+            flash('Invalid email address or password', 'info')
         else:
             flash_errors(form)
             return redirect(url_for('public.home', next=next))
@@ -126,7 +126,7 @@ def oauth_redirect():
         current_user.energy_accounts[0]
     )
 
-    flash('PGE Connectivity Completed Successfully')
+    flash('PGE Connectivity Completed Successfully', 'info')
     current_user.log_event(info="PGE Account Successfully connected via oauth.")
 
     return redirect(url_for('dashboard.home'))
