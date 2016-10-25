@@ -88,7 +88,7 @@ def home():
             flash('Invalid email address or password')
         else:
             flash_errors(form)
-            return redirect(url_for('dashboard.home', next=next))
+            return redirect(url_for('public.home', next=next))
     return render_template('public/home.html', form=form, register_form=register_form)
 
 @blueprint.route('/about')

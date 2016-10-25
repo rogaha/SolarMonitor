@@ -49,5 +49,5 @@ def register():
         return redirect(next or url_for('dashboard.home'))
     else:
         flash_errors(form)
-        return redirect(url_for('dashboard.home', next=next))
+        return redirect(url_for('public.home', next=next))
     return render_template('public/register.html', form=form)
