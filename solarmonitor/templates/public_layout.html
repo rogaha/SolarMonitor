@@ -131,7 +131,7 @@
                           </div>
                           <div class="form">
                             <h2>Create an account</h2>
-                            <form id="RegistrationForm" class="form-horizontal" method="post" action="{{ url_for('auth.register') }}">
+                            <form id="RegistrationForm" class="form-horizontal" method="post" action="{{ url_for('auth.register', next=request.args.get('next')) }}">
                               {{ register_form.hidden_tag() }}
                               {{ register_form.first_name(id="inputEmail", placeholder="First Name") }}
                               {{ register_form.last_name(id="inputEmail", placeholder="Last Name") }}

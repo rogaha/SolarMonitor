@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_required, login_user, logout_user, current_user
 from solarmonitor.extensions import login_manager
 from solarmonitor.auth.forms import RegistrationForm
@@ -40,8 +40,12 @@ def register():
         user.log_event(info="Default energy account created for new user \'{}\'.".format(user.full_name))
         user.log_event(info="New user account created for \'{}\'.".format(user.full_name))
         login_user(user, True)
+        next = request.args.get('next')
+        #if not next_is_valid('next'):
+        #    return abort(400)
+        current_user.log_event(info='{} just logged in.'.format(current_user.full_name))
         flash('Thank you for registering.', 'success')
-        return redirect(url_for('dashboard.home'))
+        return redirect(next or url_for('dashboard.home'))
     else:
         flash_errors(form)
     return render_template('public/register.html', form=form)

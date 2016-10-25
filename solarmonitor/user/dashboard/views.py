@@ -69,7 +69,7 @@ def home(modify=None, id=None):
         event = EnergyEvent.query.filter_by(id=id).first()
         db.session.delete(event)
         db.session.commit()
-        flash('Energy event deleted')
+        flash('Energy event deleted', 'info')
         current_user.log_event(info="Energy event deleted")
         return redirect(url_for('dashboard.home'))
 
@@ -82,7 +82,7 @@ def home(modify=None, id=None):
         )
         db.session.add(energy_event)
         db.session.commit()
-        flash('New energy event added!')
+        flash('New energy event added!', 'info')
         current_user.log_event(info="Energy event added")
         return redirect(url_for('dashboard.home'))
 
@@ -134,7 +134,7 @@ def account(modify=None):
         current_user.energy_accounts[0].pge_subscription_id = None
         current_user.energy_accounts[0].pge_usage_point = None
         db.session.commit()
-        flash('PGE connection deleted on SDP energy account. ')
+        flash('PGE connection deleted on SDP energy account.', 'info')
         return redirect(url_for('dashboard.account'))
 
     return render_template('users/dashboard/account.html',
@@ -197,7 +197,7 @@ def modify_energy_account(account_id=None):
         try:
             energy_account.solar_install_date = try_parsing_date(request.form['solar_install_date'])
         except:
-            flash('Date not a recognized format')
+            flash('Date not a recognized format', 'info')
     db.session.commit()
 
     result = energy_account.serialize()
@@ -253,7 +253,7 @@ def charts(modify=None):
         end_date_pge = datetime.strptime(session['end_date_pge'], '%Y-%m-%d') + timedelta(days=1)
 
         process_xml.delay(current_user.energy_accounts[0], start_date_pge, end_date_pge, user_id=current_user.id)
-        flash('Data processing')
+        flash('Data processing', 'info')
         return redirect(url_for('dashboard.charts'))
 
     pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph', start_date_pge, end_date_pge)
@@ -328,7 +328,7 @@ def solar_edge(modify=None):
             start_date_se = datetime.strptime(session['start_date_se'], '%Y-%m-%d')
             end_date_se = datetime.strptime(session['end_date_se'], '%Y-%m-%d')
         except:
-            flash('Date entered, not in correct format.')
+            flash('Date entered, not in correct format.', 'info')
             return redirect(url_for('dashboard.solar_edge'))
 
         return redirect(url_for('dashboard.solar_edge'))
@@ -341,7 +341,7 @@ def solar_edge(modify=None):
             start_date_se = datetime.strptime(session['start_date_se'], '%Y-%m-%d')
             end_date_se = datetime.strptime(session['end_date_se'], '%Y-%m-%d')
         except:
-            flash('Date entered, not in correct format.')
+            flash('Date entered, not in correct format.', 'info')
             return redirect(url_for('dashboard.solar_edge'))
 
         se = SolarEdgeApi(energy_account)
@@ -359,7 +359,7 @@ def solar_edge(modify=None):
                 """Send the data returned by the API to celery for async processing."""
                 task = process_se_data.delay(se_energy, energy_account.id)
             except:
-                flash('API access is not enabled for your account')
+                flash('API access is not enabled for your account', 'info')
                 print se_data
         else:
             se_data = se.site_energy_measurements(
@@ -372,7 +372,7 @@ def solar_edge(modify=None):
                 """Send the data returned by the API to celery for async processing."""
                 task = process_se_data.delay(se_energy, energy_account.id)
             except:
-                flash('an error occurred')
+                flash('an error occurred', 'info')
                 print se_data
 
 
