@@ -116,8 +116,8 @@
 </div>
 
 
-  {% if events|length > 0 %}
-  <div class="row">
+
+  <div class="row" ng-if='events'>
     <div class="col col-xs-6">
       <table class="table">
         <thead>
@@ -138,7 +138,7 @@
     </table>
     </div>
   </div>
-  {% endif %}
+
 
 <script type="text/javascript">
 
