@@ -170,6 +170,7 @@ class EnergyAccount(db.Model):
 
         new_graph = zip(new_data, labels)
 
+
         return new_graph
 
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):

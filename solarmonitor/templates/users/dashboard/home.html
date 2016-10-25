@@ -461,7 +461,7 @@ var myChart3 = new Chart(ctx2, {
   }
 });
 
-
+{% if cumulative %}
 var data4 = {
 labels: {{ cumulative['labels']|safe }},
 datasets: [
@@ -498,6 +498,7 @@ var myChart4 = new Chart(ctx4, {
       }
   }
 });
+{% endif %}
 </script>
 
     </div>
