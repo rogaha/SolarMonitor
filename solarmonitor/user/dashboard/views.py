@@ -223,6 +223,8 @@ def charts(modify=None):
 
     if modify == 'delete-data':
         PGEUsagePoint.query.filter_by(energy_account_id=current_user.energy_accounts[0].id).delete()
+        current_user.energy_accounts[0].pge_first_date = None
+        current_user.energy_accounts[0].pge_last_date = None
         db.session.commit()
         return redirect(url_for('dashboard.charts'))
 
