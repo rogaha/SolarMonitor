@@ -25,6 +25,7 @@ def logout():
 def register():
     """Register new user."""
     form = RegistrationForm()
+    next = request.args.get('next')
     if form.validate_on_submit():
         user = User(
             email=form.email.data,
@@ -40,7 +41,7 @@ def register():
         user.log_event(info="Default energy account created for new user \'{}\'.".format(user.full_name))
         user.log_event(info="New user account created for \'{}\'.".format(user.full_name))
         login_user(user, True)
-        next = request.args.get('next')
+
         #if not next_is_valid('next'):
         #    return abort(400)
         current_user.log_event(info='{} just logged in.'.format(current_user.full_name))
@@ -48,4 +49,5 @@ def register():
         return redirect(next or url_for('dashboard.home'))
     else:
         flash_errors(form)
+        return redirect(url_for('dashboard.home', next=next))
     return render_template('public/register.html', form=form)

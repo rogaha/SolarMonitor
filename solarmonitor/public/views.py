@@ -70,6 +70,7 @@ def home():
     """Home page."""
     form = LoginForm(request.form)
     register_form = RegistrationForm()
+    next = request.args.get('next')
     # Handle logging in
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -80,7 +81,6 @@ def home():
                 user = User.query.filter_by(email=form.email.data).first()
             if user is not None and user.verify_password(form.password.data):
                 login_user(user, True)
-                next = request.args.get('next')
                 #if not next_is_valid('next'):
                 #    return abort(400)
                 current_user.log_event(info='{} just logged in.'.format(current_user.full_name))
@@ -88,6 +88,7 @@ def home():
             flash('Invalid email address or password')
         else:
             flash_errors(form)
+            return redirect(url_for('dashboard.home', next=next))
     return render_template('public/home.html', form=form, register_form=register_form)
 
 @blueprint.route('/about')
