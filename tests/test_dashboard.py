@@ -7,21 +7,15 @@ from flask import url_for, session
 import pytest
 
 from solarmonitor.user.models import User
-
+from conftest import login_user
 
 
 class TestDashboard:
     """Tests for the user dashboard."""
 
     def test_solar_edge_clear_session(self, user, testapp):
-        # Goes to homepage
-        res = testapp.get('/')
-        # Fills out login form in navbar
-        form = res.forms['loginForm']
-        form['email'] = user.email
-        form['password'] = 'myprecious'
-        # Submits
-        res = form.submit().follow()
+        login_user(user, testapp)
+
         # Goes to solar edge dashboard
         res = testapp.get(url_for('dashboard.solar_edge'))
 

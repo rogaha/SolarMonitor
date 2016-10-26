@@ -12,6 +12,8 @@ import pytest
 import datetime
 from datetime import timedelta
 
+from conftest import login_user
+
 @pytest.mark.usefixtures('db')
 class TestPublicRoutes200:
     """The purpose of this test suite is to make sure that each url route returns a 200 status code.
@@ -45,11 +47,6 @@ class TestPublicRoutes200:
         res = testapp.get(url_for('auth.logout')).follow()
         assert res.status_code == 200
 
-    def test_register(self, testapp):
-        """Register Page."""
-        res = testapp.get(url_for('auth.register'))
-        assert res.status_code == 200
-
     def test_notifications(self, testapp):
         """Notification URL. Currently should return 200 if a visitor lands on it.
         Should also return 200 if POST data is submitted from PGE.
@@ -57,17 +54,19 @@ class TestPublicRoutes200:
         res = testapp.get(url_for('public.notifications'))
         assert res.status_code == 200
 
-    def test_oauth(self, testapp):
+    def test_oauth(self, user, testapp):
         """This URL is part of the oauth process."""
+        login_user(user, testapp)
         res = testapp.get(url_for('public.oauth'))
-        assert res.status_code == 200
+        assert res.status_code == 302
 
-    def test_oauth_redirect(self, testapp):
+    def test_oauth_redirect(self, user, testapp):
         """This URL is part of the oauth process. Should return 200 currently,
         but will be update to a 301 at some point when PGE is ready.
         """
+        login_user(user, testapp)
         res = testapp.get(url_for('public.oauth_redirect'))
-        assert res.status_code == 200
+        assert res.status_code == 302
 
     def test_selenium_img_generator(self, user, testapp):
         """Solar Edge chart page for downloading and viewing data.

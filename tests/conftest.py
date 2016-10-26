@@ -8,7 +8,17 @@ from solarmonitor.app import create_app
 from solarmonitor.extensions import db as _db
 from solarmonitor.settings import TestConfig
 
-from solarmonitor.user.models import User, EnergyAccount
+from solarmonitor.user.models import User, EnergyAccount, Role
+
+def login_user(user, testapp):
+    # Goes to homepage
+    res = testapp.get('/')
+    # Fills out login form in navbar
+    form = res.forms['loginForm']
+    form['email'] = user.email
+    form['password'] = 'myprecious'
+    # Submits
+    res = form.submit().follow()
 
 @pytest.yield_fixture(scope='function')
 def app():
@@ -40,6 +50,35 @@ def db(app):
     _db.session.close()
     _db.drop_all()
 
+
+@pytest.fixture
+def admin_user(db):
+    """A user for the tests."""
+    user = User(
+        email='user_testing@solarmonitor.com',
+        first_name='solarsolar',
+        last_name='solarsolarlast',
+        password='myprecious'
+        )
+
+    role = Role(
+        role='Admin'
+    )
+    energy_account = EnergyAccount(
+        address_one = '123 Unknown',
+        address_two = 'db.Column(db.String(255))',
+        city = 'Sacramento',
+        state = 'CA',
+        zip_code = '14545',
+        pge_bulk_id = '54468',
+        pge_access_token = '2151dsfsdf',
+        solar_edge_site_id = 'api_key'
+        )
+    user.energy_accounts.append(energy_account)
+    user.roles.append(role)
+    db.session.add(user)
+    db.session.commit()
+    return user
 
 @pytest.fixture
 def user(db):
