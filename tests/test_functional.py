@@ -125,7 +125,6 @@ class TestRegistering:
 
     def test_sees_error_message_if_user_already_registered(self, user, testapp):
         #Show error if user already registered.
-
         # Goes to registration page
         res = testapp.get(url_for('public.home'))
         # Fills out form, but username is already registered

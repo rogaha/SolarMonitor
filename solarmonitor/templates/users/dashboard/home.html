@@ -52,7 +52,7 @@
             <h4 class="modal-title" id="myModalLabel">Add Event</h4>
           </div>
           <div class="modal-body">
-            <form class="form-horizontal" method='post' action="{{ url_for('dashboard.home') }}">
+            <form id="add_event_form" class="form-horizontal" method='post' action="{{ url_for('dashboard.home') }}">
               <fieldset>
 
                 {{ form.hidden_tag() }}

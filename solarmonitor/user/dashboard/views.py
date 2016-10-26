@@ -82,7 +82,7 @@ def home(modify=None, id=None):
         )
         db.session.add(energy_event)
         db.session.commit()
-        flash('New energy event added!', 'info')
+        flash('New energy event added! ({})'.format(energy_event.info), 'info')
         current_user.log_event(info="Energy event added")
         return redirect(url_for('dashboard.home'))
 
