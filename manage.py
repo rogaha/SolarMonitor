@@ -127,7 +127,7 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
         end_date = today
 
         if account.solar_edge_site_id:
-            se = SolarEdgeApi()
+            se = SolarEdgeApi(account)
             se_energy = json.loads(
                 se.site_energy_measurements(
                     start_date.strftime('%Y-%m-%d'),
