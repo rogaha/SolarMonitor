@@ -11,6 +11,7 @@ from solarmonitor.user.models import User, EnergyAccount, AppEvent
 from solarmonitor.utils import flash_errors
 from solarmonitor.settings import Config
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
+from solarmonitor.enphase.enphase_api import EnphaseApi
 from io import BytesIO
 import io
 import datetime
@@ -26,6 +27,7 @@ blueprint = Blueprint('public', __name__, static_folder='../static')
 cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
 oauth2 = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
+
 
 @blueprint.route('/get_graph/<int:energy_account_id>_<start_date>_<end_date>_charts.png', methods=['GET', 'POST'])
 def selenium_img_generator(energy_account_id=None, start_date=None, end_date=None):
@@ -94,6 +96,26 @@ def home():
 @blueprint.route('/about')
 def about():
     """About page."""
+    return render_template('public/about.html')
+
+@blueprint.route('/enphase-authorization')
+@login_required
+def enphase_authorization():
+    """Enphase Authorization landing page."""
+    user_id = request.args.get('user_id', None)
+    if not user_id:
+        flash('Unable to connect Enphase account', 'info')
+        return redirect(url_for('dashboard.account'))
+
+    enphase = EnphaseApi(current_user.energy_accounts[0]) #assumes only one energy account for each user
+    system_info = enphase.systems().text
+    system_id = system_info['systems'][0]['system_id'] #assumes only one solar power system for each user
+
+    current_user.enphase_system_id = system_id
+    current_user.enphase_user_id = user_id
+    db.session.commit()
+
+    flash('Enphase account successfully connected', 'info')
     return render_template('public/about.html')
 
 

@@ -86,6 +86,8 @@ class EnergyAccount(db.Model):
     solar_install_date = db.Column(db.DateTime)
     solar_edge_site_id = db.Column(db.String(255))
     solar_edge_api_key = db.Column(db.String(255))
+    enphase_user_id = db.Column(db.String(255))
+    enphase_system_id = db.Column(db.String(255))
     pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
     celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')

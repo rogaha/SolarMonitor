@@ -9,6 +9,7 @@ from solarmonitor.celerytasks.se_tasks import process_se_data
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.pge.pge_helpers import PGEHelper
 from solarmonitor.solaredge.se_api import SolarEdgeApi
+from solarmonitor.enphase.enphase_api import EnphaseApi
 from solarmonitor.mailgun.mailgun_api import send_email
 from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeUsagePoint, EnergyAccount, EnergyEvent
 from solarmonitor.user.dashboard.forms import EventAddForm
@@ -137,6 +138,13 @@ def account(modify=None):
         flash('PGE connection deleted on SDP energy account.', 'info')
         return redirect(url_for('dashboard.account'))
 
+    if modify == 'del_enphase':
+        current_user.energy_accounts[0].enphase_user_id = None
+        current_user.energy_accounts[0].enphase_system_id = None
+        db.session.commit()
+        flash('Enphase connection deleted on SDP energy account.', 'info')
+        return redirect(url_for('dashboard.account'))
+
     return render_template('users/dashboard/account.html',
         energy_accounts=current_user.energy_accounts,
         breadcrumbs=breadcrumbs, heading=heading,
@@ -150,6 +158,8 @@ def authorizations(start_oauth=None):
                    ('Account', 'user', url_for('dashboard.account')),
                    ('Authorizations', 'user', url_for('dashboard.authorizations'))]
     heading = 'Authorizations'
+    if start_oauth == 'enphase':
+        return redirect(config.ENPHASE_AUTHORIZATION_URL, code=302)
 
     if start_oauth:
         #See settings.py for more info on this.

@@ -48,6 +48,7 @@
                     <th>PGE Bulk ID</th>
                     <th>SolarEdge Site ID</th>
                     <th>SolarEdge API Key</th>
+                    <th>Enphase Solar</th>
                     <th>PGE First Date</th>
                     <th>PGE Last Date</th>
                     <th>Solar Install Date</th>
@@ -69,6 +70,7 @@
                         <td id="account_pge_bulk_id">{% if current_user.energy_accounts[0].pge_refresh_token %}PGE Account is Authorized <a href="{{ url_for('dashboard.account', modify='del_pge') }}"><i class="fa fa-close" style="color:red"></i></a>{% else%}  <a href="{{ url_for('dashboard.authorizations', start_oauth='yes')}}" class="btn btn-primary">Authorize PGE</a>{% endif %}</td>
                         <td id="account_solar_edge_site_id">{{ account.solar_edge_site_id }}</td>
                         <td id="account_solar_edge_api_key">{{ account.solar_edge_api_key }}</td>
+                        <td id="account_enphase">{% if current_user.energy_accounts[0].enphase_user_id %}Enphase Account is Authorized <a href="{{ url_for('dashboard.account', modify='del_enphase') }}"><i class="fa fa-close" style="color:red"></i></a>{% else%}  <a href="{{ url_for('dashboard.authorizations', start_oauth='enphase')}}" class="btn btn-primary">Authorize Enphase</a>{% endif %}</td>
                         <td id="account_solar_edge_site_id">{% if account.pge_first_date %}{{ account.pge_first_date.strftime('%m/%d/%Y') }}{% endif %}</td>
                         <td id="account_solar_edge_site_id">{% if account.pge_last_date %}{{ account.pge_last_date.strftime('%m/%d/%Y') }}{% endif %}</td>
                         <td id="account_solar_install_date">{% if account.solar_install_date %}{{ account.solar_install_date.strftime('%m/%d/%Y') }}{% endif %}</td>

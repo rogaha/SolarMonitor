@@ -30,6 +30,12 @@ class Config(object):
     TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
     CELERY_BROKER_URL = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-163-252-131.compute-1.amazonaws.com:13639'
     CELERY_RESULT_BACKEND = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-163-252-131.compute-1.amazonaws.com:13639'
+    ENPHASE_API_KEY = 'aedc75d38120f96a689e7f83c4ce22f8'
+    ENPHASE_REDIRECT_URI = 'https://notrueup.solardatapros.com/enphase-authorization'
+    ENPHASE_APP_ID = '1409613132468'
+    ENPHASE_AUTHORIZATION_URL = 'https://enlighten.enphaseenergy.com/app_user_auth/new?app_id={}&redirect={}'.format(
+                                                                                                    ENPHASE_APP_ID,
+                                                                                                    ENPHASE_REDIRECT_URI)
 
 class ProdConfig(Config):
     """Production configuration."""
