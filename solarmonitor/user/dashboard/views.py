@@ -6,6 +6,7 @@ from solarmonitor.extensions import login_manager
 from solarmonitor.settings import Config
 from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.celerytasks.se_tasks import process_se_data
+from solarmonitor.celerytasks.enphase_tasks import process_enphase_data
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.pge.pge_helpers import PGEHelper
 from solarmonitor.solaredge.se_api import SolarEdgeApi
@@ -289,7 +290,7 @@ def charts(modify=None):
 def solar_edge(modify=None):
     """Solar Edge API"""
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('Solar Edge', 'bar-chart-o', url_for('dashboard.solar_edge'))]
-    heading = 'Solar Edge Electricity'
+    heading = 'Solar Electricity Production'
 
     energy_account = current_user.energy_accounts[0]
 
@@ -355,6 +356,15 @@ def solar_edge(modify=None):
         except:
             flash('Date entered, not in correct format.', 'info')
             return redirect(url_for('dashboard.solar_edge'))
+
+        if energy_account.enphase_user_id and energy_account.enphase_system_id:
+            enphase = EnphaseApi(energy_account)
+            try:
+                json_data = enphase.energy_lifetime(start_date_se, end_date_se).text
+                task = process_enphase_data(json_data, energy_account.id)
+            except Exception as e:
+                flash('An error occurred: {}'.format(e), 'warn')
+                print json_data
 
         se = SolarEdgeApi(energy_account)
 

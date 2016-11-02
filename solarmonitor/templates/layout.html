@@ -197,7 +197,7 @@
                         <a href="{{ url_for('dashboard.charts') }}"><i class="fa fa-fw fa-bar-chart-o"></i> PGE Charts</a>
                     </li>
                     <li class="{% if request.url_rule.endpoint == 'dashboard.solar_edge' %} active {% endif %}">
-                        <a href="{{ url_for('dashboard.solar_edge') }}"><i class="fa fa-fw fa-bar-chart-o"></i>Solar Edge Charts</a>
+                        <a href="{{ url_for('dashboard.solar_edge') }}"><i class="fa fa-fw fa-sun-o"></i> Solar Charts</a>
                     </li>
 
                     {% if current_user.is_authenticated %}

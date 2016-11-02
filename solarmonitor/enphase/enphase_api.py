@@ -25,20 +25,11 @@ class EnphaseApi:
         self.api_key = Config.ENPHASE_API_KEY
         self.user_id = energy_account.enphase_user_id
         self.system_id = energy_account.enphase_system_id
-        self.redirect_uri = Config.ENPHASE_REDIRECT_URI
         self.app_id = Config.ENPHASE_APP_ID
         self.base_url = 'https://api.enphaseenergy.com/api/v2'
 
     def __repr__(self):
         return '<EnphaseApi>'
-
-    @staticmethod
-    def authorize_user(self, app_id, redirect_uri):
-        """This URL should accept GET requests that include a user_id parameter on the query string. Save the user_id from the request parameter, and use it plus your API key to make requests on this user’s behalf.
-        """
-        return requests.get(
-            "https://enlighten.enphaseenergy.com/app_user_auth/new?app_id={}&redirect={}".format(app_id, redirect_uri),
-        )
 
     def systems(self):
         """Returns a list of systems for which the user can make API requests.
