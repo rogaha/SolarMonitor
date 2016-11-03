@@ -122,9 +122,6 @@ def enphase_authorization():
     except Exception as e:
         flash('Unable to find a system to connect: {}'.format(e))
 
-
-
-
     flash('Enphase account successfully connected', 'info')
     return redirect(url_for('dashboard.account'))
 

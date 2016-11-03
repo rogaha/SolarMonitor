@@ -365,6 +365,7 @@ def solar_edge(modify=None):
             except Exception as e:
                 flash('An error occurred: {}'.format(e), 'warn')
                 print json_data
+            return redirect(url_for('dashboard.solar_edge'))
 
         se = SolarEdgeApi(energy_account)
 
