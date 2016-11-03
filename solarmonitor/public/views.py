@@ -112,6 +112,8 @@ def enphase_authorization():
 
     enphase = EnphaseApi(current_user.energy_accounts[0]) #assumes only one energy account for each user
     system_info = enphase.systems().text
+    system_info = json.loads(system_info)
+    print system_info
     system_id = system_info['systems'][0]['system_id'] #assumes only one solar power system for each user
 
     current_user.enphase_system_id = system_id

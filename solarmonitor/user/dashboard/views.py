@@ -360,7 +360,7 @@ def solar_edge(modify=None):
         if energy_account.enphase_user_id and energy_account.enphase_system_id:
             enphase = EnphaseApi(energy_account)
             try:
-                json_data = enphase.energy_lifetime(start_date_se, end_date_se).text
+                json_data = json.loads(enphase.energy_lifetime(start_date_se, end_date_se).text)
                 task = process_enphase_data(json_data, energy_account.id)
             except Exception as e:
                 flash('An error occurred: {}'.format(e), 'warn')
