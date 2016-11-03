@@ -126,7 +126,7 @@ def test_enphase_throttling():
     today = datetime.datetime.today() + timedelta(days=1)
     x_days_ago = datetime.datetime.today() - timedelta(days=number_of_days_history)
     while counter < 20:
-        today = datetime.datetime.today() + timedelta(days=1)
+        today = datetime.datetime.today()
         x_days_ago = datetime.datetime.today() - timedelta(days=number_of_days_history)
         enphase = EnphaseApi(account)
 
@@ -147,7 +147,7 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
         end_date = today
 
         if account.enphase_user_id and account.enphase_system_id:
-            end_date = datetime.datetime.today() + timedelta(days=1)
+            end_date = datetime.datetime.today()
             start_date = datetime.datetime.today() - timedelta(days=number_of_days_history)
             enphase = EnphaseApi(account)
             try:

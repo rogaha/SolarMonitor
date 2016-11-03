@@ -30,6 +30,8 @@ def process_enphase_data(self, json_data, energy_account_id):
                 timeout_end = json_data['period_end']
                 time_to_wait = timeout_end - timeout_start
                 time.sleep(time_to_wait)
+            elif json_data['reason'] == 'Requested date is in the future':
+                return
 
         start_date = datetime.datetime.strptime(json_data['start_date'], ('%Y-%m-%d'))
 
