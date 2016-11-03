@@ -131,7 +131,7 @@ def test_enphase_throttling():
         enphase = EnphaseApi(account)
 
         json_data = json.loads(enphase.energy_lifetime(x_days_ago, today).text)
-        task = process_enphase_data(json_data, account.id)
+        task = process_enphase_data.delay(json_data, account.id)
 
         counter += 1
 
@@ -152,7 +152,7 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
             enphase = EnphaseApi(account)
             try:
                 json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
-                task = process_enphase_data(json_data, account.id)
+                task = process_enphase_data.delay(json_data, account.id)
             except Exception as e:
                 print json_data, e
 
