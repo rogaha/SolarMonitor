@@ -353,6 +353,8 @@ def solar_edge(modify=None):
         try:
             start_date_se = datetime.strptime(session['start_date_se'], '%Y-%m-%d')
             end_date_se = datetime.strptime(session['end_date_se'], '%Y-%m-%d')
+            if end_date_se > datetime.now():
+                end_date_se = datetime.now()
         except:
             flash('Date entered, not in correct format.', 'info')
             return redirect(url_for('dashboard.solar_edge'))
