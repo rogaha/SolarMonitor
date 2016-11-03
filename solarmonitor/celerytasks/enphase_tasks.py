@@ -19,6 +19,7 @@ def process_enphase_data(self, json_data, energy_account_id):
       "meta": {"status": "normal", "last_report_at": 1445619615, "last_energy_at": 1445619033, "operational_at": 1357023600}
     }
     """
+    print json_data
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
@@ -29,7 +30,7 @@ def process_enphase_data(self, json_data, energy_account_id):
                 timeout_end = json_data['period_end']
                 time_to_wait = timeout_end - timeout_start
                 time.sleep(time_to_wait)
-                
+
         start_date = datetime.datetime.strptime(json_data['start_date'], ('%Y-%m-%d'))
 
         for index, each in enumerate(json_data['production']):
