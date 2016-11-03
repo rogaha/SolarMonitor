@@ -3,6 +3,7 @@ from solarmonitor.settings import Config, ProdConfig
 from solarmonitor.user.models import SolarEdgeUsagePoint, EnergyAccount
 import datetime
 from datetime import timedelta, date
+import time
 
 from solarmonitor.utils import celery
 
@@ -21,6 +22,14 @@ def process_enphase_data(self, json_data, energy_account_id):
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
+        if 'reason' in json_data:
+            if json_data['reason'] == "409":
+                print 'Enphase Throttling!'
+                timeout_start = json_data['period_start']
+                timeout_end = json_data['period_end']
+                time_to_wait = timeout_end - timeout_start
+                time.sleep(time_to_wait)
+                
         start_date = datetime.datetime.strptime(json_data['start_date'], ('%Y-%m-%d'))
 
         for index, each in enumerate(json_data['production']):

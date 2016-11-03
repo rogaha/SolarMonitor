@@ -17,7 +17,9 @@ from solarmonitor.user.models import User, EnergyAccount, EnergyEvent
 from solarmonitor.extensions import db
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
 from solarmonitor.solaredge.se_api import SolarEdgeApi
+from solarmonitor.enphase.enphase_api import EnphaseApi
 from solarmonitor.celerytasks.se_tasks import process_se_data
+from solarmonitor.celerytasks.enphase_tasks import process_enphase_data
 from solarmonitor.celerytasks.pgetasks import process_xml
 import json
 
@@ -117,6 +119,24 @@ def bulk_download_pge_data():
             print 'No refresh token available for account {}'.format(account.id)
 
 @manager.command
+def test_enphase_throttling():
+    counter = 0
+    number_of_days_history=7
+    account = EnergyAccount.query.filter_by(id=13).first()
+    today = datetime.datetime.today() + timedelta(days=1)
+    x_days_ago = datetime.datetime.today() - timedelta(days=number_of_days_history)
+    while counter < 20:
+        today = datetime.datetime.today() + timedelta(days=1)
+        x_days_ago = datetime.datetime.today() - timedelta(days=number_of_days_history)
+        enphase = EnphaseApi(account)
+
+        json_data = json.loads(enphase.energy_lifetime(x_days_ago, today).text)
+        task = process_enphase_data(json_data, account.id)
+
+        counter += 1
+
+
+@manager.command
 def bulk_download_solar_edge_data(number_of_days_history=7):
     today = datetime.datetime.today().date() + timedelta(days=1)
     x_days_ago = datetime.datetime.today().date() - timedelta(days=number_of_days_history)
@@ -125,6 +145,16 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
     for account in energy_accounts:
         start_date = x_days_ago
         end_date = today
+
+        if account.enphase_user_id and account.enphase_system_id:
+            end_date = datetime.datetime.today() + timedelta(days=1)
+            start_date = datetime.datetime.today() - timedelta(days=number_of_days_history)
+            enphase = EnphaseApi(account)
+            try:
+                json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
+                task = process_enphase_data(json_data, account.id)
+            except Exception as e:
+                print json_data, e
 
         if account.solar_edge_site_id:
             se = SolarEdgeApi(account)
