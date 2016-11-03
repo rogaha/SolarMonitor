@@ -114,7 +114,10 @@ def enphase_authorization():
     system_info = enphase.systems().text
     system_info = json.loads(system_info)
     print system_info
-    system_id = system_info['systems'][0]['system_id'] #assumes only one solar power system for each user
+    try:
+        system_id = system_info['systems'][0]['system_id'] #assumes only one solar power system for each user
+    except Exception as e:
+        flash('Unable to find a system to connect: {}'.format(e))
 
     current_user.enphase_system_id = system_id
     db.session.commit()
