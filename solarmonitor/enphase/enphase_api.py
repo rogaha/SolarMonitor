@@ -55,7 +55,7 @@ class EnphaseApi:
             "{}/systems".format(self.base_url),
             params={
                 'key': self.api_key,
-                'user_id': self.api_key,
+                'user_id': self.user_id,
                 'limit': 1
             }
         )
@@ -86,7 +86,7 @@ class EnphaseApi:
         """
         parameters = {
             'key': self.api_key,
-            'user_id': self.api_key,
+            'user_id': self.user_id,
         }
         if start_date:
             parameters['start_date'] = start_date.strftime('%Y-%m-%d')
