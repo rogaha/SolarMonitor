@@ -102,21 +102,22 @@ def about():
 @login_required
 def enphase_authorization():
     """Enphase Authorization landing page."""
+    energy_account = current_user.energy_accounts[0]
     user_id = request.args.get('user_id', None)
     if not user_id:
         flash('Unable to connect Enphase account', 'info')
         return redirect(url_for('dashboard.account'))
 
-    current_user.enphase_user_id = user_id
+    energy_account.enphase_user_id = user_id
     db.session.commit()
 
-    enphase = EnphaseApi(current_user.energy_accounts[0]) #assumes only one energy account for each user
+    enphase = EnphaseApi(energy_account) #assumes only one energy account for each user
     system_info = enphase.systems().text
     system_info = json.loads(system_info)
     print system_info
     try:
         system_id = system_info['systems'][0]['system_id'] #assumes only one solar power system for each user
-        current_user.enphase_system_id = system_id
+        energy_account.enphase_system_id = system_id
         db.session.commit()
     except Exception as e:
         flash('Unable to find a system to connect: {}'.format(e))
