@@ -126,7 +126,7 @@ def enphase_authorization():
 
 
     flash('Enphase account successfully connected', 'info')
-    return render_template('public/about.html')
+    return render_template('dashboard/account.html')
 
 
 #TODO Need to move this route to the auth module. Need to clear with PGE first.
