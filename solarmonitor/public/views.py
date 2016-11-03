@@ -107,13 +107,16 @@ def enphase_authorization():
         flash('Unable to connect Enphase account', 'info')
         return redirect(url_for('dashboard.account'))
 
+    current_user.enphase_user_id = user_id
+    db.session.commit()
+
     enphase = EnphaseApi(current_user.energy_accounts[0]) #assumes only one energy account for each user
     system_info = enphase.systems().text
     system_id = system_info['systems'][0]['system_id'] #assumes only one solar power system for each user
 
     current_user.enphase_system_id = system_id
-    current_user.enphase_user_id = user_id
     db.session.commit()
+
 
     flash('Enphase account successfully connected', 'info')
     return render_template('public/about.html')
