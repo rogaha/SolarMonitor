@@ -5,6 +5,7 @@ from solarmonitor.enphase.enphase_api import EnphaseApi
 import datetime
 from datetime import timedelta, date
 import time
+import json
 
 from solarmonitor.utils import celery
 
