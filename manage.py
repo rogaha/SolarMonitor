@@ -128,10 +128,8 @@ def test_enphase_throttling():
     while counter < 20:
         today = datetime.datetime.today()
         x_days_ago = datetime.datetime.today() - timedelta(days=number_of_days_history)
-        enphase = EnphaseApi(account)
 
-        json_data = json.loads(enphase.energy_lifetime(x_days_ago, today).text)
-        task = process_enphase_data.delay(json_data, account.id)
+        task = process_enphase_data.delay(account.id, x_days_ago, today)
 
         counter += 1
 

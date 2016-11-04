@@ -1,6 +1,7 @@
 from solarmonitor.extensions import db
 from solarmonitor.settings import Config, ProdConfig
 from solarmonitor.user.models import SolarEdgeUsagePoint, EnergyAccount
+from solarmonitor.enphase.enphase_api import EnphaseApi
 import datetime
 from datetime import timedelta, date
 import time
@@ -9,7 +10,11 @@ from solarmonitor.utils import celery
 
 
 @celery.task(bind=True)
-def process_enphase_data(self, json_data, energy_account_id):
+def process_enphase_data(self, energy_account_id, start_date, end_date):
+    energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
+    enphase = EnphaseApi(account)
+    json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
+    print json_data
     """
     {
       "system_id": 66,
@@ -29,7 +34,7 @@ def process_enphase_data(self, json_data, energy_account_id):
                 timeout_start = json_data['period_start']
                 timeout_end = json_data['period_end']
                 time_to_wait = timeout_end - timeout_start
-                time.sleep(time_to_wait)
+                self.retry(countdown=time_to_wait)
             elif json_data['reason'] == 'Requested date is in the future':
                 return
 
@@ -55,6 +60,6 @@ def process_enphase_data(self, json_data, energy_account_id):
             else:
                 db.session.add(usage_point)
                 db.session.commit()
-        energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
+
         for user in energy_account.users:
             user.log_event(info="Incoming Enphase Data finished processing. Energy Acount: {}".format(energy_account.id))
