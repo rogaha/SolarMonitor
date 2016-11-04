@@ -11,10 +11,6 @@ from solarmonitor.utils import celery
 
 @celery.task(bind=True)
 def process_enphase_data(self, energy_account_id, start_date, end_date):
-    energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
-    enphase = EnphaseApi(energy_account)
-    json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
-    print json_data
     """
     {
       "system_id": 66,
@@ -24,10 +20,13 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
       "meta": {"status": "normal", "last_report_at": 1445619615, "last_energy_at": 1445619033, "operational_at": 1357023600}
     }
     """
-    print json_data
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
+        energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
+        enphase = EnphaseApi(energy_account)
+        json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
+        print json_data
         if 'reason' in json_data:
             if json_data['reason'] == "409":
                 print 'Enphase Throttling!'
