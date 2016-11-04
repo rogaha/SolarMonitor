@@ -52,6 +52,7 @@
                     <th>PGE First Date</th>
                     <th>PGE Last Date</th>
                     <th>Solar Install Date</th>
+                    <th>Solar Provider</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,6 +75,51 @@
                         <td id="account_solar_edge_site_id">{% if account.pge_first_date %}{{ account.pge_first_date.strftime('%m/%d/%Y') }}{% endif %}</td>
                         <td id="account_solar_edge_site_id">{% if account.pge_last_date %}{{ account.pge_last_date.strftime('%m/%d/%Y') }}{% endif %}</td>
                         <td id="account_solar_install_date">{% if account.solar_install_date %}{{ account.solar_install_date.strftime('%m/%d/%Y') }}{% endif %}</td>
+                        <td>
+                          <span id="solarcontainer">
+                          {% if account.enphase_user_id %}
+                            Enphase Account is Authorized
+                            <a href="{{ url_for('dashboard.account', modify='del_enphase') }}">
+                              <i class="fa fa-close" style="color:red"></i></a>
+                          {% elif account.solar_edge_site_id %}
+                            Site ID: {{ account.solar_edge_site_id }}<br>
+                            API Key: {{ account.solar_edge_api_key }}
+                          {% else %}
+
+
+                          <form id="solarform" method='post' action="{{ url_for('dashboard.select_solar') }}">
+                          <select name="solar_provider" id="dropdown_selector">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="enphase">Enphase</option>
+                            <option value="solar_edge">Solar Edge</option>
+                          </select>
+                          <!--input class='btn' type='submit' value='Authorize'-->
+                          </form>
+                        {% endif %}
+                        </span>
+                          <script>
+                          $(document).ready( function ()
+                          {
+                            /* we are assigning change event handler for select box */
+                          	/* it will run when selectbox options are changed */
+                          	$('#dropdown_selector').change(function()
+                          	{
+                          		/* setting currently changed option value to option variable */
+                          		var option = $(this).find('option:selected').val();
+
+                              if (option === 'solar_edge') {
+                                $('#energy_account_modify_{{ account.id }}').modal('show');
+                              }
+
+                              if (option === 'enphase') {
+                                window.location.replace('https://enlighten.enphaseenergy.com/app_user_auth/new?app_id=1409613132468&redirect=https://notrueup.solardatapros.com/enphase-authorization');
+                              }
+
+                          	});
+                          });
+                          </script>
+
+                        </td>
 
                       </tr>
                   {% endfor %}
@@ -241,6 +287,12 @@
                             $('#account_solar_edge_site_id').text(data.solar_edge_site_id);
                             $('#account_solar_install_date').text(data.solar_install_date);
                             $('#account_solar_edge_api_key').text(data.solar_edge_api_key);
+
+                            if (data.solar_edge_api_key && data.solar_edge_site_id) {
+                              $('#solarcontainer').html(
+                                'Site ID: ' + data.solar_edge_site_id + '<br> API Key: ' + data.solar_edge_api_key
+                              )
+                            }
                         }
                     });
 

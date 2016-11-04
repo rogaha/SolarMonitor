@@ -102,6 +102,14 @@ def home(modify=None, id=None):
         form=form
         )
 
+@blueprint.route('/select-solar', methods=['GET', 'POST'])
+@login_required
+def select_solar():
+    form = request.form
+    print form
+    if form['solar_provider'] == 'enphase':
+        return redirect(url_for('dashboard.authorizations', start_oauth='enphase'))
+
 @blueprint.route('/pull-ytd', methods=['GET', 'POST'])
 @login_required
 def pull_ytd():
@@ -361,7 +369,7 @@ def solar_edge(modify=None):
 
         if energy_account.enphase_user_id and energy_account.enphase_system_id:
             task = process_enphase_data.delay(energy_account.id, start_date_se, end_date_se)
-            flash('Process Enphase Data', 'info')
+            flash('Processing Enphase Data', 'info')
             return redirect(url_for('dashboard.solar_edge'))
 
         se = SolarEdgeApi(energy_account)
