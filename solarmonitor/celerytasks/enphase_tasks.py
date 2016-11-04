@@ -12,7 +12,7 @@ from solarmonitor.utils import celery
 @celery.task(bind=True)
 def process_enphase_data(self, energy_account_id, start_date, end_date):
     energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
-    enphase = EnphaseApi(account)
+    enphase = EnphaseApi(energy_account)
     json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
     print json_data
     """
