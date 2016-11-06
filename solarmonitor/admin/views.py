@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, session
 from flask_login import login_required, login_user, logout_user, current_user
 from solarmonitor.auth.forms import RegistrationForm
 from solarmonitor.utils import flash_errors, requires_roles, try_parsing_date, flash_errors
-from solarmonitor.user.models import User, EnergyAccount, AppEvent
+from solarmonitor.user.models import User, EnergyAccount, AppEvent, Role
 from solarmonitor.extensions import db
 from solarmonitor.public.forms import DownloadDataForm
 from solarmonitor.auth.forms import RegistrationForm
@@ -22,6 +22,21 @@ def test_user_account(page=1, modify=None, user_id=None):
         logout_user()
         login_user(test_user, True)
         return redirect(url_for('dashboard.home'))
+
+@blueprint.route('/change_role/<role>/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@requires_roles('Admin')
+def change_user_role(role=None, user_id=None):
+    if role == 'Admin':
+        user_to_modify = User.query.filter_by(id=user_id).first()
+        role_to_add = Role.query.filter_by(role='Admin').first()
+        if role_to_add in user_to_modify.roles:
+            flash('User is already an admin!', 'info')
+            return redirect(url_for('admin.users'))
+        user_to_modify.roles.append(role_to_add)
+        current_user.log_event(info='{} changed {}\'s role to {}'.format(current_user.full_name, user_to_modify.full_name, role))
+        flash('{} changed {}\'s role to {}'.format(current_user.full_name, user_to_modify.full_name, role), 'info')
+        return redirect(url_for('admin.users'))
 
 @blueprint.route('/users', methods=['GET', 'POST'])
 @blueprint.route('/users/page/<int:page>', methods=['GET', 'POST'])

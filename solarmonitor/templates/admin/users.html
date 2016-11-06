@@ -115,6 +115,7 @@
                     <th><em class="fa fa-cog"></em></th>
                     <th class="hidden-xs">ID</th>
                     <th>Name</th>
+                    <th>Security Roles</th>
                     <th>Address</th>
                     <th>Email</th>
                     <th>Energy Accounts</th>
@@ -243,10 +244,16 @@
                         </td>
                         <td class="hidden-xs">{{ user.id }}</td>
                         <td id="account_nick_name">{{ user.first_name }} {{ user.last_name }}</td>
+                        <td id="account_security_role">{% for role in user.roles %}{{ role.role }} {% endfor %}</td>
                         <td id="account_address_one">{{ user.full_address }}</td>
                         <td id="account_pge_bulk_id">{{ user.email }}</td>
                         <td id="account_solar_edge_site_id">{{ user.energy_accounts | length }}</td>
-                        <td><a href='{{ url_for("admin.test_user_account", modify="login_as", user_id=user.id)}}' class='btn btn-primary'>Login as User</a></td>
+                        <td>
+                          <a href='{{ url_for("admin.test_user_account", modify="login_as", user_id=user.id)}}' class='btn btn-primary'>Login as User</a>
+
+                          <a href='{{ url_for("admin.change_user_role", role="Admin", user_id=user.id)}}' class='btn btn-primary'>Make Admin</a>
+
+                        </td>
                       </tr>
                   {% endfor %}
                     </tbody>
