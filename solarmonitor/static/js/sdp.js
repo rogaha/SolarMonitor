@@ -9,6 +9,11 @@ sdp.constant("moment", moment);
 sdp.controller('eventController', function($scope, $http) {
 
     $scope.today = moment().subtract(1, 'days');
+
+    var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+    var secondDate = new Date();
+    var firstDate = new Date(secondDate.getFullYear(),01,01);
+    $scope.ytd  = Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)))
     $scope.getEvents = function(daysAgo) {
         console.log(daysAgo)
         $scope.startDate = moment().subtract((1 + daysAgo), 'days').format("YYYY-MM-DD");

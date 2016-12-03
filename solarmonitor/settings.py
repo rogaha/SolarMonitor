@@ -28,8 +28,8 @@ class Config(object):
     PGE_DATA_CUSTODIAN_URL = 'https://sharemydata.pge.com/myAuthorization/?clientId=50154&verified=true'
     PGE_3rd_PARTY_REDIRECT_URI = 'https://notrueup.solardatapros.com/pge-oauth-redirect'
     TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
-    CELERY_BROKER_URL = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-221-253-136.compute-1.amazonaws.com:6819'
-    CELERY_RESULT_BACKEND = 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-221-253-136.compute-1.amazonaws.com:6819'
+    CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-221-253-136.compute-1.amazonaws.com:6819')
+    CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-221-253-136.compute-1.amazonaws.com:6819')
     ENPHASE_API_KEY = 'aedc75d38120f96a689e7f83c4ce22f8'
     ENPHASE_REDIRECT_URI = 'https://notrueup.solardatapros.com/enphase-authorization'
     ENPHASE_APP_ID = '1409613132468'
@@ -42,7 +42,7 @@ class ProdConfig(Config):
 
     ENV = 'prod'
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgres://npyecevfvfiqyu:lczG2Ce2qeydBnN37WVBDnERcy@ec2-54-243-45-168.compute-1.amazonaws.com:5432/d88tv4rrrt3c55'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgres://npyecevfvfiqyu:lczG2Ce2qeydBnN37WVBDnERcy@ec2-54-243-45-168.compute-1.amazonaws.com:5432/d88tv4rrrt3c55')
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
 
 class DevConfig(Config):
@@ -53,7 +53,7 @@ class DevConfig(Config):
     DB_NAME = 'dev.db'
     # Put the db file in project root
     DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
-    SQLALCHEMY_DATABASE_URI = 'postgres://npyecevfvfiqyu:lczG2Ce2qeydBnN37WVBDnERcy@ec2-54-243-45-168.compute-1.amazonaws.com:5432/d88tv4rrrt3c55'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgres://npyecevfvfiqyu:lczG2Ce2qeydBnN37WVBDnERcy@ec2-54-243-45-168.compute-1.amazonaws.com:5432/d88tv4rrrt3c55')
     DEBUG_TB_ENABLED = True
     ASSETS_DEBUG = True  # Don't bundle/minify static assets
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.

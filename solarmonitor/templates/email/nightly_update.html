@@ -49,12 +49,14 @@
 								</tr>&#13;
 								<tr>
 									<table class="table">
+										{% if events | length > 0 %}
 							      <thead>
 							        <th align="left">Time</th>
 							        <th align="left">Type</th>
 							        <th align="left">Info</th>
 							        <th></th>
 							      </thead>
+										{% endif %}
 
 							    {% for event in events %}
 							    <tr>

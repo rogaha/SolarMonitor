@@ -24,10 +24,25 @@
               </div>
               <div class="col col-xs-6 text-right">
 
+                <form id="form1" class="form-inline" action="{{ url_for('admin.users', modify='search') }}" method="post">
+                  {{ search_form.hidden_tag() }}
+                  <div class="form-group">
+                      <label class="sr-only" for="inputEmail">Search</label>
+                      {{ search_form.start_date(class="form-control input-md", id="datepicker1", autocomplete="off", placeholder="Search") }}
+
+                  </div>
+
+                <button type="submit" class="btn btn-sm btn-primary btn-create">Search</button>
+                {% if session['user_search_term'] %}
+                <a href="{{ url_for('admin.users', modify='search_clear') }}" class='btn btn-danger'>Clear Search '{{ session['user_search_term'] }}'</a>
+                {% endif %}
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-sm btn-primary btn-create" data-toggle="modal" data-target="#myModal">
+                <button type="button" class="btn btn-sm btn-primary btn-create" data-toggle="modal" data-target="#myModal" srtyle="float:right;">
                   Create New
                 </button>
+                </form>
+
+
 
                 <!-- Modal -->
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -115,10 +130,10 @@
                     <th><em class="fa fa-cog"></em></th>
                     <th class="hidden-xs">ID</th>
                     <th>Name</th>
-                    <th>Security Roles</th>
+                    <th>Roles</th>
                     <th>Address</th>
                     <th>Email</th>
-                    <th>Energy Accounts</th>
+                    <th>Accounts</th>
                     <th>Test Account</th>
                 </tr>
               </thead>
@@ -243,7 +258,7 @@
                           <a href="{{ url_for('admin.users', modify='del', user_id=user.id) }}" class="btn btn-danger"><em class="fa fa-trash"></em></a>
                         </td>
                         <td class="hidden-xs">{{ user.id }}</td>
-                        <td id="account_nick_name">{{ user.first_name }} {{ user.last_name }}</td>
+                        <td id="account_nick_name"> {{ user.last_name }}, {{ user.first_name }}</td>
                         <td id="account_security_role">{% for role in user.roles %}{{ role.role }} {% endfor %}</td>
                         <td id="account_address_one">{{ user.full_address }}</td>
                         <td id="account_pge_bulk_id">{{ user.email }}</td>

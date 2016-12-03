@@ -182,6 +182,8 @@
 </div>
 <div class="col-md-4">
   <a class="btn btn-success btn-large" href="{{ url_for('dashboard.pull_ytd')}}">Pull YTD Data</a>
+  <p style="font-size:14px;">PGE First Date: {{ current_user.energy_accounts[0].pge_first_date.strftime('%m/%d/%Y')}}<br>
+  PGE Last Date: {{ current_user.energy_accounts[0].pge_last_date.strftime('%m/%d/%Y')}}</p>
 </div>
 </div>
 </div><!-- /.jumbotron -->

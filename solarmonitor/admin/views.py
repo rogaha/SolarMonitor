@@ -41,6 +41,7 @@ def change_user_role(role=None, user_id=None):
 @blueprint.route('/users', methods=['GET', 'POST'])
 @blueprint.route('/users/page/<int:page>', methods=['GET', 'POST'])
 @blueprint.route('/<modify>/<int:user_id>', methods=['GET', 'POST'])
+@blueprint.route('/<modify>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Admin')
 def users(page=1, modify=None, user_id=None):
@@ -48,10 +49,28 @@ def users(page=1, modify=None, user_id=None):
     breadcrumbs = [('Admin Dashboard', 'dashboard', url_for('admin.users'))]
     heading = 'Admin Dashboard'
 
-    users = User.query
+    if session.get('user_search_term', None):
+        users = User.query.filter(
+            (User.last_name.like('%{}%'.format(session['user_search_term']))) |
+            (User.first_name.like('%{}%'.format(session['user_search_term']))) |
+            (User.zip_code.like('%{}%'.format(session['user_search_term']))) |
+            (User.email.like('%{}%'.format(session['user_search_term'])))
+        ).order_by(User.last_name.asc())
+    else:
+        users = User.query.order_by(User.last_name.asc())
+
+    search_form = DownloadDataForm(prefix="search")
 
     add_user_form = RegistrationForm(prefix="add")
     edit_user_form = RegistrationForm(prefix="edit")
+
+    if modify == 'search':
+        session['user_search_term'] = search_form.start_date.data
+        return redirect(url_for('admin.users'))
+
+    if modify == 'search_clear':
+        session.pop('user_search_term')
+        return redirect(url_for('admin.users'))
 
     if modify == 'edit':
         user = User.query.filter_by(id=user_id).first()
@@ -109,7 +128,8 @@ def users(page=1, modify=None, user_id=None):
         heading=heading,
         users=users.paginate(page, 10, False),
         add_user_form=add_user_form,
-        edit_user_form=edit_user_form
+        edit_user_form=edit_user_form,
+        search_form=search_form
     )
 
 @blueprint.route('/events', methods=['GET', 'POST'])
