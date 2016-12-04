@@ -51,10 +51,10 @@ def users(page=1, modify=None, user_id=None):
 
     if session.get('user_search_term', None):
         users = User.query.filter(
-            (User.last_name.like('%{}%'.format(session['user_search_term']))) |
-            (User.first_name.like('%{}%'.format(session['user_search_term']))) |
-            (User.zip_code.like('%{}%'.format(session['user_search_term']))) |
-            (User.email.like('%{}%'.format(session['user_search_term'])))
+            (User.last_name.ilike('%{}%'.format(session['user_search_term']))) |
+            (User.first_name.ilike('%{}%'.format(session['user_search_term']))) |
+            (User.zip_code.like('%{}%'.format(session['user_search_term'])))
+
         ).order_by(User.last_name.asc())
     else:
         users = User.query.order_by(User.last_name.asc())
