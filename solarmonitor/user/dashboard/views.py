@@ -58,6 +58,14 @@ def home(modify=None, id=None):
 
     cumulative = current_user.energy_accounts[0].serialize_charts('cumulative_usage_graph', start_date, end_date)
 
+    financial_cumulative = [round((float(x) * 0.23627), 2) for x in cumulative['net_usage']]
+
+    financial_min = financial_cumulative[0]
+
+    financial_max = financial_cumulative[-1]
+
+    financial_step_value = (financial_max - financial_min) / 10
+
     events = current_user.energy_accounts[0].energy_events(start_date, end_date)
 
     if current_user.energy_accounts[0].solar_install_date:
@@ -94,6 +102,10 @@ def home(modify=None, id=None):
         prod_net_usg=prod_net_usg,
         prod_comb=prod_comb,
         financial=financial,
+        financial_cumulative=financial_cumulative,
+        financial_min=financial_min,
+        financial_max=financial_max,
+        financial_step_value=financial_step_value,
         cumulative=cumulative,
         account_id=current_user.energy_accounts[0].id,
         solar_install_date=solar_install_date,
