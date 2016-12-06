@@ -479,7 +479,14 @@ var myChart4 = new Chart(ctx4, {
           }, {
 
               ticks: {
-                beginAtZero: false
+                beginAtZero: true,
+                steps: 10,
+                stepValue: 5,
+                max: 100
+              },
+              scaleLabel: {
+                display: true,
+                labelString: 'Dollars'
               },
               position: 'right',
               'id': 'y-axis-1'
