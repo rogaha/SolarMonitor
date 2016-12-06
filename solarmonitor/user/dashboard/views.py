@@ -58,11 +58,11 @@ def home(modify=None, id=None):
 
     cumulative = current_user.energy_accounts[0].serialize_charts('cumulative_usage_graph', start_date, end_date)
 
-    financial_cumulative = [round((float(x) * 0.23627), 2) for x in cumulative['net_usage']]
+    financial_cumulative = [int(float(x) * 0.23627) for x in cumulative['net_usage']]
 
-    financial_min = financial_cumulative[0]
+    financial_min = round(financial_cumulative[0] * 2, -1) / 2
 
-    financial_max = financial_cumulative[-1]
+    financial_max = round(financial_cumulative[-1] * 2, -1) / 2
 
     financial_step_value = (financial_max - financial_min) / 10
 
