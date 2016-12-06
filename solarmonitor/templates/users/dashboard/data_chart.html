@@ -42,6 +42,7 @@
     $(document).ready(function() {
         $('#datepicker1').datepicker({
           format: 'yyyy-mm-dd',
+          todayHighlight: true
         }).on('changeDate', function(e){
             $(this).datepicker('hide');
         });;
@@ -62,6 +63,7 @@
     $(document).ready(function() {
         $('#datepicker2').datepicker({
           format: 'yyyy-mm-dd',
+          todayHighlight: true
         }).on('changeDate', function(e){
             $(this).datepicker('hide');
         });
@@ -132,6 +134,7 @@
     $(document).ready(function() {
         $('#datepicker3').datepicker({
           format: 'yyyy-mm-dd',
+          todayHighlight: true
         }).on('changeDate', function(e){
             $(this).datepicker('hide');
         });
@@ -152,6 +155,7 @@
     $(document).ready(function() {
         $('#datepicker4').datepicker({
           format: 'yyyy-mm-dd',
+          todayHighlight: true
         }).on('changeDate', function(e){
             $(this).datepicker('hide');
         });
@@ -182,8 +186,8 @@
 </div>
 <div class="col-md-4">
   <a class="btn btn-success btn-large" href="{{ url_for('dashboard.pull_ytd')}}">Pull YTD Data</a>
-  <p style="font-size:14px;">PGE First Date: {{ current_user.energy_accounts[0].pge_first_date.strftime('%m/%d/%Y')}}<br>
-  PGE Last Date: {{ current_user.energy_accounts[0].pge_last_date.strftime('%m/%d/%Y')}}</p>
+  <p style="font-size:14px;">PGE First Date:{% if current_user.energy_accounts[0].pge_first_date %} {{ current_user.energy_accounts[0].pge_first_date.strftime('%m/%d/%Y')}}{% endif %}<br>
+  PGE Last Date: {% if current_user.energy_accounts[0].pge_last_date %}{{ current_user.energy_accounts[0].pge_last_date.strftime('%m/%d/%Y')}}{% endif %}</p>
 </div>
 </div>
 </div><!-- /.jumbotron -->
