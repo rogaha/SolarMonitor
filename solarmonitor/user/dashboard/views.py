@@ -63,6 +63,10 @@ def home(modify=None, id=None):
         financial_min = round(financial_cumulative[0] * 2, -1) / 2
         financial_max = round(financial_cumulative[-1] * 2, -1) / 2
         financial_step_value = (financial_max - financial_min) / 10
+    else:
+        financial_min = 0
+        financial_max = 100
+        financial_step_value = 10
 
     events = current_user.energy_accounts[0].energy_events(start_date, end_date)
 
