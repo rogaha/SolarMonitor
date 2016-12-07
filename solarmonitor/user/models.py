@@ -327,9 +327,10 @@ class EnergyAccount(db.Model):
             }
 
         elif chart == 'cumulative_usage_graph':
+            cumulative_usage_graph = self.cumulative_usage_graph(start_date, end_date)
             if cumulative_usage_graph == None:
                 return None
-            cumulative_usage_graph = self.cumulative_usage_graph(start_date, end_date)
+
             net_usage = [convert_to_kWh(data) for data, labels in cumulative_usage_graph]
 
             financial_cumulative = [int(float(x) * 0.23627) for x in net_usage]
