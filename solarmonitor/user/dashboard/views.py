@@ -104,7 +104,6 @@ def home(modify=None, id=None):
         prod_net_usg=prod_net_usg,
         prod_comb=prod_comb,
         financial=financial,
-        financial_cumulative=financial_cumulative,
         financial_min=financial_min,
         financial_max=financial_max,
         financial_step_value=financial_step_value,
