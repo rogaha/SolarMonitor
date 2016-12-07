@@ -50,12 +50,17 @@ def users(page=1, modify=None, user_id=None):
     heading = 'Admin Dashboard'
 
     if session.get('user_search_term', None):
-        users = User.query.filter(
-            (User.last_name.ilike('%{}%'.format(session['user_search_term']))) |
-            (User.first_name.ilike('%{}%'.format(session['user_search_term']))) |
-            (User.zip_code.like('%{}%'.format(session['user_search_term'])))
-
-        ).order_by(User.last_name.asc())
+        try:
+            zip_search = int(session['user_search_term'])
+            users = User.query.join(EnergyAccount, User.energy_accounts).filter(EnergyAccount.zip_code == str(zip_search))
+        except ValueError:
+            """This search is used if search term is not an integer"""
+            users = User.query.filter(
+                (User.last_name.ilike('%{}%'.format(session['user_search_term']))) |
+                (User.first_name.ilike('%{}%'.format(session['user_search_term']))) |
+                (User.zip_code.like('%{}%'.format(session['user_search_term']))) |
+                (User.email.like('%{}%'.format(session['user_search_term'])))
+            ).order_by(User.last_name.asc())
     else:
         users = User.query.order_by(User.last_name.asc())
 
