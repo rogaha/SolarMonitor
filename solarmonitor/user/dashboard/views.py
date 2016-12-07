@@ -389,8 +389,8 @@ def solar_edge(modify=None):
         if 'data_time_unit_se' in session:
             time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
             se_data = se.site_energy_measurements(
-                start_date_se.strftime('%m/%d/%Y'),
-                end_date_se.strftime('%m/%d/%Y'),
+                start_date_se.strftime('%Y-%m-%d'),
+                end_date_se.strftime('%Y-%m-%d'),
                 energy_account.solar_edge_site_id,
                 time_unit
             ).text
@@ -403,8 +403,8 @@ def solar_edge(modify=None):
                 print se_data
         else:
             se_data = se.site_energy_measurements(
-                start_date_se.strftime('%m/%d/%Y'),
-                end_date_se.strftime('%m/%d/%Y'),
+                start_date_se.strftime('%Y-%m-%d'),
+                end_date_se.strftime('%Y-%m-%d'),
                 energy_account.solar_edge_site_id
             ).text
             try:
