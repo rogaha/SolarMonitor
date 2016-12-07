@@ -328,11 +328,21 @@ class EnergyAccount(db.Model):
 
         elif chart == 'cumulative_usage_graph':
             cumulative_usage_graph = self.cumulative_usage_graph(start_date, end_date)
+            net_usage = [convert_to_kWh(data) for data, labels in cumulative_usage_graph]
+
+            financial_cumulative = [int(float(x) * 0.23627) for x in net_usage]
+            financial_min = round(financial_cumulative[0] * 2, -1) / 2
+            financial_max = round(financial_cumulative[-1] * 2, -1) / 2
+            financial_step_value = (financial_max - financial_min) / 10
+
             if cumulative_usage_graph == None:
                 return None
             return {
-                'net_usage': [convert_to_kWh(data) for data, labels in cumulative_usage_graph],
-                'labels': [labels.strftime(date_format) for data, labels in cumulative_usage_graph]
+                'net_usage': net_usage,
+                'labels': [labels.strftime(date_format) for data, labels in cumulative_usage_graph],
+                'financial_min': financial_min,
+                'financial_max': financial_max,
+                'financial_step_value': financial_step_value
             }
 
         elif chart == 'production_net_usage_percentage_graph':

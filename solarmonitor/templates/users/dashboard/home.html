@@ -96,6 +96,9 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 
           myChart4.data.datasets[0].data = data.cumulative.net_usage;
           myChart4.data.labels = data.cumulative.labels;
+          myChart4.options.scales.yAxes[1].ticks.min = data.cumulative.financial_min
+          myChart4.options.scales.yAxes[1].ticks.max = data.cumulative.financial_max
+          myChart4.options.scales.yAxes[1].ticks.stepValue = data.cumulative.financial_step_value
           myChart4.update();
       }
   });
@@ -131,6 +134,9 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 
           myChart4.data.datasets[0].data = data.cumulative.net_usage;
           myChart4.data.labels = data.cumulative.labels;
+          myChart4.options.scales.yAxes[1].ticks.min = data.cumulative.financial_min
+          myChart4.options.scales.yAxes[1].ticks.max = data.cumulative.financial_max
+          myChart4.options.scales.yAxes[1].ticks.stepValue = data.cumulative.financial_step_value
           myChart4.update();
       }
   });
@@ -167,6 +173,9 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 
           myChart4.data.datasets[0].data = data.cumulative.net_usage;
           myChart4.data.labels = data.cumulative.labels;
+          myChart4.options.scales.yAxes[1].ticks.min = data.cumulative.financial_min
+          myChart4.options.scales.yAxes[1].ticks.max = data.cumulative.financial_max
+          myChart4.options.scales.yAxes[1].ticks.stepValue = data.cumulative.financial_step_value
           myChart4.update();
       }
   });
@@ -201,6 +210,9 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 
             myChart4.data.datasets[0].data = data.cumulative.net_usage;
             myChart4.data.labels = data.cumulative.labels;
+            myChart4.options.scales.yAxes[1].ticks.min = data.cumulative.financial_min
+            myChart4.options.scales.yAxes[1].ticks.max = data.cumulative.financial_max
+            myChart4.options.scales.yAxes[1].ticks.stepValue = data.cumulative.financial_step_value
             myChart4.update();
         }
     });
@@ -235,6 +247,9 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 
             myChart4.data.datasets[0].data = data.cumulative.net_usage;
             myChart4.data.labels = data.cumulative.labels;
+            myChart4.options.scales.yAxes[1].ticks.min = data.cumulative.financial_min
+            myChart4.options.scales.yAxes[1].ticks.max = data.cumulative.financial_max
+            myChart4.options.scales.yAxes[1].ticks.stepValue = data.cumulative.financial_step_value
             myChart4.update();
         }
     });
@@ -269,6 +284,9 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 
             myChart4.data.datasets[0].data = data.cumulative.net_usage;
             myChart4.data.labels = data.cumulative.labels;
+            myChart4.options.scales.yAxes[1].ticks.min = data.cumulative.financial_min
+            myChart4.options.scales.yAxes[1].ticks.max = data.cumulative.financial_max
+            myChart4.options.scales.yAxes[1].ticks.stepValue = data.cumulative.financial_step_value
             myChart4.update();
         }
     });
@@ -463,6 +481,9 @@ datasets: [
     }
 ]
 };
+var financial_min = {{ financial_min | safe }}
+var financial_step_value = {{ financial_step_value | safe }}
+var financial_max = {{ financial_max | safe }}
 var ctx4 = document.getElementById("myChart4");
 var myChart4 = new Chart(ctx4, {
   type: 'bar',
@@ -474,16 +495,20 @@ var myChart4 = new Chart(ctx4, {
               ticks: {
                   beginAtZero:false
               },
+              scaleLabel: {
+                display: true,
+                labelString: 'kWh'
+              },
               position: 'left',
               'id': 'y-axis-0'
           }, {
 
               ticks: {
                 beginAtZero: false,
-                min: {{ financial_min | safe }},
+                min: financial_min,
                 steps: 10,
-                stepValue: {{ financial_step_value | safe }},
-                max: {{ financial_max | safe }}
+                stepValue: financial_step_value,
+                max: financial_max
               },
               scaleLabel: {
                 display: true,
@@ -545,7 +570,7 @@ var myChart4 = new Chart(ctx4, {
 
             $(document).ready(function() {
                 $('#datepicker1').datepicker({
-                  format: 'yyyy-mm-dd',
+                  format: 'mm/dd/yyyy',
                   container:'#eventModal',
                   todayHighlight: true
                 });
@@ -594,7 +619,6 @@ var myChart4 = new Chart(ctx4, {
   </div>
 </div>
 </div>
-{{ financial_cumulative }}
     </div>
 </div>
 {% endblock %}
