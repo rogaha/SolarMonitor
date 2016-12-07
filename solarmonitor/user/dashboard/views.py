@@ -198,8 +198,8 @@ def authorizations(start_oauth=None):
 def graph_update(account_id=None, start_date=None, end_date=None):
     energy_account = EnergyAccount.query.filter_by(id=account_id).first()
 
-    s_date = try_parsing_date(start_date)
-    e_date = try_parsing_date(end_date)
+    s_date = try_parsing_date(start_date).date()
+    e_date = try_parsing_date(end_date).date()
 
     result = {
         'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
