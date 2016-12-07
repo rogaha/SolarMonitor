@@ -198,8 +198,8 @@ def authorizations(start_oauth=None):
 def graph_update(account_id=None, start_date=None, end_date=None):
     energy_account = EnergyAccount.query.filter_by(id=account_id).first()
 
-    s_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-    e_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+    s_date = try_parsing_date(start_date)
+    e_date = try_parsing_date(end_date)
 
     result = {
         'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
@@ -261,12 +261,12 @@ def charts(modify=None):
         return redirect(url_for('dashboard.charts'))
 
     if 'start_date_pge' in session:
-        start_date_pge = datetime.strptime(session['start_date_pge'], '%m/%d/%Y')
+        start_date_pge = try_parsing_date(session['start_date_pge'])
     else:
         start_date_pge = datetime.now() - timedelta(days=1)
 
     if 'end_date_pge' in session:
-        end_date_pge = datetime.strptime(session['end_date_pge'], '%m/%d/%Y') + timedelta(days=1)
+        end_date_pge = try_parsing_date(session['end_date_pge'])
     else:
         end_date_pge = datetime.now()
 
@@ -274,8 +274,8 @@ def charts(modify=None):
         session['data_time_unit'] = date_select_form.data_time_unit.data
         session['start_date_pge'] = date_select_form.start_date.data
         session['end_date_pge'] = date_select_form.end_date.data
-        start_date_pge = datetime.strptime(session['start_date_pge'], '%m/%d/%Y')
-        end_date_pge = datetime.strptime(session['end_date_pge'], '%m/%d/%Y') + timedelta(days=1)
+        start_date_pge = try_parsing_date(session['start_date_pge'])
+        end_date_pge = try_parsing_date(session['end_date_pge'])
         return redirect(url_for('dashboard.charts'))
 
     if download_data_form.validate_on_submit():
@@ -283,8 +283,8 @@ def charts(modify=None):
         session['start_date_pge'] = download_data_form.start_date.data
         session['end_date_pge'] = download_data_form.end_date.data
 
-        start_date_pge = datetime.strptime(session['start_date_pge'], '%m/%d/%Y')
-        end_date_pge = datetime.strptime(session['end_date_pge'], '%m/%d/%Y') + timedelta(days=1)
+        start_date_pge = try_parsing_date(session['start_date_pge'])
+        end_date_pge = try_parsing_date(session['end_date_pge'])
 
         process_xml.delay(current_user.energy_accounts[0], start_date_pge, end_date_pge, user_id=current_user.id)
         flash('Data processing', 'info')
@@ -338,12 +338,12 @@ def solar_edge(modify=None):
 
     """Set some default dates if nothing has been entered in the form."""
     if 'start_date_se' in session:
-        start_date_se = datetime.strptime(session['start_date_se'], '%m/%d/%Y')
+        start_date_se = try_parsing_date(session['start_date_se'])
     else:
         start_date_se = datetime.now() - timedelta(days=1)
 
     if 'end_date_se' in session:
-        end_date_se = datetime.strptime(session['end_date_se'], '%m/%d/%Y')
+        end_date_se = try_parsing_date(session['end_date_se'])
     else:
         end_date_se = datetime.now()
 
@@ -359,8 +359,8 @@ def solar_edge(modify=None):
         session['end_date_se'] = date_select_form.end_date.data
 
         try:
-            start_date_se = datetime.strptime(session['start_date_se'], '%m/%d/%Y')
-            end_date_se = datetime.strptime(session['end_date_se'], '%m/%d/%Y')
+            start_date_se = try_parsing_date(session['start_date_se'])
+            end_date_se = try_parsing_date(session['end_date_se'])
         except:
             flash('Date entered, not in correct format.', 'info')
             return redirect(url_for('dashboard.solar_edge'))
@@ -372,8 +372,8 @@ def solar_edge(modify=None):
         session['end_date_se'] = download_data_form.end_date.data
 
         try:
-            start_date_se = datetime.strptime(session['start_date_se'], '%m/%d/%Y')
-            end_date_se = datetime.strptime(session['end_date_se'], '%m/%d/%Y')
+            start_date_se = try_parsing_date(session['start_date_se'])
+            end_date_se = try_parsing_date(session['end_date_se'])
             if end_date_se > datetime.now():
                 end_date_se = datetime.now()
         except:
