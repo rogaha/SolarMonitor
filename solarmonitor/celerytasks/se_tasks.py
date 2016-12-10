@@ -37,7 +37,8 @@ def process_se_data(self, json_data, energy_account_id):
             else:
                 db.session.add(usage_point)
                 db.session.commit()
-
+                
+        energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
         if energy_account.solar_last_date:
             if energy_account.solar_last_date < end_date:
                 energy_account.solar_last_date = end_date
@@ -51,6 +52,6 @@ def process_se_data(self, json_data, energy_account_id):
             energy_account.solar_first_date = start_date
 
         db.session.commit()
-        energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
+
         for user in energy_account.users:
             user.log_event(info="Incoming Solar Edge Data finished processing. Energy Acount: {}".format(energy_account.id))
