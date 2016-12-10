@@ -94,6 +94,7 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
           myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
           myChart3.data.labels = data.production_net_usage_graph.labels;
           myChart3.update();
+          $.LoadingOverlay("hide");
 
           myChart4.data.datasets[0].data = data.cumulative.net_usage;
           myChart4.data.labels = data.cumulative.labels;
