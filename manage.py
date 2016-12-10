@@ -146,7 +146,10 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
 
         if account.enphase_user_id and account.enphase_system_id:
             end_date = datetime.datetime.today()
-            start_date = datetime.datetime.today() - timedelta(days=number_of_days_history)
+            if account.solar_last_date:
+                start_date = account.solar_last_date - timedelta(days=3)
+            else:
+                start_date = datetime.datetime.today() - timedelta(days=number_of_days_history)
             enphase = EnphaseApi(account)
             try:
                 json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
