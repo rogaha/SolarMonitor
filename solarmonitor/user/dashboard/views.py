@@ -124,8 +124,12 @@ def select_solar():
         return redirect(url_for('dashboard.authorizations', start_oauth='enphase'))
 
 @blueprint.route('/pull-ytd', methods=['GET', 'POST'])
+@blueprint.route('/pull-ytd/<pull_type>', methods=['GET', 'POST'])
 @login_required
-def pull_ytd():
+def pull_ytd(pull_type=None):
+    if pull_type == 'solar':
+        return redirect(url_for('dashboard.solar_edge'))
+
     for energy_account in current_user.energy_accounts:
         """First find the whole date range to pull data."""
         end_date = datetime.now() if energy_account.pge_last_date == None else energy_account.pge_last_date

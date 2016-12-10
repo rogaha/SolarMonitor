@@ -214,7 +214,9 @@
                             <div class="form-group">
                               <label class=" control-label" for="passwordinput"></label>
                               <div class="">
-                                <button type='submit' class='btn btn-primary'>Edit</button>
+                                <button type='submit' class='btn btn-primary'>Save</button>
+                                <button type="button" class='btn btn-default btn-popover-close'>Cancel</button>
+
 
                               </div>
                             </div>
@@ -224,6 +226,7 @@
 
 
                             </form>
+
                           </div>
 
                           <script>
@@ -244,7 +247,8 @@
                           $('[data-toggle="popover"],[data-original-title]').each(function () {
                               //the 'is' for buttons that trigger popups
                               //the 'has' for icons within a button that triggers a popup
-                              if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+
+                              if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0 || $(e.target).is('.btn-popover-close')) {
                                   (($(this).popover('hide').data('bs.popover')||{}).inState||{}).click = false  // fix for BS 3.3.6
                               }
 
@@ -255,7 +259,9 @@
 
 
 
-                          <a href="{{ url_for('admin.users', modify='del', user_id=user.id) }}" class="btn btn-danger"><em class="fa fa-trash"></em></a>
+                          <a data-toggle="confirmation" href="{{ url_for('admin.users', modify='del', user_id=user.id) }}" class="btn btn-danger"><em class="fa fa-trash"></em></a>
+
+
                         </td>
                         <td class="hidden-xs">{{ user.id }}</td>
                         <td id="account_nick_name"> {{ user.last_name }}, {{ user.first_name }}</td>
@@ -266,8 +272,11 @@
                         <td>
                           <a href='{{ url_for("admin.test_user_account", modify="login_as", user_id=user.id)}}' class='btn btn-primary'>Login as User</a>
 
+                          {% if admin_role in user.roles %}
+                          <a href='{{ url_for("admin.change_user_role", role="User", user_id=user.id)}}' class='btn btn-default'>Remove Admin</a>
+                          {% else %}
                           <a href='{{ url_for("admin.change_user_role", role="Admin", user_id=user.id)}}' class='btn btn-primary'>Make Admin</a>
-
+                          {% endif %}
                         </td>
                       </tr>
                   {% endfor %}

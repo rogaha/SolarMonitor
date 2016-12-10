@@ -134,7 +134,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
 
                         """This function begins with a start_date and and end_date that is provided by the user
                         (or system). However the start and end values for `pge_first_date` and `pge_last_date`
-                        should not be set by user input. Instead we will check for what data actuall comes back and
+                        should not be set by user input. Instead we will check for what data actually comes back and
                         set the first and last dates according to that data. On the first loop, we will set the first_date equal
                         to the first date that comes in from PGE every subsequent loop will increment the end_date which
                         will get updated and saved to the DB during the cleanup phase of this task."""

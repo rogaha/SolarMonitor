@@ -177,6 +177,11 @@
   </fieldset>
   </form>
 </div>
+<div class="col-md-4">
+  <a class="btn btn-success btn-large" href="{{ url_for('dashboard.pull_ytd', pull_type='solar')}}">Pull YTD Data</a>
+  <p style="font-size:14px;">{% if current_user.energy_accounts[0].solar_first_date %}Solar First Date: {{ current_user.energy_accounts[0].solar_first_date.strftime('%m/%d/%Y')}}{% endif %}<br>
+  {% if current_user.energy_accounts[0].solar_last_date %}Solar Last Date: {{ current_user.energy_accounts[0].pge_last_date.strftime('%m/%d/%Y')}}{% endif %}</p>
+</div>
 </div>
 </div><!-- /.jumbotron -->
 <style type="text/css">

@@ -27,6 +27,14 @@ def test_user_account(page=1, modify=None, user_id=None):
 @login_required
 @requires_roles('Admin')
 def change_user_role(role=None, user_id=None):
+    if role == 'User':
+        admin_role = Role.query.filter_by(role='Admin').first()
+        user_to_modify = User.query.filter_by(id=user_id).first()
+        user_to_modify.roles.remove(admin_role)
+        db.session.commit()
+        flash('{} has had Admin privileges revoked!'.format(user_to_modify.full_name), 'info')
+        return redirect(url_for('admin.users'))
+
     if role == 'Admin':
         user_to_modify = User.query.filter_by(id=user_id).first()
         role_to_add = Role.query.filter_by(role='Admin').first()
@@ -48,6 +56,7 @@ def users(page=1, modify=None, user_id=None):
     """Admin Home Page."""
     breadcrumbs = [('Admin Dashboard', 'dashboard', url_for('admin.users'))]
     heading = 'Admin Dashboard'
+    admin_role = Role.query.filter_by(role='Admin').first()
 
     if session.get('user_search_term', None):
         try:
@@ -93,7 +102,7 @@ def users(page=1, modify=None, user_id=None):
             user.password=edit_user_form.password.data
 
         db.session.commit()
-        flash('User modified.')
+        flash('User modified.', 'info')
         current_user.log_event(info='user account: {} modified'.format(user.full_name))
         return redirect(url_for('admin.users'))
 
@@ -101,11 +110,11 @@ def users(page=1, modify=None, user_id=None):
         user = User.query.filter_by(id=user_id).first()
         name = user.full_name
         if current_user == user:
-            flash('You can\'t delete yourself!')
+            flash('You can\'t delete yourself!', 'info')
             return redirect(url_for('admin.users'))
         db.session.delete(user)
         db.session.commit()
-        flash('User deleted')
+        flash('User deleted', 'info')
         current_user.log_event(info='user account: {} deleted'.format(name))
         return redirect(url_for('admin.users'))
 
@@ -134,7 +143,8 @@ def users(page=1, modify=None, user_id=None):
         users=users.paginate(page, 10, False),
         add_user_form=add_user_form,
         edit_user_form=edit_user_form,
-        search_form=search_form
+        search_form=search_form,
+        admin_role=admin_role
     )
 
 @blueprint.route('/events', methods=['GET', 'POST'])

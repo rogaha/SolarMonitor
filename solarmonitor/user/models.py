@@ -83,6 +83,8 @@ class EnergyAccount(db.Model):
     pge_last_date = db.Column(db.DateTime)
     pge_refresh_token_expiration = db.Column(db.DateTime)
     pge_first_date = db.Column(db.DateTime)
+    solar_first_date = db.Column(db.DateTime)
+    solar_last_date = db.Column(db.DateTime)
     solar_install_date = db.Column(db.DateTime)
     solar_edge_site_id = db.Column(db.String(255))
     solar_edge_api_key = db.Column(db.String(255))
@@ -471,8 +473,10 @@ class User(UserMixin, db.Model):
                     first_account.state,
                     first_account.zip_code
                 )
+            else:
+                return ''
         else:
-            return 'None'
+            return ''
 
     def log_event(self, event_type=None, level=1, info=None):
         event = AppEvent(

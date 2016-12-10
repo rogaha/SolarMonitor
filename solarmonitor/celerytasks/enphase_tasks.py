@@ -42,6 +42,8 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
 
         for index, each in enumerate(json_data['production']):
 
+            solar_end_date = start_date + timedelta(days=index)
+
             usage_point = SolarEdgeUsagePoint()
             usage_point.energy_account_id = energy_account_id
             usage_point.time_unit = 'DAY'
@@ -61,5 +63,18 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
                 db.session.add(usage_point)
                 db.session.commit()
 
+        if energy_account.solar_last_date:
+            if energy_account.solar_last_date < solar_end_date:
+                energy_account.solar_last_date = solar_end_date
+        else:
+            energy_account.solar_last_date = solar_end_date
+
+        if energy_account.solar_first_date:
+            if energy_account.solar_first_date > start_date:
+                energy_account.solar_first_date = start_date
+        else:
+            energy_account.solar_first_date = start_date
+            
+        db.session.commit()
         for user in energy_account.users:
             user.log_event(info="Incoming Enphase Data finished processing. Energy Acount: {}".format(energy_account.id))
