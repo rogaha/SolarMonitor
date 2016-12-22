@@ -145,6 +145,7 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
         end_date = today
 
         if account.enphase_user_id and account.enphase_system_id:
+            print 'Pulling enphase data for {}'.format(account)
             end_date = datetime.datetime.today()
             if account.solar_last_date:
                 start_date = account.solar_last_date - timedelta(days=3)
@@ -152,6 +153,7 @@ def bulk_download_solar_edge_data(number_of_days_history=7):
                 start_date = datetime.datetime.today() - timedelta(days=number_of_days_history)
             enphase = EnphaseApi(account)
             try:
+                print 'Sending enphase data for {} to be processed'.format(account)
                 json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
                 task = process_enphase_data.delay(json_data, account.id)
             except Exception as e:
