@@ -294,9 +294,9 @@ def charts(modify=None):
         flash('Data processing', 'info')
         return redirect(url_for('dashboard.charts'))
 
-    pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph', start_date_pge, end_date_pge)
+    pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph', start_date_pge, (end_date_pge + timedelta(days=1)))
 
-    pge_inc_outg_grph_combnd = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date_pge, end_date_pge)
+    pge_inc_outg_grph_combnd = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date_pge, (end_date_pge + timedelta(days=1)))
 
     date_select_form.start_date.data = start_date_pge.strftime('%m/%d/%Y')
     date_select_form.end_date.data = end_date_pge.strftime('%m/%d/%Y')
