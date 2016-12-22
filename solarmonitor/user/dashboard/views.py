@@ -298,6 +298,9 @@ def charts(modify=None):
 
     pge_inc_outg_grph_combnd = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date_pge, end_date_pge)
 
+    date_select_form.start_date.data = start_date_pge.strftime('%m/%d/%Y')
+    date_select_form.end_date.data = end_date_pge.strftime('%m/%d/%Y')
+
     return render_template('users/dashboard/data_chart.html',
         breadcrumbs=breadcrumbs,
         heading=heading,
@@ -332,6 +335,8 @@ def solar_edge(modify=None):
 
     if modify == 'delete-data':
         session.pop('start_date_se', None)
+        energy_account.solar_first_date = None
+        energy_account.solar_last_date = None
         session.pop('end_date_se', None)
         session.pop('data_time_unit_se', None)
         session.pop('se_energy_data', None)
