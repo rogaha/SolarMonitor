@@ -9,6 +9,10 @@ from solarmonitor.utils import celery
 
 @celery.task(bind=True)
 def process_se_data(self, json_data, energy_account_id):
+    """{"energy":{"timeUnit":"DAY","unit":"Wh","values":[{"date":"2013-06-01 00:00:00","value":null},{"date":"2013-
+    06-02 00:00:00","value":null},{"date":"2013-06-03 00:00:00","value":null},{"date":"2013-06-04
+    00:00:00","value":67313.24}]}}
+    """
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
@@ -20,7 +24,8 @@ def process_se_data(self, json_data, energy_account_id):
             if index == 0:
                 start_date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
 
-            end_date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
+            if each['value']:
+                end_date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
 
             usage_point = SolarEdgeUsagePoint()
             usage_point.energy_account_id = energy_account_id
