@@ -27,7 +27,11 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
         energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
         enphase = EnphaseApi(energy_account)
         json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
+        
+        """Debug printing statements so we can see what data is returned"""
+        print 'ENPHASE DATA:'
         print json_data
+
         if 'reason' in json_data:
             if json_data['reason'] == "409":
                 print 'Enphase Throttling!'
@@ -74,7 +78,7 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
                 energy_account.solar_first_date = start_date
         else:
             energy_account.solar_first_date = start_date
-            
+
         db.session.commit()
         for user in energy_account.users:
             user.log_event(info="Incoming Enphase Data finished processing. Energy Acount: {}".format(energy_account.id))

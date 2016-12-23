@@ -12,6 +12,9 @@ def process_se_data(self, json_data, energy_account_id):
     from solarmonitor.app import create_app
     app = create_app(ProdConfig)
     with app.app_context():
+        """Debug printing statements so we can see what data is returned"""
+        print 'SOLAR EDGE DATA:'
+        print json_data
 
         for index, each in enumerate(json_data['energy']['values']):
             if index == 0:
@@ -37,7 +40,7 @@ def process_se_data(self, json_data, energy_account_id):
             else:
                 db.session.add(usage_point)
                 db.session.commit()
-                
+
         energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
         if energy_account.solar_last_date:
             if energy_account.solar_last_date < end_date:
