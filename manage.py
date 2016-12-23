@@ -96,7 +96,7 @@ def email_users_graph_data():
     for account in energy_accounts:
         for user in account.users:
             events = account.energy_events(start_date, end_date)
-            print 'user: {}, energy_account: {}'.format(user.first_name, account.id)
+            print 'user: {} email: {}, energy_account: {}'.format(user.first_name, user.email, account.id)
             html = render_template('email/nightly_update.html', events=events, energy_account=account, user=user, start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
             send_html_email('Solarmonitor Admin <admin@solardatapros.com>', 'Your daily update', user.email, html)
 
