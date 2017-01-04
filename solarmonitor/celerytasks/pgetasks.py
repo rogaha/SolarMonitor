@@ -161,6 +161,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                         # Add to database
                         if duplicate_check is None:
                             db.session.add(usage_point)
+                            db.session.commit()
                         # Update the celery task for polling purposes
                         self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
