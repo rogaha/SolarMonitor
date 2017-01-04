@@ -133,7 +133,7 @@ def pull_ytd(pull_type=None):
     for energy_account in current_user.energy_accounts:
         """First find the whole date range to pull data."""
         end_date = datetime.now() if energy_account.pge_last_date == None else energy_account.pge_last_date
-        start_date = datetime(year=2016, month=1, day=1)
+        start_date = datetime(year=datetime.now().year, month=1, day=1)
 
         for month in range(start_date.month, (end_date.month+1)):
             """For the given date range, break into month chunks and pull PGE Data"""
