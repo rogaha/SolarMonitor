@@ -4,13 +4,14 @@ import datetime
 from datetime import timedelta, date
 from jxmlease import parse
 
+
 def get_usage_point_from_xml(xml):
     data = parse(xml, xml_attribs=True)
     try:
         """If a user only has one type of energy usage, we can query the kind directly.
-        If they have both gas and electric, this will fail with a key error, and in the
-        except block, we'll loop through the entry feeds looking for the Electricity UsagePoint
-        which is ns0:kind == 0"""
+        If they have both gas and electric, this will fail with a key error,
+        and in the except block, we'll loop through the entry feeds looking for
+        the Electricity UsagePoint which is ns0:kind == 0"""
         if data[u'ns1:feed'][u'ns1:entry'][u'ns1:content'][u'ns0:UsagePoint'][u'ns0:ServiceCategory'][u'ns0:kind'] == u'0':
             for link in data[u'ns1:feed'][u'ns1:entry'][u'ns1:link']:
                 if link.get_xml_attr("rel") == u'self':
@@ -23,11 +24,15 @@ def get_usage_point_from_xml(xml):
                         return link.get_xml_attr("href").rsplit('/', 1)[-1]
 
 
-def generate_random_pge_data(number_of_data_rows=10, account_id=1, numbers_of_days_ago=4):
+def generate_random_pge_data(
+        number_of_data_rows=10,
+        account_id=1,
+        numbers_of_days_ago=4):
     import random
     from datetime import datetime, timedelta
     flow_direction = [19, 1]
-    energy_value = [0, 500, 7900, 543700, 1034600, 1444300, 1404700, 1297200, 850204, 839500, 374400, 116900]
+    energy_value = [0, 500, 7900, 543700, 1034600,
+                    1444300, 1404700, 1297200, 850204, 839500, 374400, 116900]
     start_date = datetime.today() - timedelta(days=numbers_of_days_ago)
     n = 0
     while n < number_of_data_rows:
@@ -47,6 +52,7 @@ def generate_random_pge_data(number_of_data_rows=10, account_id=1, numbers_of_da
         db.session.commit()
         n += 1
 
+
 class PGEHelper:
 
     def __init__(self, start_date, end_date, energy_account_id):
@@ -55,28 +61,28 @@ class PGEHelper:
         self.energy_account_id = energy_account_id
 
     def get_daily_data_and_labels(self):
-        """This next section will grab the data and organize it into usage by day."""
+        """This next section will grab the data and organize it
+        into usage by day."""
         incoming_electric_daily_data = []
         incoming_electric_daily_label = []
         outgoing_electric_daily_data = []
         outgoing_electric_daily_label = []
 
-
         delta = self.end_date - self.start_date
         n = 0
         while n < delta.days:
             incoming_electric_daily = PGEUsagePoint.query.filter(
-                (PGEUsagePoint.flow_direction==1)&
-                (PGEUsagePoint.energy_account_id==self.energy_account_id)&
-                (PGEUsagePoint.interval_start>=(self.start_date + timedelta(days=n)))&
-                (PGEUsagePoint.interval_start<(self.start_date + timedelta(days=n+1)))
+                (PGEUsagePoint.flow_direction == 1) &
+                (PGEUsagePoint.energy_account_id == self.energy_account_id) &
+                (PGEUsagePoint.interval_start >= (self.start_date + timedelta(days=n))) &
+                (PGEUsagePoint.interval_start < (self.start_date + timedelta(days=n+1)))
                 ).order_by(PGEUsagePoint.interval_start.asc()).all()
 
             outgoing_electric_daily = PGEUsagePoint.query.filter(
-                (PGEUsagePoint.flow_direction==19)&
-                (PGEUsagePoint.energy_account_id==self.energy_account_id)&
-                (PGEUsagePoint.interval_start>=(self.start_date + timedelta(days=n)))&
-                (PGEUsagePoint.interval_start<(self.start_date + timedelta(days=n+1)))
+                (PGEUsagePoint.flow_direction == 19) &
+                (PGEUsagePoint.energy_account_id == self.energy_account_id) &
+                (PGEUsagePoint.interval_start >= (self.start_date + timedelta(days=n))) &
+                (PGEUsagePoint.interval_start < (self.start_date + timedelta(days=n+1)))
                 ).order_by(PGEUsagePoint.interval_start.asc()).all()
 
             incoming_interval_value = 0
@@ -95,4 +101,5 @@ class PGEHelper:
             outgoing_electric_daily_label.append((self.start_date + timedelta(days=n)))
             n += 1
 
-        return  incoming_electric_daily_data, incoming_electric_daily_label, outgoing_electric_daily_data, outgoing_electric_daily_label
+        return incoming_electric_daily_data, incoming_electric_daily_label, \
+            outgoing_electric_daily_data, outgoing_electric_daily_label

@@ -13,6 +13,7 @@ cc = ClientCredentials(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 api = Api(config.SSL_CERTS)
 oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
+
 def backoff(attempts):
     """Return a backoff delay, in seconds, given a number of attempts.
 
@@ -21,6 +22,7 @@ def backoff(attempts):
 
     """
     return 2 ** attempts
+
 
 @celery.task(bind=True, max_retries=3, soft_time_limit=6000)
 def process_xml(self, energy_account, start_date, end_date, user_id=1):
@@ -35,16 +37,19 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 date_time=datetime.datetime.utcnow(),
                 event_type=None,
                 level=1,
-                info='PGE Data pull started. Date range: {} to {} | celery_task_id:{}'.format(start_date.strftime('%m/%d/%Y'), end_date.strftime('%m/%d/%Y'), self.request.id)
+                info='PGE Data pull started. Date range: {} to {} | celery_task_id:{}'.format(
+                                start_date.strftime('%m/%d/%Y'),
+                                end_date.strftime('%m/%d/%Y'),
+                                self.request.id)
             )
             db.session.add(event)
             db.session.commit()
 
             energy_account = EnergyAccount.query.filter_by(id=energy_account.id).first()
 
-            #Create a new celery task in the database
+            # Create a new celery task in the database
             celery_task = CeleryTask.query.filter_by(task_id=self.request.id).first()
-            if celery_task == None:
+            if celery_task is None:
                 celery_task = CeleryTask(task_id=self.request.id, task_status=0, energy_account_id=energy_account.id)
             db.session.add(celery_task)
             db.session.commit()
@@ -53,10 +58,11 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 """If there is an expiration date in the system check if it's expired.
                 if it is get a new one and save the new expiration date in the system."""
                 if energy_account.pge_refresh_token_expiration < datetime.datetime.now():
-                    #Refresh the OAuth token. This token is good for 1 hour.
+                    # Refresh the OAuth token. This token is good for 1 hour.
                     refresh_info = oauth.get_refresh_token(energy_account)
                     print refresh_info
-                    energy_account.pge_refresh_token = refresh_info.get(u'refresh_token', energy_account.pge_refresh_token)
+                    energy_account.pge_refresh_token = refresh_info.get(u'refresh_token',
+                                                                        energy_account.pge_refresh_token)
                     energy_account.pge_access_token = refresh_info.get(u'access_token', energy_account.pge_access_token)
                     energy_account.pge_refresh_token_expiration = (datetime.datetime.now() + timedelta(hours=1))
                     db.session.commit()
@@ -65,15 +71,14 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 energy_account.pge_refresh_token_expiration = datetime.datetime.now()
                 db.session.commit()
 
-
-            #pge_data is an XML document
+            # pge_data is an XML document
             pge_data = api.sync_request(
                 energy_account,
                 start_date,
                 end_date,
             )
 
-            #This will add the XML to the heroku logs.
+            # This will add the XML to the heroku logs.
             print pge_data
 
             if 'error' in pge_data:
@@ -85,10 +90,10 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
                 """Here we loop through all the entry blocks in the XML, not all of these blocks
                 are useful to us, so we check the block on each loop to see if it has the data we need.
-                This code assumes that the <entry> blocks will always be in the same order, which although not documented
-                by PGE has proven true. The enumerate method allows us to know which loop number we
-                are on compared to the total number of loops. We use this data to know how far along we are in processing
-                the request. This produces the percent complete bar on the website."""
+                This code assumes that the <entry> blocks will always be in the same order, which although not
+                documented by PGE has proven true. The enumerate method allows us to know which loop number we
+                are on compared to the total number of loops. We use this data to know how far along we are in
+                processing the request. This produces the percent complete bar on the website."""
 
                 if u'ns0:ReadingType' in resource[u'ns1:content']:
                     """If a block contains a ReadingType value in its content block, then we know that the next
@@ -111,14 +116,15 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 if u'ns0:IntervalBlock' in resource[u'ns1:content']:
                     """This is the <entry> block that immediately follows the <entry> block that contained the ReadingType
                     information. This block has all the interval readings and we save them to the database along with
-                    some other data that we got in the previous <entry> block and then saved in the reading_type dict."""
+                    some other data that we got in the previous <entry> block and then saved in the reading_type dict.
+                    """
 
                     for reading in resource[u'ns1:content'][u'ns0:IntervalBlock'][u'ns0:IntervalReading']:
                         reading_type['interval_start'] = reading[u'ns0:timePeriod'][u'ns0:start']
                         reading_type['interval_duration'] = reading[u'ns0:timePeriod'][u'ns0:duration']
                         reading_type['interval_value'] = reading[u'ns0:value']
 
-                        #Create an object to store in the database
+                        # Create an object to store in the database
                         usage_point = PGEUsagePoint(
                             energy_account_id=energy_account.id,
                             commodity_type=reading_type['commodity_type'],
@@ -143,8 +149,8 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
 
                         end_date = usage_point.interval_start
 
-                        #Before executing the SQL, check to see if the data is already there
-                        #Data is considered a dupe if it's the same energy account, interval value, flow direction, and start time
+                        # Before executing the SQL, check to see if the data is already there
+                        # Data is considered a dupe if it's the same energy account, interval value, flow direction, and start time
                         duplicate_check = PGEUsagePoint.query.filter_by(
                             energy_account_id=energy_account.id,
                             interval_value=usage_point.interval_value,
@@ -152,16 +158,14 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                             interval_start=usage_point.interval_start
                             ).first()
 
-                        #Add to database
-                        if duplicate_check == None:
+                        # Add to database
+                        if duplicate_check is None:
                             db.session.add(usage_point)
-                            db.session.commit()
-
-                        #Update the celery task for polling purposes
+                        # Update the celery task for polling purposes
                         self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
-            #Mark the task as complete. Previously this was only done on the front-end but created
-            #rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
+            # Mark the task as complete. Previously this was only done on the front-end but created
+            # rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
             if energy_account.pge_last_date:
                 if energy_account.pge_last_date < end_date:
                     energy_account.pge_last_date = end_date
