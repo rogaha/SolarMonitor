@@ -282,7 +282,8 @@ def charts(modify=None):
         start_date_pge = try_parsing_date(session['start_date_pge'])
         end_date_pge = try_parsing_date(session['end_date_pge'])
 
-        process_xml.delay(current_user.energy_accounts[0], start_date_pge, end_date_pge, user_id=current_user.id)
+        pull_chunks(start_date_pge, end_date_pge, current_user)
+
         flash('Data processing', 'info')
         return redirect(url_for('dashboard.charts'))
 
