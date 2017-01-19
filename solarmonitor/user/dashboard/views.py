@@ -16,7 +16,7 @@ from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeU
 from solarmonitor.user.dashboard.forms import EventAddForm
 from solarmonitor.public.forms import DateSelectForm, DownloadDataForm
 from solarmonitor.extensions import db
-from solarmonitor.utils import try_parsing_date
+from solarmonitor.utils import try_parsing_date, pull_chunks
 import requests
 import json
 
@@ -33,6 +33,7 @@ oauth = OAuth2(config.PGE_CLIENT_CREDENTIALS, config.SSL_CERTS)
 
 blueprint = Blueprint('dashboard', __name__, url_prefix='/users/dashboard', static_folder='../static')
 
+
 @blueprint.route('', methods=['GET', 'POST'])
 @blueprint.route('/<modify>/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -43,11 +44,10 @@ def home(modify=None, id=None):
     start_date = datetime.today().date() - timedelta(days=8)
     end_date = datetime.today().date() - timedelta(days=1)
 
-
     """The data for each chart needs to be calculated here, otherwise the calculations
     Are performed for each occurrence of a data set. This also makes the template
     Code Neater"""
-    #TODO assumes for now that we want only the first energy account.
+    # TODO assumes for now that we want only the first energy account.
     prod_net_usg_pct = current_user.energy_accounts[0].serialize_charts('production_net_usage_percentage_graph', start_date, end_date)
 
     prod_net_usg = current_user.energy_accounts[0].serialize_charts('production_net_usage_graph', start_date, end_date)
@@ -98,22 +98,21 @@ def home(modify=None, id=None):
         current_user.log_event(info="Energy event added")
         return redirect(url_for('dashboard.home'))
 
-
     return render_template('users/dashboard/home.html',
-        prod_net_usg_pct=prod_net_usg_pct,
-        prod_net_usg=prod_net_usg,
-        prod_comb=prod_comb,
-        financial=financial,
-        financial_min=financial_min,
-        financial_max=financial_max,
-        financial_step_value=financial_step_value,
-        cumulative=cumulative,
-        account_id=current_user.energy_accounts[0].id,
-        solar_install_date=solar_install_date,
-        breadcrumbs=breadcrumbs, heading=heading,
-        events=events,
-        form=form
-        )
+                           prod_net_usg_pct=prod_net_usg_pct,
+                           prod_net_usg=prod_net_usg,
+                           prod_comb=prod_comb,
+                           financial=financial,
+                           financial_min=financial_min,
+                           financial_max=financial_max,
+                           financial_step_value=financial_step_value,
+                           cumulative=cumulative,
+                           account_id=current_user.energy_accounts[0].id,
+                           solar_install_date=solar_install_date,
+                           breadcrumbs=breadcrumbs, heading=heading,
+                           events=events,
+                           form=form)
+
 
 @blueprint.route('/select-solar', methods=['GET', 'POST'])
 @login_required
@@ -123,6 +122,7 @@ def select_solar():
     if form['solar_provider'] == 'enphase':
         return redirect(url_for('dashboard.authorizations', start_oauth='enphase'))
 
+
 @blueprint.route('/pull-ytd', methods=['GET', 'POST'])
 @blueprint.route('/pull-ytd/<pull_type>', methods=['GET', 'POST'])
 @login_required
@@ -130,24 +130,13 @@ def pull_ytd(pull_type=None):
     if pull_type == 'solar':
         return redirect(url_for('dashboard.solar_edge'))
 
-    for energy_account in current_user.energy_accounts:
-        """First find the whole date range to pull data."""
-        end_date = datetime.now() if energy_account.pge_last_date == None else energy_account.pge_last_date
-        start_date = datetime(year=datetime.now().year, month=1, day=1)
+    end_date = datetime.now() if energy_account.pge_last_date is None else energy_account.pge_last_date
+    start_date = datetime(year=datetime.now().year, month=1, day=1)
 
-        for month in range(start_date.month, (end_date.month+1)):
-            """For the given date range, break into month chunks and pull PGE Data"""
-            week_day, last_day = monthrange(start_date.year, month)
-
-            start_date = datetime(year=start_date.year, month=month, day=1)
-            end_date = datetime(year=start_date.year, month=month, day=last_day)
-
-            print start_date, end_date
-
-            process_xml.delay(energy_account, start_date, end_date, user_id=current_user.id)
-
+    pull_chunks(start_date, end_date, current_user)
 
     return redirect(url_for('dashboard.charts'))
+
 
 @blueprint.route('/account', methods=['GET', 'POST'])
 @blueprint.route('/account/<modify>', methods=['GET', 'POST'])
@@ -172,9 +161,9 @@ def account(modify=None):
         return redirect(url_for('dashboard.account'))
 
     return render_template('users/dashboard/account.html',
-        energy_accounts=current_user.energy_accounts,
-        breadcrumbs=breadcrumbs, heading=heading,
-        )
+                           energy_accounts=current_user.energy_accounts,
+                           breadcrumbs=breadcrumbs, heading=heading,)
+
 
 @blueprint.route('/authorizations', methods=['GET', 'POST'])
 @blueprint.route('/authorizations/pge/<start_oauth>', methods=['GET', 'POST'])
@@ -188,13 +177,12 @@ def authorizations(start_oauth=None):
         return redirect(config.ENPHASE_AUTHORIZATION_URL, code=302)
 
     if start_oauth:
-        #See settings.py for more info on this.
+        # See settings.py for more info on this.
         return redirect(config.PGE_DATA_CUSTODIAN_URL, code=302)
 
     return render_template('users/dashboard/authorizations.html',
-        energy_accounts=current_user.energy_accounts,
-        breadcrumbs=breadcrumbs, heading=heading,
-        )
+                           energy_accounts=current_user.energy_accounts,
+                           breadcrumbs=breadcrumbs, heading=heading)
 
 
 @blueprint.route('/graph/update/<int:account_id>/<start_date>/<end_date>', methods=['GET', 'POST'])
@@ -214,6 +202,7 @@ def graph_update(account_id=None, start_date=None, end_date=None):
 
     return jsonify(result)
 
+
 @blueprint.route('/energy_account/<int:account_id>', methods=['GET', 'POST'])
 @login_required
 def modify_energy_account(account_id=None):
@@ -224,7 +213,7 @@ def modify_energy_account(account_id=None):
     energy_account.city = request.form['city']
     energy_account.state = request.form['state']
     energy_account.zip_code = request.form['zip_code']
-    #energy_account.pge_bulk_id = request.form['pge_bulk_id'] TODO Removed temporarily
+    # energy_account.pge_bulk_id = request.form['pge_bulk_id'] TODO Removed temporarily
     energy_account.solar_edge_site_id = request.form['solar_edge_site_id']
     energy_account.solar_edge_api_key = request.form['solar_edge_api_key']
     if not request.form['solar_install_date']:
@@ -239,6 +228,7 @@ def modify_energy_account(account_id=None):
     result = energy_account.serialize()
 
     return jsonify(result)
+
 
 @blueprint.route('/charts', methods=['GET', 'POST'])
 @blueprint.route('/charts/session/<modify>', methods=['GET', 'POST'])
@@ -294,23 +284,25 @@ def charts(modify=None):
         flash('Data processing', 'info')
         return redirect(url_for('dashboard.charts'))
 
-    pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph', start_date_pge, (end_date_pge + timedelta(days=1)))
+    pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph',
+                                                                         start_date_pge, (end_date_pge + timedelta(days=1)))
 
-    pge_inc_outg_grph_combnd = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date_pge, (end_date_pge + timedelta(days=1)))
+    pge_inc_outg_grph_combnd = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph',
+                                                                                start_date_pge, (end_date_pge + timedelta(days=1)))
 
     date_select_form.start_date.data = start_date_pge.strftime('%m/%d/%Y')
     date_select_form.end_date.data = end_date_pge.strftime('%m/%d/%Y')
 
     return render_template('users/dashboard/data_chart.html',
-        breadcrumbs=breadcrumbs,
-        heading=heading,
-        date_select_form=date_select_form,
-        download_data_form=download_data_form,
-        pge_inc_outg_grph=pge_inc_outg_grph,
-        pge_inc_outg_grph_combnd=pge_inc_outg_grph_combnd,
-        start_date=start_date_pge,
-        end_date=end_date_pge
-    )
+                           breadcrumbs=breadcrumbs,
+                           heading=heading,
+                           date_select_form=date_select_form,
+                           download_data_form=download_data_form,
+                           pge_inc_outg_grph=pge_inc_outg_grph,
+                           pge_inc_outg_grph_combnd=pge_inc_outg_grph_combnd,
+                           start_date=start_date_pge,
+                           end_date=end_date_pge)
+
 
 @blueprint.route('/solaredge', methods=['GET', 'POST'])
 @blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
@@ -425,19 +417,17 @@ def solar_edge(modify=None):
                 flash('An error occurred', 'info')
                 print se_data
 
-
-
         return redirect(url_for('dashboard.solar_edge'))
 
     date_select_form.start_date.data = start_date_se.strftime('%m/%d/%Y')
     date_select_form.end_date.data = end_date_se.strftime('%m/%d/%Y')
 
     return render_template('users/dashboard/solar_edge.html',
-        date_select_form=date_select_form,
-        download_data_form=download_data_form,
-        breadcrumbs=breadcrumbs,
-        heading=heading
-        )
+                           date_select_form=date_select_form,
+                           download_data_form=download_data_form,
+                           breadcrumbs=breadcrumbs,
+                           heading=heading)
+
 
 @blueprint.route('/status/<task_id>', methods=['GET', 'POST'])
 @blueprint.route('/status/<task_id>/<start_date>/<end_date>', methods=['GET', 'POST'])
@@ -459,8 +449,8 @@ def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None)
 
     if task_id == "task_check":
         unfinished_tasks = CeleryTask.query.filter(
-            (CeleryTask.task_status==0)&
-            (CeleryTask.energy_account_id==current_user.energy_accounts[0].id)
+            (CeleryTask.task_status == 0) &
+            (CeleryTask.energy_account_id == current_user.energy_accounts[0].id)
             ).all()
 
         pending_tasks = []
@@ -479,7 +469,6 @@ def taskstatus(task_id=None, change_status=None, start_date=None, end_date=None)
             pending_tasks.append(task_dict)
         print pending_tasks
         return jsonify(pending_tasks=pending_tasks)
-
 
     task = process_xml.AsyncResult(task_id)
     if task.state == 'PENDING':

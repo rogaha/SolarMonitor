@@ -21,6 +21,7 @@ energy_accounts = db.Table('energy_accounts_users',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
 )
 
+
 role_associations = db.Table('users_roles',
     db.Column('role_id', db.Integer, db.ForeignKey('roles.id')),
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'))

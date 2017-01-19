@@ -4,14 +4,36 @@ from functools import wraps
 from flask_login import current_user
 
 from flask import flash, g, request, redirect, url_for, abort
+from solarmonitor.celerytasks.pgetasks import process_xml
 
 from celery import Celery
 from solarmonitor.settings import ProdConfig
 
 from datetime import datetime
+from datetime import datetime, timedelta, date
+from calendar import monthrange
 
 
 celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfig.CELERY_RESULT_BACKEND)
+
+
+def pull_chunks(start_date_object, end_date_object, user):
+    for energy_account in user.energy_accounts:
+        days_of_data_needed = (end_date_object - start_date_object).days
+
+        while days_of_data_needed:
+            days_to_pull = 30 if days_of_data_needed >= 30 else days_of_data_needed
+            process_xml.delay(
+                                energy_account,
+                                start_date_object,
+                                end_date_object.timedelta(days=days_to_pull),
+                                user_id=user.id
+                            )
+            """Cleanup and prepare for next loop"""
+            start_date_object = end_date_object.timedelta(days=days_to_pull)
+            end_date_object = start_date_object
+            days_of_data_needed -= days_to_pull
+
 
 def flash_errors(form, category='warning'):
     """Flash all errors for a form."""
@@ -19,8 +41,10 @@ def flash_errors(form, category='warning'):
         for error in errors:
             flash('{0} - {1}'.format(getattr(form, field).label.text, error), category)
 
+
 def convert_to_kWh(microwatts):
     return round((microwatts * (10**-6)), 2)
+
 
 def try_parsing_date(text):
     if not text:
