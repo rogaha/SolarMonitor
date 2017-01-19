@@ -26,12 +26,11 @@ def pull_chunks(start_date_object, end_date_object, user):
             process_xml.delay(
                                 energy_account,
                                 start_date_object,
-                                (end_date_object + timedelta(days=days_to_pull)),
+                                (start_date_object + timedelta(days=days_to_pull)),
                                 user_id=user.id
                             )
             """Cleanup and prepare for next loop"""
             start_date_object = (end_date_object + timedelta(days=days_to_pull))
-            end_date_object = start_date_object
             days_of_data_needed -= days_to_pull
 
 
