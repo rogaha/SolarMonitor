@@ -4,7 +4,6 @@ from functools import wraps
 from flask_login import current_user
 
 from flask import flash, g, request, redirect, url_for, abort
-from solarmonitor.celerytasks.pgetasks import process_xml
 
 from celery import Celery
 from solarmonitor.settings import ProdConfig
@@ -18,6 +17,7 @@ celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfi
 
 
 def pull_chunks(start_date_object, end_date_object, user):
+    from solarmonitor.celerytasks.pgetasks import process_xml
     for energy_account in user.energy_accounts:
         days_of_data_needed = (end_date_object - start_date_object).days
 
