@@ -25,8 +25,8 @@
 {% block content %}
 <div ng-controller='eventController'>
 <div class="body-content" >
-<div class="row">
-  <div class="col col-xs-6">
+<div class="row" >
+  <div class="col col-xs-6" id="customDateForm">
     <div class="btn-group" style="float:left">
       <button id="reset_date" type="button" class="btn btn-primary">Select Date Range</button>
       <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -44,7 +44,7 @@
         <li><a id="custom" href="#" ng-click="showCustom = !showCustom">Custom</a></li>
       </ul>
     </div>
-    <div ng-show="showCustom" class="form-inline" style="float:left" ng-cloak>
+    <div   ng-show="showCustom" class="form-inline" style="float:left" ng-cloak>
         <div class="form-group">
           <div class="col-md-6">
               <input type="text" name="" value="" class="form-control" id="dphomestart" ng-model="homeStart" placeholder="start date">
@@ -66,7 +66,8 @@
     $(document).ready(function() {
         $('#dphomeend').datepicker({
           format: 'mm/dd/yyyy',
-          todayHighlight: true
+          todayHighlight: true,
+          container:'#customDateForm'
         }).on('changeDate', function(e){
             $(this).datepicker('hide');
         });;
@@ -75,7 +76,8 @@
     $(document).ready(function() {
         $('#dphomestart').datepicker({
           format: 'mm/dd/yyyy',
-          todayHighlight: true
+          todayHighlight: true,
+          container:'#customDateForm'
         }).on('changeDate', function(e){
             $(this).datepicker('hide');
         });;
