@@ -44,16 +44,12 @@
         <li><a id="custom" href="#" ng-click="showCustom = !showCustom">Custom</a></li>
       </ul>
     </div>
-    <div   ng-show="showCustom" class="form-inline" style="float:left" ng-cloak>
+    <div ng-show="showCustom" class="form-inline" style="float:left; margin-left:20px;" ng-cloak>
         <div class="form-group">
-          <div class="col-md-6">
-              <input type="text" name="" value="" class="form-control" id="dphomestart" ng-model="homeStart" placeholder="start date">
-          </div>
+            <input type="text" name="" value="" class="form-control" id="dphomestart" ng-model="homeStart" placeholder="start date">
         </div>
         <div class="form-group">
-          <div class="col-md-6">
-              <input type="text" name="" value="" class="form-control" id="dphomeend" ng-model="homeEnd" placeholder="end date">
-          </div>
+            <input type="text" name="" value="" class="form-control" id="dphomeend" ng-model="homeEnd" placeholder="end date">
         </div>
         <div class="form-group">
             <a id="customButtom" class="btn btn-primary">Go</a>
