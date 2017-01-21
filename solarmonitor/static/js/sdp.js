@@ -9,6 +9,9 @@ sdp.constant("moment", moment);
 sdp.controller('eventController', function($scope, $http) {
     $scope.showCustom = false;
 
+    $scope.today = moment().subtract(1, 'days');
+
+
     var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
     var secondDate = new Date();
     var firstDate = new Date(secondDate.getFullYear(),01,01);
