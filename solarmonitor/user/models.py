@@ -10,6 +10,7 @@ from solarmonitor.utils import convert_to_kWh
 from solarmonitor.extensions import bcrypt, db
 import datetime
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 from flask.ext.login import AnonymousUserMixin
 from sqlalchemy import func
 
@@ -17,20 +18,17 @@ today = datetime.datetime.today().date()
 seven_days_ago = datetime.datetime.today().date() - timedelta(days=7)
 
 energy_accounts = db.Table('energy_accounts_users',
-    db.Column('energy_account_id', db.Integer, db.ForeignKey('energy_accounts.id')),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
-)
+                           db.Column('energy_account_id', db.Integer, db.ForeignKey('energy_accounts.id')),
+                           db.Column('user_id', db.Integer, db.ForeignKey('users.id')))
 
 
 role_associations = db.Table('users_roles',
-    db.Column('role_id', db.Integer, db.ForeignKey('roles.id')),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
-)
+                             db.Column('role_id', db.Integer, db.ForeignKey('roles.id')),
+                             db.Column('user_id', db.Integer, db.ForeignKey('users.id')))
 
 permission_associations = db.Table('permissions_roles',
-    db.Column('permission_id', db.Integer, db.ForeignKey('permissions.id')),
-    db.Column('role_id', db.Integer, db.ForeignKey('roles.id'))
-)
+                                   db.Column('permission_id', db.Integer, db.ForeignKey('permissions.id')),
+                                   db.Column('role_id', db.Integer, db.ForeignKey('roles.id')))
 
 
 class Anonymous(AnonymousUserMixin):
@@ -58,6 +56,7 @@ class AppEvent(db.Model):
     info = db.Column(db.String(1300))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+
 class EnergyEvent(db.Model):
     __tablename__ = 'energy_events'
     id = db.Column(db.Integer, primary_key=True)
@@ -65,6 +64,7 @@ class EnergyEvent(db.Model):
     date = db.Column(db.Date)
     event_type = db.Column(db.Integer)
     info = db.Column(db.String(355))
+
 
 class EnergyAccount(db.Model):
     __tablename__ = 'energy_accounts'
@@ -91,14 +91,14 @@ class EnergyAccount(db.Model):
     solar_edge_api_key = db.Column(db.String(255))
     enphase_user_id = db.Column(db.String(255))
     enphase_system_id = db.Column(db.String(255))
-    pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
-    solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
-    celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan" , lazy='dynamic')
+    pge_usage_points = db.relationship('PGEUsagePoint', backref="energy_account", cascade="all, delete-orphan", lazy='dynamic')
+    solar_edge_usage_points = db.relationship('SolarEdgeUsagePoint', backref="energy_account", cascade="all, delete-orphan", lazy='dynamic')
+    celery_tasks = db.relationship('CeleryTask', backref="energy_account", cascade="all, delete-orphan", lazy='dynamic')
 
     def energy_events(self, start_date=seven_days_ago, end_date=today, serialize=False):
         events = EnergyEvent.query.filter(
-            (EnergyEvent.date <= end_date)&
-            (EnergyEvent.date >= start_date)&
+            (EnergyEvent.date <= end_date) &
+            (EnergyEvent.date >= start_date) &
             (EnergyEvent.energy_account_id == self.id)
         ).order_by(EnergyEvent.date.asc()).all()
 
@@ -125,7 +125,8 @@ class EnergyAccount(db.Model):
         b) Starting the graph range, start and the cumulative and show each days change.
         This is a line graph similar to the SE production.
 
-        c) Later we can move to a "caching" style db that saves us processing a year of data, but for now, lets just pull the usage data live and see how bad it is in terms of timing.
+        c) Later we can move to a "caching" style db that saves us processing a year of data, but for now,
+        lets just pull the usage data live and see how bad it is in terms of timing.
         for flow_direction 1 means delivered electric and 19 means reversed and sold back to grid. """
         today = datetime.datetime.now()
         first_of_year = datetime.datetime(year=today.year, month=1, day=1)
@@ -139,23 +140,23 @@ class EnergyAccount(db.Model):
         print self.solar_install_date
         print start_date
 
-        #sold back to grid
+        # sold back to grid
         negative_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
-            (PGEUsagePoint.flow_direction == 19)&
-            (PGEUsagePoint.interval_start < start_date)&
-            (PGEUsagePoint.energy_account_id == self.id)&
+            (PGEUsagePoint.flow_direction == 19) &
+            (PGEUsagePoint.interval_start < start_date) &
+            (PGEUsagePoint.energy_account_id == self.id) &
             (PGEUsagePoint.interval_start >= historical_start)
         ).scalar()
 
-        #used electric
+        # used electric
         positive_usage = PGEUsagePoint.query.with_entities(func.sum(PGEUsagePoint.interval_value)).filter(
-            (PGEUsagePoint.flow_direction == 1)&
-            (PGEUsagePoint.interval_start < start_date)&
-            (PGEUsagePoint.energy_account_id == self.id)&
+            (PGEUsagePoint.flow_direction == 1) &
+            (PGEUsagePoint.interval_start < start_date) &
+            (PGEUsagePoint.energy_account_id == self.id) &
             (PGEUsagePoint.interval_start >= historical_start)
         ).scalar()
 
-        if (negative_usage == None) and (positive_usage == None):
+        if (negative_usage is None) and (positive_usage is None):
             return None
 
         print positive_usage, negative_usage
@@ -175,8 +176,20 @@ class EnergyAccount(db.Model):
 
         new_graph = zip(new_data, labels)
 
-
         return new_graph
+
+    def comparison_graph(self, start_date=seven_days_ago, end_date=today):
+        """This graph accepts a date range and outputs a line chart with
+        the combined incoming/outgoing energy usage for the date and range
+        in addition to the same graph for the date range exactly one year prior."""
+        net_usage_year1 = self.pge_incoming_outgoing_combined_graph(start_date, end_date)
+        net_usage_year2 = self.pge_incoming_outgoing_combined_graph(
+                                                                (start_date - relativedelta(years=1)),
+                                                                (end_date - relativedelta(years=1)))
+        y1_data = [x[0] for x in net_usage_year1]
+        y2_data = [x[0] for x in net_usage_year2]
+        labels = [x[1] for x in net_usage_year1]
+        return zip(y1_data, y2_data, labels)
 
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
         """Solar Edge production vs Combined PGE data"""
@@ -188,8 +201,8 @@ class EnergyAccount(db.Model):
         we will only have 10 days of data for pge and 15 days of data for solar edge. Data for the same date
         ranges need to be displayed together, otherwise funky things happen with the chart."""
 
-        #get all the dates for both lists and combine them into one list in date order, removing duplicates, convert to dict
-        date_dict = {key:None for key in set([p[1] for p in production] + [n[1] for n in net_usage])}
+        # get all the dates for both lists and combine them into one list in date order, removing duplicates, convert to dict
+        date_dict = {key: None for key in set([p[1] for p in production] + [n[1] for n in net_usage])}
 
         for value, date in net_usage:
             date_dict[date] = (value,)
@@ -213,9 +226,9 @@ class EnergyAccount(db.Model):
 
         labels = [labels for production, net_usage, labels in p]
         production_percentage = [(x/(x + y)*100) if (x + y) != 0 else 0 for x, y, l in p]
-        production_percentage = [x if x <=100 else 100 for x in production_percentage]
+        production_percentage = [x if x <= 100 else 100 for x in production_percentage]
 
-        net_usage_percentage = [100-x if x != 0 else 0 for x in production_percentage ]
+        net_usage_percentage = [100-x if x != 0 else 0 for x in production_percentage]
 
         net_input = [((x/(x + y)) - 1) if (x + y) != 0 else 0 for x, y, l in p]
         net_input = [x * 100 if x > 0 else 0 for x in net_input]
@@ -258,9 +271,9 @@ class EnergyAccount(db.Model):
     def solar_edge_production_graph(self, start_date=seven_days_ago, end_date=today):
         """Pulls all solar edge data (by day) and returns a zipped list of kWh values and datetime objects as a list of tuples."""
         solar_edge_data_pull = SolarEdgeUsagePoint.query.filter(
-            (SolarEdgeUsagePoint.date>=start_date)&
-            (SolarEdgeUsagePoint.energy_account_id==self.id)&
-            (SolarEdgeUsagePoint.date<=end_date)
+            (SolarEdgeUsagePoint.date >= start_date) &
+            (SolarEdgeUsagePoint.energy_account_id == self.id) &
+            (SolarEdgeUsagePoint.date <= end_date)
             ).order_by(SolarEdgeUsagePoint.date.asc()).all()
 
         se_energy_data = []
@@ -273,7 +286,6 @@ class EnergyAccount(db.Model):
         se_energy_data = [float(x) * 1000 for x in se_energy_data]
 
         return zip(se_energy_data, se_energy_labels)
-
 
     def serialize(self):
         if not self.solar_install_date:
@@ -294,7 +306,14 @@ class EnergyAccount(db.Model):
         }
 
     def serialize_charts(self, chart, start_date=seven_days_ago, end_date=today, date_format='%m/%d', separate=False, financial=False):
-        if chart == 'solar_edge_production_graph':
+        if chart == 'comparison_graph':
+            comparison_graph = self.comparison_graph(start_date, end_date)
+            return {
+                'y1_data': [convert_to_kWh(y1_data) for y1_data, y2_data, labels in comparison_graph],
+                'y2_data': [convert_to_kWh(y2_data) for y1_data, y2_data, labels in comparison_graph],
+                'labels': [labels.strftime(date_format) for y1_data, y2_data, labels in comparison_graph]
+            }
+        elif chart == 'solar_edge_production_graph':
             solar_edge_production_graph = self.solar_edge_production_graph(start_date, end_date)
             return {
                 'se_energy_data': [convert_to_kWh(data) for data, labels in solar_edge_production_graph],
@@ -331,7 +350,7 @@ class EnergyAccount(db.Model):
 
         elif chart == 'cumulative_usage_graph':
             cumulative_usage_graph = self.cumulative_usage_graph(start_date, end_date)
-            if cumulative_usage_graph == None:
+            if cumulative_usage_graph is None:
                 return None
 
             net_usage = [convert_to_kWh(data) for data, labels in cumulative_usage_graph]
@@ -340,7 +359,6 @@ class EnergyAccount(db.Model):
             financial_min = round(financial_cumulative[0] * 2, -1) / 2
             financial_max = round(financial_cumulative[-1] * 2, -1) / 2
             financial_step_value = (financial_max - financial_min) / 10
-
 
             return {
                 'net_usage': net_usage,
@@ -367,9 +385,9 @@ class EnergyAccount(db.Model):
                 'labels': [labels.strftime(date_format) for production, net_usage, labels in production_net_usage_graph]
             }
 
-
     def __repr__(self):
         return '<EnergyAccount {}>' .format(self.id)
+
 
 class PGEUsagePoint(db.Model):
     __tablename__ = 'pge_usage_points'
@@ -388,6 +406,7 @@ class PGEUsagePoint(db.Model):
     def __repr__(self):
         return '<PGEUsagePoint {}>' .format(self.id)
 
+
 class SolarEdgeUsagePoint(db.Model):
     __tablename__ = 'solar_edge_usage_points'
     id = db.Column(db.Integer, primary_key=True)
@@ -400,6 +419,7 @@ class SolarEdgeUsagePoint(db.Model):
     def __repr__(self):
         return '<SolarEdgeUsagePoint {}>' .format(self.id)
 
+
 class CeleryTask(db.Model):
     __tablename__ = 'celery_tasks'
     id = db.Column(db.Integer, primary_key=True)
@@ -410,16 +430,18 @@ class CeleryTask(db.Model):
     def __repr__(self):
         return '<CeleryTask {}>' .format(self.id)
 
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(50))
     permissions = relationship("Permission",
-                    secondary=permission_associations,
-                    backref="roles")
+                               secondary=permission_associations,
+                               backref="roles")
 
     def __repr__(self):
         return '<Role {}>' .format(self.id)
+
 
 class Permission(db.Model):
     __tablename__ = 'permissions'
@@ -428,6 +450,7 @@ class Permission(db.Model):
 
     def __repr__(self):
         return '<Permission {}>' .format(self.id)
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -443,11 +466,11 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     app_events = db.relationship('AppEvent', backref="user", lazy='dynamic', cascade="all, delete-orphan")
     energy_accounts = relationship("EnergyAccount",
-                    secondary=energy_accounts,
-                    backref="users")
+                                   secondary=energy_accounts,
+                                   backref="users")
     roles = relationship("Role",
-                    secondary=role_associations,
-                    backref="users")
+                         secondary=role_associations,
+                         backref="users")
 
     def has_role(self, role):
         user_roles = [x.role for x in self.roles]
@@ -504,7 +527,6 @@ class User(UserMixin, db.Model):
 
     def verify_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
-
 
     def __repr__(self):
         return '<User {}>' .format(self.first_name)

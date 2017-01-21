@@ -48,7 +48,6 @@ def home(modify=None, id=None):
     Are performed for each occurrence of a data set. This also makes the template
     Code Neater"""
     # TODO assumes for now that we want only the first energy account.
-    prod_net_usg_pct = current_user.energy_accounts[0].serialize_charts('production_net_usage_percentage_graph', start_date, end_date)
 
     prod_net_usg = current_user.energy_accounts[0].serialize_charts('production_net_usage_graph', start_date, end_date)
 
@@ -57,6 +56,8 @@ def home(modify=None, id=None):
     financial = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph', start_date, end_date, financial=True)
 
     cumulative = current_user.energy_accounts[0].serialize_charts('cumulative_usage_graph', start_date, end_date)
+
+    comparison_graph = current_user.energy_accounts[0].serialize_charts('comparison_graph', start_date, end_date)
 
     if cumulative:
         financial_cumulative = [int(float(x) * 0.23627) for x in cumulative['net_usage']]
@@ -99,9 +100,9 @@ def home(modify=None, id=None):
         return redirect(url_for('dashboard.home'))
 
     return render_template('users/dashboard/home.html',
-                           prod_net_usg_pct=prod_net_usg_pct,
                            prod_net_usg=prod_net_usg,
                            prod_comb=prod_comb,
+                           comparison_graph=comparison_graph,
                            financial=financial,
                            financial_min=financial_min,
                            financial_max=financial_max,
@@ -196,10 +197,10 @@ def graph_update(account_id=None, start_date=None, end_date=None):
     e_date = try_parsing_date(end_date).date()
 
     result = {
-        'production_net_usage_percentage_graph': energy_account.serialize_charts('production_net_usage_percentage_graph', s_date, e_date),
         'production_net_usage_graph': energy_account.serialize_charts('production_net_usage_graph', s_date, e_date),
         'net_usage_separated': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, separate=True),
-        'cumulative': energy_account.serialize_charts('cumulative_usage_graph', s_date, e_date)
+        'cumulative': energy_account.serialize_charts('cumulative_usage_graph', s_date, e_date),
+        'comparison_graph': energy_account.serialize_charts('comparison_graph', s_date, e_date)
     }
 
     return jsonify(result)

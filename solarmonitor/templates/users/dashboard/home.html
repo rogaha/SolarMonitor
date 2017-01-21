@@ -41,6 +41,7 @@
         <li><a id="60days" href="#" ng-click="getEvents(60)">60 days</a></li>
         <li><a id="90days" href="#" ng-click="getEvents(90)">90 days</a></li>
         <li><a id="ytddays" href="#" ng-click="getEvents(ytd)">YTD</a></li>
+        <li><a id="custom" href="#">Custom</a></li>
       </ul>
     </div>
 
@@ -77,17 +78,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
       url: url,
       success: function (data) {
           console.log(data);
-          /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
-          myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
-          myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
-          myChart.data.labels = data.production_net_usage_percentage_graph.labels;
-          myChart.update();
 
-          myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
-          myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
-          myChart2.data.labels = data.production_net_usage_graph.labels;
-          myChart2.update();
-          */
+          twoYearChart.data.datasets[0].data = data.comparison_graph.y1_data;
+          twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
+          twoYearChart.data.labels = data.comparison_graph.labels;
+          twoYearChart.update();
+          $.LoadingOverlay("hide");
 
           myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
           myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -118,17 +114,11 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
       url: url,
       success: function (data) {
           console.log(data);
-          /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
-          myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
-          myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
-          myChart.data.labels = data.production_net_usage_percentage_graph.labels;
-          myChart.update();
-
-          myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
-          myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
-          myChart2.data.labels = data.production_net_usage_graph.labels;
-          myChart2.update();
-          */
+          twoYearChart.data.datasets[0].data = data.comparison_graph.y1_data;
+          twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
+          twoYearChart.data.labels = data.comparison_graph.labels;
+          twoYearChart.update();
+          $.LoadingOverlay("hide");
 
           myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
           myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -160,17 +150,11 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
       url: url,
       success: function (data) {
           console.log(data);
-          /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
-          myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
-          myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
-          myChart.data.labels = data.production_net_usage_percentage_graph.labels;
-          myChart.update();
-
-          myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
-          myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
-          myChart2.data.labels = data.production_net_usage_graph.labels;
-          myChart2.update();
-          */
+          twoYearChart.data.datasets[0].data = data.comparison_graph.y1_data;
+          twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
+          twoYearChart.data.labels = data.comparison_graph.labels;
+          twoYearChart.update();
+          $.LoadingOverlay("hide");
 
           myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
           myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -200,17 +184,11 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
         url: url,
         success: function (data) {
             console.log(data);
-            /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
-            myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
-            myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
-            myChart.data.labels = data.production_net_usage_percentage_graph.labels;
-            myChart.update();
-
-            myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
-            myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
-            myChart2.data.labels = data.production_net_usage_graph.labels;
-            myChart2.update();
-            */
+            twoYearChart.data.datasets[0].data = data.comparison_graph.y1_data;
+            twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
+            twoYearChart.data.labels = data.comparison_graph.labels;
+            twoYearChart.update();
+            $.LoadingOverlay("hide");
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -240,17 +218,13 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
         url: url,
         success: function (data) {
             console.log(data);
-            /*myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
-            myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
-            myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
-            myChart.data.labels = data.production_net_usage_percentage_graph.labels;
-            myChart.update();
 
-            myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
-            myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
-            myChart2.data.labels = data.production_net_usage_graph.labels;
-            myChart2.update();
-            */
+            twoYearChart.data.datasets[0].data = data.comparison_graph.y1_data;
+            twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
+            twoYearChart.data.labels = data.comparison_graph.labels;
+            twoYearChart.update();
+            $.LoadingOverlay("hide");
+
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -280,17 +254,11 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
         url: url,
         success: function (data) {
             console.log(data);
-            /*
-            myChart.data.datasets[0].data = data.production_net_usage_percentage_graph.production_percentage;
-            myChart.data.datasets[1].data = data.production_net_usage_percentage_graph.net_input;
-            myChart.data.datasets[2].data = data.production_net_usage_percentage_graph.net_usage_percentage;
-            myChart.data.labels = data.production_net_usage_percentage_graph.labels;
-            myChart.update();
-
-            myChart2.data.datasets[0].data = data.production_net_usage_graph.production;
-            myChart2.data.datasets[1].data = data.production_net_usage_graph.net_usage;
-            myChart2.data.labels = data.production_net_usage_graph.labels;
-            myChart2.update();*/
+            twoYearChart.data.datasets[0].data = data.comparison_graph.y1_data;
+            twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
+            twoYearChart.data.labels = data.comparison_graph.labels;
+            twoYearChart.update();
+            $.LoadingOverlay("hide");
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -317,61 +285,59 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 <br>
 
     <div class="row">
-      <div class="col col-xs-6">
-        <canvas id="myChart3" width="380" height="200"></canvas>
-      </div>
-
-
-    <div class="col col-xs-6">
-      <canvas id="myChart4" width="380" height="200"></canvas>
+        <div class="col col-xs-6">
+            <canvas id="myChart3" width="380" height="200"></canvas>
+        </div>
+        <div class="col col-xs-6">
+          <canvas id="myChart4" width="380" height="200"></canvas>
+        </div>
     </div>
-  </div>
+    <div class="row">
+        <div class="col col-xs-6">
+            <canvas id="twoyear" width="380" height="200"></canvas>
+        </div>
+
     </div>
+    </div>
+
 
 
 
 <script>
 
-var data = {
-labels: {{ prod_net_usg_pct['labels']|safe }},
+var dataTwoYear = {
+labels: {{ comparison_graph['labels']|safe }},
 datasets: [
     {
-        label: 'Production %',
+        type: 'line',
+        label: 'Current Year',
         backgroundColor: "rgba(43,83,207,0.2)",
         borderColor: "rgba(25,60,168,1)",
         borderWidth: 1,
         hoverBackgroundColor: "rgba(43,83,207,0.4)",
         hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ prod_net_usg_pct['production_percentage']|safe }},
+        data: {{ comparison_graph['y1_data']|safe }},
     },
     {
-        label: 'Net Usage %',
-        backgroundColor: "rgba(127,191,63,0.2)",
-        borderColor: "rgba(9,174,9,1)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(127,191,63,0.4)",
-        hoverBorderColor: "rgba(9,174,9,1)",
-        data: {{ prod_net_usg_pct['net_input']|safe }},
-    },
-    {
-        label: 'Net Input %',
+        type: 'line',
+        label: 'Previous Year',
         backgroundColor: "rgba(168,25,25,0.2)",
         borderColor: "rgba(138,16,16,1)",
         borderWidth: 1,
         hoverBackgroundColor: "rgba(168,25,25,0.4)",
         hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ prod_net_usg_pct['net_usage_percentage']|safe }},
-    },
+        data: {{ comparison_graph['y2_data']|safe }},
+    }
 ]
 };
-var ctx = document.getElementById("myChart");
-/*var myChart = new Chart(ctx, {
-  type: 'bar',
-  data: data,
+var twoYearChartCtx = document.getElementById("twoyear");
+var twoYearChart = new Chart(twoYearChartCtx, {
+  type: 'line',
+  data: dataTwoYear,
   options: {
       scales: {
           yAxes: [{
-              stacked: true,
+              stacked: false,
               ticks: {
                   beginAtZero:true
               }
@@ -382,51 +348,6 @@ var ctx = document.getElementById("myChart");
       }
   }
 });
-*/
-</script>
-
-<script>
-var data = {
-labels: {{ prod_net_usg['labels']|safe }},
-datasets: [
-    {
-        label: 'Production kWh',
-        backgroundColor: "rgba(43,83,207,0.2)",
-        borderColor: "rgba(25,60,168,1)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(43,83,207,0.4)",
-        hoverBorderColor: "rgba(25,60,168,1)",
-        data: {{ prod_net_usg['production']|safe }},
-    },
-    {
-        label: 'Net Usage',
-        backgroundColor: "rgba(168,25,25,0.2)",
-        borderColor: "rgba(138,16,16,1)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(168,25,25,0.4)",
-        hoverBorderColor: "rgba(138,16,16,1)",
-        data: {{ prod_net_usg['net_usage']|safe }},
-    }
-]
-};
-var ctx = document.getElementById("myChart2");
-/*var myChart2 = new Chart(ctx, {
-  type: 'bar',
-  data: data,
-  options: {
-      scales: {
-          yAxes: [{
-              stacked: true,
-              ticks: {
-                  beginAtZero:true
-              }
-          }],
-          xAxes: [{
-              stacked: true
-          }]
-      }
-  }
-});*/
 
 var data2 = {
 labels: {{ prod_net_usg['labels']|safe }},
