@@ -41,11 +41,48 @@
         <li><a id="60days" href="#" ng-click="getEvents(60)">60 days</a></li>
         <li><a id="90days" href="#" ng-click="getEvents(90)">90 days</a></li>
         <li><a id="ytddays" href="#" ng-click="getEvents(ytd)">YTD</a></li>
-        <li><a id="custom" href="#">Custom</a></li>
+        <li><a id="custom" href="#" ng-click="showCustom = !showCustom">Custom</a></li>
+        <li ng-show="showCustom">
+            <div class="form-group">
+              <label class="col-md-4 control-label" for="textinput">Start Date</label>
+              <div class="col-md-6">
+                  <input type="text" name="" value="" class="form-control" id="dphomestart" ng-model="homeStart">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label" for="textinput">End Date</label>
+              <div class="col-md-6">
+                  <input type="text" name="" value="" class="form-control" id="dphomeend" ng-model="homeEnd">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-6">
+                  <a id="customButtom" class="btn btn-primary">Go</a>
+              </div>
+            </div>
+        </li>
       </ul>
     </div>
 
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('#dphomeend').datepicker({
+          format: 'mm/dd/yyyy',
+          todayHighlight: true
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
+        });;
+    })
 
+    $(document).ready(function() {
+        $('#dphomestart').datepicker({
+          format: 'mm/dd/yyyy',
+          todayHighlight: true
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
+        });;
+    })
+    </script>
 
 
       <!-- Modal -->
@@ -63,6 +100,43 @@
 
 
 <script type="text/javascript">
+$('#customButtom').click(function () {
+  $.LoadingOverlay("show");
+var account_id = {{ account_id|safe }};
+var customStart = moment($('#dphomestart').val(), "MM/DD/YYYY").format("YYYY-MM-DD");
+var customEnd = moment($('#dphomeend').val(), "MM/DD/YYYY").format("YYYY-MM-DD");
+var url = "/users/dashboard/graph/update/" + account_id + "/" + customStart + "/" + customEnd;
+  $.ajax({
+      type: 'GET',
+      url: url,
+      success: function (data) {
+          console.log(data);
+
+          twoYearChart.data.datasets[0].data = data.comparison_graph.y1_data;
+          twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
+          twoYearChart.data.labels = data.comparison_graph.labels;
+          twoYearChart.update();
+          $.LoadingOverlay("hide");
+
+          myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
+          myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
+          myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
+          myChart3.data.labels = data.production_net_usage_graph.labels;
+          myChart3.update();
+          $.LoadingOverlay("hide");
+
+          myChart4.data.datasets[0].data = data.cumulative.net_usage;
+          myChart4.data.labels = data.cumulative.labels;
+          myChart4.options.scales.yAxes[1].ticks.min = data.cumulative.financial_min
+          myChart4.options.scales.yAxes[1].ticks.max = data.cumulative.financial_max
+          myChart4.options.scales.yAxes[1].ticks.stepValue = data.cumulative.financial_step_value
+          myChart4.update();
+          $.LoadingOverlay("hide");
+      }
+  });
+});
+
+
 var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
 var secondDate = new Date();
 var firstDate = new Date(secondDate.getFullYear(),01,01);

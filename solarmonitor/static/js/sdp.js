@@ -7,8 +7,18 @@ sdp.config(function($interpolateProvider) {
 sdp.constant("moment", moment);
 
 sdp.controller('eventController', function($scope, $http) {
+    $scope.showCustom = false;
 
     $scope.today = moment().subtract(1, 'days');
+    $scope.homeEnd = '';
+    $scope.homeStart = '';
+
+    $scope.customDates = function() {
+        $http.get('/users/dashboard/status/events/' + $scope.homeStart + '/' + $scope.homeEnd
+            .then(function(response) {
+                $scope.customData = response.data
+            });
+    }
 
     var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
     var secondDate = new Date();
