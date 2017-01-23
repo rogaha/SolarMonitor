@@ -68,7 +68,7 @@ class PGEHelper:
         outgoing_electric_daily_data = []
         outgoing_electric_daily_label = []
 
-        delta = self.end_date - self.start_date
+        delta = (self.end_date + timedelta(days=1)) - self.start_date
         n = 0
         while n < delta.days:
             incoming_electric_daily = PGEUsagePoint.query.filter(
