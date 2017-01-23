@@ -87,6 +87,12 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
             reading_type = {}
             data = parse(pge_data)
 
+            data_received = {
+                'start_date': '',
+                'end_date': '',
+                'data': []
+            }
+
             for index, resource in enumerate(data[u'ns1:feed'][u'ns1:entry']):
                 """Here we loop through all the entry blocks in the XML, not all of these blocks
                 are useful to us, so we check the block on each loop to see if it has the data we need.
@@ -146,25 +152,39 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                         will get updated and saved to the DB during the cleanup phase of this task."""
                         if index == 0:
                             start_date = usage_point.interval_start
+                            data_received['start_date'] = usage_point.interval_start
 
                         end_date = usage_point.interval_start
+                        data_received['end_date'] = usage_point.interval_start
+
+                        data_received['data'].append(usage_point)
 
                         # Before executing the SQL, check to see if the data is already there
                         # Data is considered a dupe if it's the same energy account, interval value, flow direction, and start time
-                        duplicate_check = PGEUsagePoint.query.filter_by(
-                            energy_account_id=energy_account.id,
-                            interval_value=usage_point.interval_value,
-                            flow_direction=usage_point.flow_direction,
-                            interval_start=usage_point.interval_start
-                            ).first()
+                        # duplicate_check = PGEUsagePoint.query.filter_by(
+                        #     energy_account_id=energy_account.id,
+                        #     interval_value=usage_point.interval_value,
+                        #     flow_direction=usage_point.flow_direction,
+                        #     interval_start=usage_point.interval_start
+                        #     ).first()
 
                         # Add to database
-                        if duplicate_check is None:
-                            db.session.add(usage_point)
+                        # if duplicate_check is None:
+                        #     db.session.add(usage_point)
 
                         # Update the celery task for polling purposes
                         self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
+            PGEUsagePoint.query.filter(
+                (PGEUsagePoint.interval_start >= data_received['start_date']) &
+                (PGEUsagePoint.interval_start <= data_received['end_date'])
+            ).delete()
+            db.session.commit()
+
+            for usage in data_received['data']:
+                db.session.add(usage)
+
+            db.session.commit()
             # Mark the task as complete. Previously this was only done on the front-end but created
             # rogue uncompleted tasks if someone navigated away from the dashboard before a task ended.
             if energy_account.pge_last_date:
