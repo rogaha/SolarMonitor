@@ -153,6 +153,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                         if index == 0:
                             start_date = usage_point.interval_start
                             data_received['start_date'] = usage_point.interval_start
+                            print start_date
 
                         end_date = usage_point.interval_start
                         data_received['end_date'] = usage_point.interval_start
@@ -176,8 +177,8 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                         self.update_state(state='PROGRESS',  meta={'current': index, 'total': len(data[u'ns1:feed'][u'ns1:entry'])})
 
             PGEUsagePoint.query.filter(
-                (PGEUsagePoint.interval_start >= data_received['start_date']) &
-                (PGEUsagePoint.interval_start <= data_received['end_date'])
+                (PGEUsagePoint.interval_start >= start_date) &
+                (PGEUsagePoint.interval_start <= end_date)
             ).delete()
             db.session.commit()
 
