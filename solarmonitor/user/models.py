@@ -129,7 +129,7 @@ class EnergyAccount(db.Model):
         lets just pull the usage data live and see how bad it is in terms of timing.
         for flow_direction 1 means delivered electric and 19 means reversed and sold back to grid. """
         today = datetime.datetime.now()
-        first_of_year = datetime.datetime(year=today.year, month=1, day=1)
+        first_of_year = datetime.datetime(year=start_date.year, month=1, day=1)
 
         if self.solar_install_date and (self.solar_install_date > first_of_year):
             historical_start = self.solar_install_date
