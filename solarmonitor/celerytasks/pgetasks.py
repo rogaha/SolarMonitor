@@ -178,7 +178,8 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
 
             PGEUsagePoint.query.filter(
                 (PGEUsagePoint.interval_start >= start_date) &
-                (PGEUsagePoint.interval_start <= end_date)
+                (PGEUsagePoint.interval_start <= end_date) &
+                (PGEUsagePoint.energy_account_id == energy_account.id)
             ).delete()
             db.session.commit()
 
