@@ -287,7 +287,7 @@ def charts(modify=None):
                             current_user.energy_accounts[0],
                             start_date_pge,
                             end_date_pge,
-                            user_id=user.id
+                            user_id=current_user.id
                         )
 
         # pull_chunks(start_date_pge, end_date_pge, current_user)
