@@ -15,22 +15,6 @@ from calendar import monthrange
 
 celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfig.CELERY_RESULT_BACKEND)
 
-def pull_solar_chunks(start_date_object, end_date_object, user):
-    from solarmonitor.celerytasks.pgetasks import process_xml
-    for energy_account in user.energy_accounts:
-        days_of_data_needed = (end_date_object - start_date_object).days
-
-        while days_of_data_needed:
-            days_to_pull = 30 if days_of_data_needed >= 30 else days_of_data_needed
-            process_xml.delay(
-                                energy_account,
-                                start_date_object,
-                                (start_date_object + timedelta(days=days_to_pull)),
-                                user_id=user.id
-                            )
-            """Cleanup and prepare for next loop"""
-            start_date_object = (end_date_object + timedelta(days=days_to_pull))
-            days_of_data_needed -= days_to_pull
 
 def pull_chunks(start_date_object, end_date_object, user):
     from solarmonitor.celerytasks.pgetasks import process_xml
