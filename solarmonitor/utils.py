@@ -25,6 +25,7 @@ def pull_chunks(start_date_object, end_date_object, user):
 
         while days_of_data_needed:
             days_to_pull = 30 if days_of_data_needed >= 30 else days_of_data_needed
+            print days_of_data_needed
             print 'start date', start_date_object
             print 'end date', (start_date_object + timedelta(days=days_to_pull))
 
@@ -35,7 +36,7 @@ def pull_chunks(start_date_object, end_date_object, user):
                                 user_id=user.id
                             )
             """Cleanup and prepare for next loop"""
-            start_date_object = (end_date_object + timedelta(days=days_to_pull))
+            start_date_object = (start_date_object + timedelta(days=days_to_pull))
             days_of_data_needed -= days_to_pull
 
 
