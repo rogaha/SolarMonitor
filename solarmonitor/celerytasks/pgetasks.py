@@ -70,7 +70,7 @@ def process_xml(self, energy_account, start_date, end_date, user_id=1):
                 """If the expiration date is null, set it to now so we get a new one next time."""
                 energy_account.pge_refresh_token_expiration = datetime.datetime.now()
                 db.session.commit()
-
+            print 'sending request to PGE'
             # pge_data is an XML document
             pge_data = api.sync_request(
                 energy_account,
