@@ -13,7 +13,9 @@ from datetime import datetime, timedelta, date
 from calendar import monthrange
 
 
-celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL, backend=ProdConfig.CELERY_RESULT_BACKEND)
+celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL,
+                backend=ProdConfig.CELERY_RESULT_BACKEND,
+                redis_max_connections=ProdConfig.CELERY_REDIS_MAX_CONNECTIONS)
 
 
 def pull_chunks(start_date_object, end_date_object, user):
