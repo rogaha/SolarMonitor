@@ -30,6 +30,7 @@ class Config(object):
     TESTING_XML = os.path.join(APP_DIR, 'testing/bulk_data_2.xml')
     CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-221-253-136.compute-1.amazonaws.com:6819')
     CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://h:p2kbl8u0gp3fvnd0cmtthi98bqq@ec2-54-221-253-136.compute-1.amazonaws.com:6819')
+    CELERY_REDIS_MAX_CONNECTIONS = 15
     ENPHASE_API_KEY = 'aedc75d38120f96a689e7f83c4ce22f8'
     ENPHASE_REDIRECT_URI = 'https://notrueup.solardatapros.com/enphase-authorization'
     ENPHASE_APP_ID = '1409613132468'
