@@ -25,6 +25,9 @@ def pull_chunks(start_date_object, end_date_object, user):
 
         while days_of_data_needed:
             days_to_pull = 30 if days_of_data_needed >= 30 else days_of_data_needed
+            print 'start date', start_date_object
+            print 'end date', (start_date_object + timedelta(days=days_to_pull))
+
             process_xml.delay(
                                 energy_account,
                                 start_date_object,
