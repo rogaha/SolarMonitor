@@ -139,8 +139,9 @@ var today = moment().subtract(1, 'days').format("YYYY-MM-DD");
 $('#ytddays').click(function () {
   $.LoadingOverlay("show");
 var account_id = {{ account_id|safe }};
-var thirtyDaysAgo = moment().subtract(ytddays, 'days').format("YYYY-MM-DD");
-var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + "/" + today;
+console.log(ytddays)
+var y = moment().subtract(ytddays, 'days').format("YYYY-MM-DD");
+var url = "/users/dashboard/graph/update/" + account_id + "/" + moment().startOf('year').format('YYYY-MM-DD') + "/" + today;
   $.ajax({
       type: 'GET',
       url: url,
