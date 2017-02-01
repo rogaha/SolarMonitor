@@ -27,7 +27,7 @@
 {% block content %}
 {% if (current_user.energy_accounts[0].pge_nag) and (current_user.energy_accounts[0].pge_refresh_token == None)%}
 <div class="bs-calltoaction bs-calltoaction-info" style="position:relative" id="pge_nag">
-    <i class="fa fa-close" style="position:absolute; top:5px; right:8px; font-size:25px; cursor:pointer;" id="hide"></i>
+    <i class="fa fa-close" style="position:absolute; top:5px; right:8px; font-size:25px; cursor:pointer; z-index:1000" id="hide"></i>
     <div class="row">
         <div class="col-md-9 cta-contents">
             <h1 class="cta-title">Connect your PG&E account</h1>
