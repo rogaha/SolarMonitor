@@ -181,6 +181,57 @@
   <a class="btn btn-success btn-large" href="{{ url_for('dashboard.pull_ytd', pull_type='solar')}}">Pull YTD Data</a>
   <p style="font-size:14px;">{% if current_user.energy_accounts[0].solar_first_date %}Solar First Date: {{ current_user.energy_accounts[0].solar_first_date.strftime('%m/%d/%Y')}}{% endif %}<br>
   {% if current_user.energy_accounts[0].solar_last_date %}Solar Last Date: {{ current_user.energy_accounts[0].solar_last_date.strftime('%m/%d/%Y')}}{% endif %}</p>
+  <form class="form" id="userform">
+  <select name="userform" id="dropdown_selector" class="form-control">
+    {% for user in users %}
+    {% if session['select_user'] %}
+        {% if user[0] == session['select_user']%}
+            <option selected value="{{user[0]}}">{{user[1]}}</option>
+        {% elif user[1] == 'SDP Admin'%}
+        {% else %}
+            <option value="{{user[0]}}">{{user[1]}}</option>
+        {% endif %}
+    {% else %}
+        {% if user[0] == current_user.id %}
+            <option selected value="{{user[0]}}">{{user[1]}}</option>
+        {% elif user[1] == 'SDP Admin'%}
+        {% else %}
+            <option value="{{user[0]}}">{{user[1]}}</option>
+        {% endif %}
+    {% endif %}
+    {% endfor %}
+
+  </select>
+  <!--input class='btn' type='submit' value='Authorize'-->
+  </form>
+  <br>
+  <a href="{{ url_for('dashboard.select_user', modify='clear')}}" class="btn btn-primary" name="button">Clear Selection</a>
+  <br>
+  <br>
+  <div class="alert alert-success" id="user_change" style="display: none;">
+      <strong>User changed!</strong>
+</div>
+  <script>
+
+  $(document).ready( function ()
+  {
+    /* we are assigning change event handler for select box */
+    /* it will run when selectbox options are changed */
+    $('#dropdown_selector').change(function()
+    {
+        /* setting currently changed option value to option variable
+        option = value*/
+        var option = $(this).find('option:selected').val();
+
+        $.ajax({
+            url: "/users/dashboard/select_user/" + option,
+            success: function(result) {
+                $("#user_change").fadeIn(100).fadeOut(4000)
+            }
+        });
+    });
+  });
+  </script>
 </div>
 </div>
 </div><!-- /.jumbotron -->

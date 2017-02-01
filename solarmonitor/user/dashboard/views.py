@@ -8,6 +8,7 @@ from solarmonitor.celerytasks.pgetasks import process_xml
 from solarmonitor.celerytasks.se_tasks import process_se_data
 from solarmonitor.celerytasks.enphase_tasks import process_enphase_data
 from solarmonitor.pge.pge import Api, ClientCredentials, OAuth2
+from solarmonitor.utils import requires_roles
 from solarmonitor.pge.pge_helpers import PGEHelper
 from solarmonitor.solaredge.se_api import SolarEdgeApi
 from solarmonitor.enphase.enphase_api import EnphaseApi
@@ -264,6 +265,7 @@ def modify_energy_account(account_id=None):
 @blueprint.route('/charts', methods=['GET', 'POST'])
 @blueprint.route('/charts/session/<modify>', methods=['GET', 'POST'])
 @login_required
+@requires_roles('Admin')
 def charts(modify=None):
     """PGE Electricity Usage Chart"""
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('PGE', 'bar-chart-o', url_for('dashboard.charts'))]
@@ -271,6 +273,12 @@ def charts(modify=None):
 
     date_select_form = DateSelectForm(prefix="date_select_form")
     download_data_form = DownloadDataForm(prefix="download_data_form")
+
+    if session.get('select_user', None):
+        user = User.query.filter_by(id=session['select_user']).first()
+        energy_account = user.energy_accounts[0]
+    else:
+        energy_account = current_user.energy_accounts[0]
 
     if modify == 'clear':
         session.pop('start_date_pge', None)
@@ -280,8 +288,8 @@ def charts(modify=None):
 
     if modify == 'delete-data':
         PGEUsagePoint.query.filter_by(energy_account_id=current_user.energy_accounts[0].id).delete()
-        current_user.energy_accounts[0].pge_first_date = None
-        current_user.energy_accounts[0].pge_last_date = None
+        energy_account.pge_first_date = None
+        energy_account.pge_last_date = None
         db.session.commit()
         return redirect(url_for('dashboard.charts'))
 
@@ -312,7 +320,7 @@ def charts(modify=None):
         end_date_pge = try_parsing_date(session['end_date_pge'])
 
         # process_xml.delay(
-        #                     current_user.energy_accounts[0],
+        #                     energy_account,
         #                     start_date_pge,
         #                     end_date_pge,
         #                     user_id=current_user.id
@@ -323,14 +331,17 @@ def charts(modify=None):
         flash('Data processing', 'info')
         return redirect(url_for('dashboard.charts'))
 
-    pge_inc_outg_grph = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_graph',
+    pge_inc_outg_grph = energy_account.serialize_charts('pge_incoming_outgoing_graph',
                                                                          start_date_pge, (end_date_pge + timedelta(days=1)))
 
-    pge_inc_outg_grph_combnd = current_user.energy_accounts[0].serialize_charts('pge_incoming_outgoing_combined_graph',
+    pge_inc_outg_grph_combnd = energy_account.serialize_charts('pge_incoming_outgoing_combined_graph',
                                                                                 start_date_pge, (end_date_pge + timedelta(days=1)))
 
     date_select_form.start_date.data = start_date_pge.strftime('%m/%d/%Y')
     date_select_form.end_date.data = end_date_pge.strftime('%m/%d/%Y')
+
+    users = User.query.all()
+    users = [(user.id, user.full_name) for user in users]
 
     return render_template('users/dashboard/data_chart.html',
                            breadcrumbs=breadcrumbs,
@@ -340,18 +351,39 @@ def charts(modify=None):
                            pge_inc_outg_grph=pge_inc_outg_grph,
                            pge_inc_outg_grph_combnd=pge_inc_outg_grph_combnd,
                            start_date=start_date_pge,
-                           end_date=end_date_pge)
+                           end_date=end_date_pge,
+                           users=users)
 
+
+
+@blueprint.route('/select_user/<int:user_id>', methods=['GET', 'POST'])
+@blueprint.route('/select_user/modify/<modify>', methods=['GET', 'POST'])
+@requires_roles('Admin')
+@login_required
+def select_user(user_id=None, modify=None):
+    session['select_user'] = user_id
+
+    if modify == 'clear':
+        session.pop('select_user', None)
+
+    return redirect(request.referrer)
 
 @blueprint.route('/solaredge', methods=['GET', 'POST'])
 @blueprint.route('/solaredge/<modify>', methods=['GET', 'POST'])
+@requires_roles('Admin')
 @login_required
 def solar_edge(modify=None):
     """Solar Edge API"""
     breadcrumbs = [('Dashboard', 'dashboard', url_for('dashboard.home')), ('Solar Edge', 'bar-chart-o', url_for('dashboard.solar_edge'))]
     heading = 'Solar Electricity Production'
+    users = User.query.all()
+    users = [(user.id, user.full_name) for user in users]
 
-    energy_account = current_user.energy_accounts[0]
+    if session.get('select_user', None):
+        user = User.query.filter_by(id=session['select_user']).first()
+        energy_account = user.energy_accounts[0]
+    else:
+        energy_account = current_user.energy_accounts[0]
 
     date_select_form = DateSelectForm(prefix="date_select_form")
     download_data_form = DownloadDataForm(prefix="download_data_form")
@@ -465,7 +497,8 @@ def solar_edge(modify=None):
                            date_select_form=date_select_form,
                            download_data_form=download_data_form,
                            breadcrumbs=breadcrumbs,
-                           heading=heading)
+                           heading=heading,
+                           users=users)
 
 
 @blueprint.route('/status/<task_id>', methods=['GET', 'POST'])
