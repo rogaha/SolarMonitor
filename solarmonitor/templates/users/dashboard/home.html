@@ -43,7 +43,11 @@
 </div>
 <script type="text/javascript">
 
-$("#hide, #no_account").click(function(){
+$("#hide").click(function(){
+    $("#pge_nag").hide(1000);
+});
+
+$("#no_account").click(function(){
     $.ajax({
         url: "/users/dashboard/hide_pge_nag",
         success: function(result) {
