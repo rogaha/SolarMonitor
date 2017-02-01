@@ -44,14 +44,14 @@
 <script type="text/javascript">
 
 $("#hide").click(function(){
-    $("#pge_nag").hide(1000);
+    $("#pge_nag").hide(250);
 });
 
 $("#no_account").click(function(){
     $.ajax({
         url: "/users/dashboard/hide_pge_nag",
         success: function(result) {
-            $("#pge_nag").hide(1000);
+            $("#pge_nag").hide(250);
         }
     });
 });
@@ -109,14 +109,14 @@ $("#no_account").click(function(){
 <script type="text/javascript">
 
 $("#hide_solar").click(function(){
-    $("#solar_nag").hide(1000);
+    $("#solar_nag").hide(250);
 });
 
 $("#no_account_solar").click(function(){
     $.ajax({
         url: "/users/dashboard/hide_solar_nag",
         success: function(result) {
-            $("#solar_nag").hide(1000);
+            $("#solar_nag").hide(250);
         }
     });
 });
@@ -795,7 +795,7 @@ var myChart4 = new Chart(ctx4, {
                       $.ajax({
                           url: "/users/dashboard/hide_solar_nag",
                           success: function(result) {
-                              $("#solar_nag").hide(1000);
+                              $("#solar_nag").hide(250);
                           }
                       });
 
