@@ -85,6 +85,7 @@ class EnergyAccount(db.Model):
     pge_last_date = db.Column(db.DateTime)
     pge_refresh_token_expiration = db.Column(db.DateTime)
     pge_first_date = db.Column(db.DateTime)
+    solar_nag = db.Column(db.Integer, default=1)
     solar_first_date = db.Column(db.DateTime)
     solar_last_date = db.Column(db.DateTime)
     solar_install_date = db.Column(db.DateTime)
