@@ -74,11 +74,9 @@ $("#no_account").click(function(){
             </div>
         </div>
         <div class="col-md-3 cta-button">
-            <a href="{{ url_for('dashboard.authorizations', start_oauth='yes')}}" class="btn btn-lg btn-block btn-info">Get Started</a>
-            <br>
             <form class="form" id="solarform">
             <select name="solar_provider" id="dropdown_selector" class="form-control">
-              <option disabled selected value> -- select an option -- </option>
+              <option disabled selected value> -- Select a Solar Provider -- </option>
               <option value="enphase">Enphase</option>
               <option value="solar_edge">Solar Edge</option>
             </select>
