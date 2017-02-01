@@ -63,14 +63,14 @@ $("#no_account").click(function(){
     (current_user.energy_accounts[0].solar_edge_site_id == None) and
     (current_user.energy_accounts[0].enphase_user_id == None)
 %}
-<div class="bs-calltoaction bs-calltoaction-info" style="position:relative" id="pge_nag">
-    <i class="fa fa-close" style="position:absolute; top:5px; right:8px; font-size:25px; cursor:pointer; z-index:1000" id="hide"></i>
+<div class="bs-calltoaction bs-calltoaction-info" style="position:relative" id="solar_nag">
+    <i class="fa fa-close" style="position:absolute; top:5px; right:8px; font-size:25px; cursor:pointer; z-index:1000" id="hide_solar"></i>
     <div class="row">
         <div class="col-md-9 cta-contents">
             <h1 class="cta-title">Select a solar provider</h1>
             <div class="cta-desc">
                 <p>By connecting your solar account, we can monitor your usage and help eliminate a large true up bill.</p>
-                <p><a href='' id="no_account">I don't have a solar provider</a></p>
+                <p><a href='' id="no_account_solar">I don't have a solar provider</a></p>
             </div>
         </div>
         <div class="col-md-3 cta-button">
@@ -89,15 +89,15 @@ $("#no_account").click(function(){
 </div>
 <script type="text/javascript">
 
-$("#hide").click(function(){
-    $("#pge_nag").hide(1000);
+$("#hide_solar").click(function(){
+    $("#solar_nag").hide(1000);
 });
 
-$("#no_account").click(function(){
+$("#no_account_solar").click(function(){
     $.ajax({
         url: "/users/dashboard/hide_solar_nag",
         success: function(result) {
-            $("#pge_nag").hide(1000);
+            $("#solar_nag").hide(1000);
         }
     });
 });
