@@ -124,6 +124,16 @@ def select_solar():
         return redirect(url_for('dashboard.authorizations', start_oauth='enphase'))
 
 
+@blueprint.route('/hide_pge_nag', methods=['GET', 'POST'])
+@login_required
+def hide_pge_nag():
+    current_user.energy_accounts[0].pge_nag = 0
+    db.session.commit()
+    return jsonify({
+        'result': 'ok'
+    })
+
+
 @blueprint.route('/pull-ytd', methods=['GET', 'POST'])
 @blueprint.route('/pull-ytd/<pull_type>', methods=['GET', 'POST'])
 @login_required
@@ -152,6 +162,7 @@ def account(modify=None):
         current_user.energy_accounts[0].pge_refresh_token = None
         current_user.energy_accounts[0].pge_subscription_id = None
         current_user.energy_accounts[0].pge_usage_point = None
+        current_user.energy_accounts[0].pge_nag = 1
         db.session.commit()
         flash('PGE connection deleted on SDP energy account.', 'info')
         return redirect(url_for('dashboard.account'))
