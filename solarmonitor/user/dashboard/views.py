@@ -133,9 +133,9 @@ def hide_pge_nag():
         'result': 'ok'
     })
 
-@blueprint.route('/hide_pge_nag', methods=['GET', 'POST'])
+@blueprint.route('/hide_solar_nag', methods=['GET', 'POST'])
 @login_required
-def hide_pge_nag():
+def hide_solar_nag():
     current_user.energy_accounts[0].solar_nag = 0
     db.session.commit()
     return jsonify({
