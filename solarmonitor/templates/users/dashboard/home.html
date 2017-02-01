@@ -33,6 +33,7 @@
             <h1 class="cta-title">Connect your PG&E account</h1>
             <div class="cta-desc">
                 <p>By connecting your account, we can monitor your usage and help eliminate a large true up bill.</p>
+                <p><a href='' id="no_account">I don't have a PG&E account</a></p>
             </div>
         </div>
         <div class="col-md-3 cta-button">
@@ -42,7 +43,7 @@
 </div>
 <script type="text/javascript">
 
-$("#hide").click(function(){
+$("#hide, #no_account").click(function(){
     $.ajax({
         url: "/users/dashboard/hide_pge_nag",
         success: function(result) {
