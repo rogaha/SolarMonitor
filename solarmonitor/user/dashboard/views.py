@@ -230,16 +230,24 @@ def graph_update(account_id=None, start_date=None, end_date=None):
 @login_required
 def modify_energy_account(account_id=None):
     energy_account = EnergyAccount.query.filter_by(id=account_id).first()
-    energy_account.nick_name = request.form['nick_name']
-    energy_account.address_one = request.form['address_one']
-    energy_account.address_two = request.form['address_two']
-    energy_account.city = request.form['city']
-    energy_account.state = request.form['state']
-    energy_account.zip_code = request.form['zip_code']
+    if request.form.get('nick_name', None):
+        energy_account.nick_name = request.form['nick_name']
+    if request.form.get('address_one', None):
+        energy_account.address_one = request.form['address_one']
+    if request.form.get('address_two', None):
+        energy_account.address_two = request.form['address_two']
+    if request.form.get('city', None):
+        energy_account.city = request.form['city']
+    if request.form.get('state', None):
+        energy_account.state = request.form['state']
+    if request.form.get('zip_code', None):
+        energy_account.zip_code = request.form['zip_code']
     # energy_account.pge_bulk_id = request.form['pge_bulk_id'] TODO Removed temporarily
-    energy_account.solar_edge_site_id = request.form['solar_edge_site_id']
-    energy_account.solar_edge_api_key = request.form['solar_edge_api_key']
-    if not request.form['solar_install_date']:
+    if request.form.get('solar_edge_site_id', None):
+        energy_account.solar_edge_site_id = request.form['solar_edge_site_id']
+    if request.form.get('solar_edge_api_key', None):
+        energy_account.solar_edge_api_key = request.form['solar_edge_api_key']
+    if request.form.get('solar_install_date', None) is None:
         energy_account.solar_install_date = None
     else:
         try:
