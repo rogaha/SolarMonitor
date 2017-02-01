@@ -76,9 +76,9 @@
                           {% else %}
 
 
-                          <form id="solarform" method='post' action="{{ url_for('dashboard.select_solar') }}">
-                          <select name="solar_provider" id="dropdown_selector">
-                            <option disabled selected value> -- select an option -- </option>
+                          <form id="solarform" method='post' action="{{ url_for('dashboard.select_solar') }}" class="form">
+                          <select name="solar_provider" id="dropdown_selector" class="form-control">
+                            <option disabled selected value> -- Select a Solar Provider -- </option>
                             <option value="enphase">Enphase</option>
                             <option value="solar_edge">Solar Edge</option>
                           </select>
@@ -86,27 +86,27 @@
                           </form>
                         {% endif %}
                         </span>
-                          <script>
-                          $(document).ready( function ()
+                        <script>
+                        $(document).ready( function ()
+                        {
+                          /* we are assigning change event handler for select box */
+                          /* it will run when selectbox options are changed */
+                          $('#dropdown_selector').change(function()
                           {
-                            /* we are assigning change event handler for select box */
-                          	/* it will run when selectbox options are changed */
-                          	$('#dropdown_selector').change(function()
-                          	{
-                          		/* setting currently changed option value to option variable */
-                          		var option = $(this).find('option:selected').val();
+                              /* setting currently changed option value to option variable */
+                              var option = $(this).find('option:selected').val();
 
-                              if (option === 'solar_edge') {
-                                $('#energy_account_modify_{{ account.id }}').modal('show');
-                              }
+                            if (option === 'solar_edge') {
+                              $('#solar_edge_modal').modal('show');
+                            }
 
-                              if (option === 'enphase') {
-                                window.location.replace('https://enlighten.enphaseenergy.com/app_user_auth/new?app_id=1409613132468&redirect=https://notrueup.solardatapros.com/enphase-authorization');
-                              }
+                            if (option === 'enphase') {
+                              window.location.replace('https://enlighten.enphaseenergy.com/app_user_auth/new?app_id=1409613132468&redirect=https://notrueup.solardatapros.com/enphase-authorization');
+                            }
 
-                          	});
                           });
-                          </script>
+                        });
+                        </script>
 
                         </td>
 
@@ -258,7 +258,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-primary" id="submit">Save</button>
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>              
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                   <script type="text/javascript">
                     $('#submit').click(function () {
                     var url = "/users/dashboard/energy_account/" + $("#account_id").val();
@@ -292,6 +292,75 @@
             </div>
           </div>
           {% endfor %}
+          <div class="modal fade" id="solar_edge_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Enter Solar Edge Data</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" id="solar_edge_modify_form">
+                        <div class="form-group">
+                          <label class="col-md-4 control-label" for="textinput">Solar Edge Site Id</label>
+                          <div class="col-md-4">
+                          <input id="account_solar_edge_site_id" name="solar_edge_site_id" type="text" placeholder="" class="form-control input-md" value="">
+
+                          </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                          <label class="col-md-4 control-label" for="textinput">Solar Edge API Key</label>
+                          <div class="col-md-4">
+                          <input id="account_solar_edge_api_key" name="solar_edge_api_key" type="text" placeholder="" class="form-control input-md" value="">
+
+                          </div>
+                        </div>
+                    </form>
+
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" id="submit2">Save</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <script type="text/javascript">
+                    $('#submit2').click(function () {
+                        var account_id = {{ current_user.energy_accounts[0].id | safe }};
+                        var url = "/users/dashboard/energy_account/" + account_id;
+                        console.log(url)
+                        var data = $('#solar_edge_modify_form').serialize();
+                        console.log(data)
+
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            data: data,
+                            success: function (data) {
+                                console.log(data);
+                                $('#solar_edge_modal').modal('hide');
+                                $('#account_solar_edge_site_id').text(data.solar_edge_site_id);
+                                $('#account_solar_edge_api_key').text(data.solar_edge_api_key);
+
+                                $.ajax({
+                                    url: "/users/dashboard/hide_solar_nag",
+                                    success: function(result) {
+                                        $("#solar_nag").hide(250);
+                                    }
+                                });
+
+                                if (data.solar_edge_api_key && data.solar_edge_site_id) {
+                                  $('#solarcontainer').html('SolarEdge Authorized')
+                                }
+
+                            }
+                        });
+                    });
+                  </script>
+                </div>
+              </div>
+            </div>
+          </div>
 
         </div>
 
