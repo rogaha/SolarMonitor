@@ -188,6 +188,8 @@ class EnergyAccount(db.Model):
         net_usage_year2 = self.pge_incoming_outgoing_combined_graph(
                                                                 (start_date - relativedelta(years=1)),
                                                                 (end_date - relativedelta(years=1)))
+        if not net_usage_year2:
+            net_usage_year2 = [(0, 'fake_label') for x in range(len(net_usage_year1))]
         y1_data = [x[0] for x in net_usage_year1]
         y2_data = [x[0] for x in net_usage_year2]
         labels = [x[1] for x in net_usage_year1]
