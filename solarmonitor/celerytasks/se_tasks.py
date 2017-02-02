@@ -20,12 +20,20 @@ def process_se_data(self, json_data, energy_account_id):
         print 'SOLAR EDGE DATA:'
         print json_data
 
+        data_received = {
+            'start_date': '',
+            'end_date': '',
+            'data': []
+        }
+
         for index, each in enumerate(json_data['energy']['values']):
             if index == 0:
                 start_date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
+                data_received['start_date'] = start_date
 
             if each['value']:
                 end_date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
+                data_received['end_date'] = end_date
 
             usage_point = SolarEdgeUsagePoint()
             usage_point.energy_account_id = energy_account_id
@@ -34,17 +42,19 @@ def process_se_data(self, json_data, energy_account_id):
             usage_point.date = datetime.datetime.strptime(str(each['date']), '%Y-%m-%d %H:%M:%S')
             usage_point.value = 0 if each['value'] == None else each['value']
 
-            duplicate_check = SolarEdgeUsagePoint.query.filter(
-                (SolarEdgeUsagePoint.date==usage_point.date)&
-                (SolarEdgeUsagePoint.energy_account_id==energy_account_id)
-                ).first()
+            data_received['data'].append(usage_point)
 
-            if duplicate_check:
-                duplicate_check.value = usage_point.value
-                db.session.commit()
-            else:
-                db.session.add(usage_point)
-                db.session.commit()
+        SolarEdgeUsagePoint.query.filter(
+            (SolarEdgeUsagePoint.interval_start >= start_date) &
+            (SolarEdgeUsagePoint.interval_start <= end_date) &
+            (SolarEdgeUsagePoint.energy_account_id == energy_account.id)
+        ).delete()
+        db.session.commit()
+
+        for usage in data_received['data']:
+            db.session.add(usage)
+
+        db.session.commit()
 
         energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
         if energy_account.solar_last_date:

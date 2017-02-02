@@ -390,8 +390,8 @@ def solar_edge(modify=None):
     users = [(user.id, user.full_name) for user in users]
 
     if session.get('select_user', None):
-        user = User.query.filter_by(id=session['select_user']).first()
-        energy_account = user.energy_accounts[0]
+        current_user = User.query.filter_by(id=session['select_user']).first()
+        energy_account = current_user.energy_accounts[0]
     else:
         energy_account = current_user.energy_accounts[0]
 

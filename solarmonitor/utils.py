@@ -12,6 +12,7 @@ from solarmonitor.solaredge.se_api import SolarEdgeApi
 from datetime import datetime
 from datetime import datetime, timedelta, date
 from calendar import monthrange
+import json
 
 
 celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL,
@@ -20,6 +21,7 @@ celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL,
 
 
 def pull_solar_chunks(start_date_object, end_date_object, user):
+    print user.full_name
     from solarmonitor.celerytasks.se_tasks import process_se_data
     from solarmonitor.celerytasks.enphase_tasks import process_enphase_data
     for energy_account in user.energy_accounts:
@@ -32,9 +34,11 @@ def pull_solar_chunks(start_date_object, end_date_object, user):
             print 'end date', (start_date_object + timedelta(days=days_to_pull))
 
             if energy_account.enphase_user_id and energy_account.enphase_system_id:
+                print 'enphase PULLING'
                 process_enphase_data.delay(energy_account.id, start_date_object, (start_date_object + timedelta(days=days_to_pull)))
 
             if energy_account.solar_edge_site_id:
+                print 'solar edge PULLING'
                 se = SolarEdgeApi(energy_account)
                 se_energy = json.loads(
                     se.site_energy_measurements(

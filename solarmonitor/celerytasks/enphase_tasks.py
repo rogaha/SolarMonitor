@@ -27,7 +27,7 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
         energy_account = EnergyAccount.query.filter_by(id=energy_account_id).first()
         enphase = EnphaseApi(energy_account)
         json_data = json.loads(enphase.energy_lifetime(start_date, end_date).text)
-        
+
         """Debug printing statements so we can see what data is returned"""
         print 'ENPHASE DATA:'
         print json_data
@@ -44,6 +44,12 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
 
         start_date = datetime.datetime.strptime(json_data['start_date'], ('%Y-%m-%d'))
 
+        data_received = {
+            'start_date': '',
+            'end_date': '',
+            'data': []
+        }
+
         for index, each in enumerate(json_data['production']):
 
             solar_end_date = start_date + timedelta(days=index)
@@ -55,17 +61,19 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
             usage_point.date = start_date + timedelta(days=index)
             usage_point.value = each
 
-            duplicate_check = SolarEdgeUsagePoint.query.filter(
-                (SolarEdgeUsagePoint.date==usage_point.date)&
-                (SolarEdgeUsagePoint.energy_account_id==energy_account_id)
-                ).first()
+            data_received['data'].append(usage_point)
 
-            if duplicate_check:
-                duplicate_check.value = usage_point.value
-                db.session.commit()
-            else:
-                db.session.add(usage_point)
-                db.session.commit()
+        SolarEdgeUsagePoint.query.filter(
+            (SolarEdgeUsagePoint.interval_start >= start_date) &
+            (SolarEdgeUsagePoint.interval_start <= end_date) &
+            (SolarEdgeUsagePoint.energy_account_id == energy_account.id)
+        ).delete()
+        db.session.commit()
+
+        for usage in data_received['data']:
+            db.session.add(usage)
+
+        db.session.commit()
 
         if energy_account.solar_last_date:
             if energy_account.solar_last_date < solar_end_date:
