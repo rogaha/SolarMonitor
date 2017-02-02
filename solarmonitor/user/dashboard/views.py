@@ -151,7 +151,11 @@ def pull_ytd(pull_type=None):
     if pull_type == 'solar':
         return redirect(url_for('dashboard.solar_edge'))
 
-    energy_account = current_user.energy_accounts[0]
+    if session.get('select_user', None):
+        user = User.query.filter_by(id=session['select_user']).first()
+        energy_account = user.energy_accounts[0]
+    else:
+        energy_account = current_user.energy_accounts[0]
 
     end_date = datetime.now() if energy_account.pge_last_date is None else energy_account.pge_last_date
     start_date = datetime(year=datetime.now().year, month=1, day=1)
