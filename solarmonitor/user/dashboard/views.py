@@ -17,7 +17,7 @@ from solarmonitor.user.models import User, PGEUsagePoint, CeleryTask, SolarEdgeU
 from solarmonitor.user.dashboard.forms import EventAddForm
 from solarmonitor.public.forms import DateSelectForm, DownloadDataForm
 from solarmonitor.extensions import db
-from solarmonitor.utils import try_parsing_date, pull_chunks
+from solarmonitor.utils import try_parsing_date, pull_chunks, pull_solar_chunks
 import requests
 import json
 
@@ -152,9 +152,6 @@ def hide_solar_nag():
 @blueprint.route('/pull-ytd/<pull_type>', methods=['GET', 'POST'])
 @login_required
 def pull_ytd(pull_type=None):
-    if pull_type == 'solar':
-        return redirect(url_for('dashboard.solar_edge'))
-
     if session.get('select_user', None):
         user = User.query.filter_by(id=session['select_user']).first()
         energy_account = user.energy_accounts[0]
@@ -163,6 +160,10 @@ def pull_ytd(pull_type=None):
 
     end_date = datetime.now() if energy_account.pge_last_date is None else energy_account.pge_last_date
     start_date = datetime(year=datetime.now().year, month=1, day=1)
+
+    if pull_type == 'solar':
+        pull_solar_chunks(start_date, end_date, current_user)
+        return redirect(url_for('dashboard.solar_edge'))
 
     pull_chunks(start_date, end_date, current_user)
 
@@ -461,41 +462,7 @@ def solar_edge(modify=None):
             flash('Date entered, not in correct format.', 'info')
             return redirect(url_for('dashboard.solar_edge'))
 
-        if energy_account.enphase_user_id and energy_account.enphase_system_id:
-            task = process_enphase_data.delay(energy_account.id, start_date_se, end_date_se)
-            flash('Processing Enphase Data', 'info')
-            return redirect(url_for('dashboard.solar_edge'))
-
-        se = SolarEdgeApi(energy_account)
-
-        if 'data_time_unit_se' in session:
-            time_unit = 'DAY' if session['data_time_unit_se'] == 'Daily' else 'HOUR'
-            se_data = se.site_energy_measurements(
-                start_date_se.strftime('%Y-%m-%d'),
-                end_date_se.strftime('%Y-%m-%d'),
-                energy_account.solar_edge_site_id,
-                time_unit
-            ).text
-            try:
-                se_energy = json.loads(se_data)
-                """Send the data returned by the API to celery for async processing."""
-                task = process_se_data.delay(se_energy, energy_account.id)
-            except:
-                flash('API access is not enabled for your account', 'info')
-                print se_data
-        else:
-            se_data = se.site_energy_measurements(
-                start_date_se.strftime('%Y-%m-%d'),
-                end_date_se.strftime('%Y-%m-%d'),
-                energy_account.solar_edge_site_id
-            ).text
-            try:
-                se_energy = json.loads(se_data)
-                """Send the data returned by the API to celery for async processing."""
-                task = process_se_data.delay(se_energy, energy_account.id)
-            except:
-                flash('An error occurred', 'info')
-                print se_data
+        pull_solar_chunks(start_date_se, end_date_se, current_user)
 
         return redirect(url_for('dashboard.solar_edge'))
 

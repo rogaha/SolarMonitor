@@ -7,6 +7,7 @@ from flask import flash, g, request, redirect, url_for, abort
 
 from celery import Celery
 from solarmonitor.settings import ProdConfig
+from solarmonitor.solaredge.se_api import SolarEdgeApi
 
 from datetime import datetime
 from datetime import datetime, timedelta, date
@@ -16,6 +17,38 @@ from calendar import monthrange
 celery = Celery(__name__, broker=ProdConfig.CELERY_BROKER_URL,
                 backend=ProdConfig.CELERY_RESULT_BACKEND,
                 redis_max_connections=ProdConfig.CELERY_REDIS_MAX_CONNECTIONS)
+
+
+def pull_solar_chunks(start_date_object, end_date_object, user):
+    from solarmonitor.celerytasks.se_tasks import process_se_data
+    from solarmonitor.celerytasks.enphase_tasks import process_enphase_data
+    for energy_account in user.energy_accounts:
+        days_of_data_needed = (end_date_object - start_date_object).days
+
+        while days_of_data_needed:
+            days_to_pull = 30 if days_of_data_needed >= 30 else days_of_data_needed
+            print days_of_data_needed
+            print 'start date', start_date_object
+            print 'end date', (start_date_object + timedelta(days=days_to_pull))
+
+            if energy_account.enphase_user_id and energy_account.enphase_system_id:
+                process_enphase_data.delay(energy_account.id, start_date_object, (start_date_object + timedelta(days=days_to_pull)))
+
+            if energy_account.solar_edge_site_id:
+                se = SolarEdgeApi(energy_account)
+                se_energy = json.loads(
+                    se.site_energy_measurements(
+                        start_date_object.strftime('%Y-%m-%d'),
+                        (start_date_object + timedelta(days=days_to_pull)).strftime('%Y-%m-%d'),
+                        energy_account.solar_edge_site_id,
+                        'DAY'
+                    ).text
+                )
+                task = process_se_data.delay(se_energy, energy_account.id)
+
+            """Cleanup and prepare for next loop"""
+            start_date_object = (start_date_object + timedelta(days=days_to_pull))
+            days_of_data_needed -= days_to_pull
 
 
 def pull_chunks(start_date_object, end_date_object, user):
