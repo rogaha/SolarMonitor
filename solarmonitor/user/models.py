@@ -193,6 +193,22 @@ class EnergyAccount(db.Model):
         labels = [x[1] for x in net_usage_year1]
         return zip(y1_data, y2_data, labels)
 
+    def comparison_graph_solar(self, start_date=seven_days_ago, end_date=today):
+        """This graph accepts a date range and outputs a line chart with
+        the combined incoming/outgoing energy usage for the date and range
+        in addition to the same graph for the date range exactly one year prior."""
+        net_usage_year1 = self.solar_edge_production_graph(start_date, end_date)
+        net_usage_year2 = self.solar_edge_production_graph((start_date - relativedelta(years=1)),
+                                                           (end_date - relativedelta(years=1)))
+        print net_usage_year1, net_usage_year2
+        if not net_usage_year2:
+            net_usage_year2 = [(0, 'fake_label') for x in range(len(net_usage_year1))]
+        y1_data = [x[0] for x in net_usage_year1]
+        y2_data = [x[0] for x in net_usage_year2]
+        labels = [x[1] for x in net_usage_year1]
+        print zip(y1_data, y2_data, labels)
+        return zip(y1_data, y2_data, labels)
+
     def production_net_usage_graph(self, start_date=seven_days_ago, end_date=today):
         """Solar Edge production vs Combined PGE data"""
         production = self.solar_edge_production_graph(start_date, end_date)
@@ -308,7 +324,14 @@ class EnergyAccount(db.Model):
         }
 
     def serialize_charts(self, chart, start_date=seven_days_ago, end_date=today, date_format='%m/%d', separate=False, financial=False):
-        if chart == 'comparison_graph':
+        if chart == 'comparison_graph_solar':
+            comparison_graph_solar = self.comparison_graph_solar(start_date, end_date)
+            return {
+                'y1_data': [convert_to_kWh(y1_data) for y1_data, y2_data, labels in comparison_graph_solar],
+                'y2_data': [convert_to_kWh(y2_data) for y1_data, y2_data, labels in comparison_graph_solar],
+                'labels': [labels.strftime(date_format) for y1_data, y2_data, labels in comparison_graph_solar]
+            }
+        elif chart == 'comparison_graph':
             comparison_graph = self.comparison_graph(start_date, end_date)
             return {
                 'y1_data': [convert_to_kWh(y1_data) for y1_data, y2_data, labels in comparison_graph],

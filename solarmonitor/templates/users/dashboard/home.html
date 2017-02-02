@@ -213,6 +213,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + customStart + "/
           twoYearChart.update();
           $.LoadingOverlay("hide");
 
+          twoYearSolarChart.data.datasets[0].data = data.comparison_graph_solar.y1_data;
+          twoYearSolarChart.data.datasets[1].data = data.comparison_graph_solar.y2_data;
+          twoYearSolarChart.data.labels = data.comparison_graph_solar.labels;
+          twoYearSolarChart.update();
+          $.LoadingOverlay("hide");
+
           myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
           myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
           myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
@@ -255,6 +261,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + moment().startOf
           twoYearChart.update();
           $.LoadingOverlay("hide");
 
+          twoYearSolarChart.data.datasets[0].data = data.comparison_graph_solar.y1_data;
+          twoYearSolarChart.data.datasets[1].data = data.comparison_graph_solar.y2_data;
+          twoYearSolarChart.data.labels = data.comparison_graph_solar.labels;
+          twoYearSolarChart.update();
+          $.LoadingOverlay("hide");
+
           myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
           myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
           myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
@@ -288,6 +300,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
           twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
           twoYearChart.data.labels = data.comparison_graph.labels;
           twoYearChart.update();
+          $.LoadingOverlay("hide");
+
+          twoYearSolarChart.data.datasets[0].data = data.comparison_graph_solar.y1_data;
+          twoYearSolarChart.data.datasets[1].data = data.comparison_graph_solar.y2_data;
+          twoYearSolarChart.data.labels = data.comparison_graph_solar.labels;
+          twoYearSolarChart.update();
           $.LoadingOverlay("hide");
 
           myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
@@ -326,6 +344,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
           twoYearChart.update();
           $.LoadingOverlay("hide");
 
+          twoYearSolarChart.data.datasets[0].data = data.comparison_graph_solar.y1_data;
+          twoYearSolarChart.data.datasets[1].data = data.comparison_graph_solar.y2_data;
+          twoYearSolarChart.data.labels = data.comparison_graph_solar.labels;
+          twoYearSolarChart.update();
+          $.LoadingOverlay("hide");
+
           myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
           myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
           myChart3.data.datasets[2].data = data.net_usage_separated.net_usage_negative;
@@ -358,6 +382,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
             twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
             twoYearChart.data.labels = data.comparison_graph.labels;
             twoYearChart.update();
+            $.LoadingOverlay("hide");
+
+            twoYearSolarChart.data.datasets[0].data = data.comparison_graph_solar.y1_data;
+            twoYearSolarChart.data.datasets[1].data = data.comparison_graph_solar.y2_data;
+            twoYearSolarChart.data.labels = data.comparison_graph_solar.labels;
+            twoYearSolarChart.update();
             $.LoadingOverlay("hide");
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
@@ -395,6 +425,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
             twoYearChart.update();
             $.LoadingOverlay("hide");
 
+            twoYearSolarChart.data.datasets[0].data = data.comparison_graph_solar.y1_data;
+            twoYearSolarChart.data.datasets[1].data = data.comparison_graph_solar.y2_data;
+            twoYearSolarChart.data.labels = data.comparison_graph_solar.labels;
+            twoYearSolarChart.update();
+            $.LoadingOverlay("hide");
+
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
             myChart3.data.datasets[1].data = data.net_usage_separated.net_usage_positive;
@@ -428,6 +464,12 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
             twoYearChart.data.datasets[1].data = data.comparison_graph.y2_data;
             twoYearChart.data.labels = data.comparison_graph.labels;
             twoYearChart.update();
+            $.LoadingOverlay("hide");
+
+            twoYearSolarChart.data.datasets[0].data = data.comparison_graph_solar.y1_data;
+            twoYearSolarChart.data.datasets[1].data = data.comparison_graph_solar.y2_data;
+            twoYearSolarChart.data.labels = data.comparison_graph_solar.labels;
+            twoYearSolarChart.update();
             $.LoadingOverlay("hide");
 
             myChart3.data.datasets[0].data = data.production_net_usage_graph.production;
@@ -467,6 +509,10 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
             <canvas id="twoyear" width="380" height="200"></canvas>
         </div>
 
+        <div class="col col-xs-6">
+            <canvas id="twoyear_solar" width="380" height="200"></canvas>
+        </div>
+
     </div>
     </div>
 
@@ -474,6 +520,51 @@ var url = "/users/dashboard/graph/update/" + account_id + "/" + thirtyDaysAgo + 
 
 
 <script>
+
+var dataTwoYearSolar = {
+labels: {{ comparison_graph_solar['labels']|safe }},
+datasets: [
+    {
+        type: 'line',
+        label: 'Current Year',
+        backgroundColor: "rgba(43,83,207,0.2)",
+        borderColor: "rgba(25,60,168,1)",
+        borderWidth: 1,
+        hoverBackgroundColor: "rgba(43,83,207,0.4)",
+        hoverBorderColor: "rgba(25,60,168,1)",
+        data: {{ comparison_graph_solar['y1_data']|safe }},
+    },
+    {
+        type: 'line',
+        label: 'Previous Year',
+        backgroundColor: "rgba(168,25,25,0.2)",
+        borderColor: "rgba(138,16,16,1)",
+        borderWidth: 1,
+        hoverBackgroundColor: "rgba(168,25,25,0.4)",
+        hoverBorderColor: "rgba(138,16,16,1)",
+        data: {{ comparison_graph_solar['y2_data']|safe }},
+    }
+]
+};
+console.log(dataTwoYearSolar)
+var twoYearSolarChartCtx = document.getElementById("twoyear_solar");
+var twoYearSolarChart = new Chart(twoYearSolarChartCtx, {
+  type: 'line',
+  data: dataTwoYearSolar,
+  options: {
+      scales: {
+          yAxes: [{
+              stacked: false,
+              ticks: {
+                  beginAtZero:true
+              }
+          }],
+          xAxes: [{
+              stacked: true
+          }]
+      }
+  }
+});
 
 var dataTwoYear = {
 labels: {{ comparison_graph['labels']|safe }},

@@ -60,6 +60,9 @@ def home(modify=None, id=None):
 
     comparison_graph = current_user.energy_accounts[0].serialize_charts('comparison_graph', start_date, end_date)
 
+    comparison_graph_solar = current_user.energy_accounts[0].serialize_charts('comparison_graph_solar', start_date, end_date)
+
+    print comparison_graph_solar
     if cumulative:
         financial_cumulative = [int(float(x) * 0.23627) for x in cumulative['net_usage']]
         financial_min = round(financial_cumulative[0] * 2, -1) / 2
@@ -104,6 +107,7 @@ def home(modify=None, id=None):
                            prod_net_usg=prod_net_usg,
                            prod_comb=prod_comb,
                            comparison_graph=comparison_graph,
+                           comparison_graph_solar=comparison_graph_solar,
                            financial=financial,
                            financial_min=financial_min,
                            financial_max=financial_max,
@@ -225,7 +229,8 @@ def graph_update(account_id=None, start_date=None, end_date=None):
         'production_net_usage_graph': energy_account.serialize_charts('production_net_usage_graph', s_date, e_date),
         'net_usage_separated': energy_account.serialize_charts('pge_incoming_outgoing_combined_graph', s_date, e_date, separate=True),
         'cumulative': energy_account.serialize_charts('cumulative_usage_graph', s_date, e_date),
-        'comparison_graph': energy_account.serialize_charts('comparison_graph', s_date, e_date)
+        'comparison_graph': energy_account.serialize_charts('comparison_graph', s_date, e_date),
+        'comparison_graph_solar': energy_account.serialize_charts('comparison_graph_solar', s_date, e_date)
     }
 
     return jsonify(result)
