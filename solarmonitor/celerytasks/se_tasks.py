@@ -45,8 +45,8 @@ def process_se_data(self, json_data, energy_account_id):
             data_received['data'].append(usage_point)
 
         SolarEdgeUsagePoint.query.filter(
-            (SolarEdgeUsagePoint.interval_start >= start_date) &
-            (SolarEdgeUsagePoint.interval_start <= end_date) &
+            (SolarEdgeUsagePoint.date >= start_date) &
+            (SolarEdgeUsagePoint.date <= end_date) &
             (SolarEdgeUsagePoint.energy_account_id == energy_account_id)
         ).delete()
         db.session.commit()

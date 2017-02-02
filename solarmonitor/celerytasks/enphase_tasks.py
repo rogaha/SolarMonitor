@@ -64,8 +64,8 @@ def process_enphase_data(self, energy_account_id, start_date, end_date):
             data_received['data'].append(usage_point)
 
         SolarEdgeUsagePoint.query.filter(
-            (SolarEdgeUsagePoint.interval_start >= start_date) &
-            (SolarEdgeUsagePoint.interval_start <= end_date) &
+            (SolarEdgeUsagePoint.date >= start_date) &
+            (SolarEdgeUsagePoint.date <= end_date) &
             (SolarEdgeUsagePoint.energy_account_id == energy_account.id)
         ).delete()
         db.session.commit()
